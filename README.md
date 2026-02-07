@@ -53,7 +53,7 @@ If you add non-Steam games to your Steam library manually or through the [Heroic
 
 ### Detail
 
-<img alt="Detail" src="https://github.com/user-attachments/assets/a4372154-cfea-4e73-ab7b-f7600f8ab379" />
+<img alt="Details" src="https://github.com/user-attachments/assets/4a658bd2-3f34-4f86-b011-54d93d2d1e10" />
 
 ### Library Collection
 
