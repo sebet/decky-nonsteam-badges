@@ -1,0 +1,31 @@
+<svg width="84" height="60" viewBox="34 34 84 60" xmlns="http://www.w3.org/2000/svg">
+  <!-- Steam-like core -->
+  <circle
+    cx="64"
+    cy="64"
+    r="26"
+    fill="none"
+    stroke="#1b2838"
+    stroke-width="8"/>
+  <circle cx="64" cy="64" r="10" fill="#1b2838"/>
+
+  <!-- Plug connector -->
+  <path
+    d="M80 64 L88 64"
+    stroke="#1b2838"
+    stroke-width="6"
+    stroke-linecap="round"/>
+
+  <!-- Plug body -->
+  <rect
+    x="88"
+    y="54"
+    width="22"
+    height="20"
+    rx="4"
+    fill="#1b2838"/>
+
+  <!-- Plug prongs -->
+  <line x1="110" y1="58" x2="118" y2="58" stroke="#1b2838" stroke-width="3"/>
+  <line x1="110" y1="70" x2="118" y2="70" stroke="#1b2838" stroke-width="3"/>
+</svg>

@@ -1,0 +1,35 @@
+.container {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+}
+
+button.steamStoreButton {
+  padding: 8px !important;
+  min-width: auto !important;
+  color: #000 !important;
+  background: #1b2838 !important;
+  animation: nonsteam-badge-fade-in 0.3s cubic-bezier(0.2, 0, 0.2, 1) forwards;
+}
+
+button.steamStoreButton:hover,
+button.steamStoreButton:focus,
+button.steamStoreButton:active {
+  background: #4b6479 !important;
+  outline: 1px solid black !important;
+}
+
+.steamStoreButton svg {
+  color: #fff;
+}
+
+@keyframes nonsteam-badge-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

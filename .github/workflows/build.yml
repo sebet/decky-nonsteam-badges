@@ -1,0 +1,65 @@
+name: Build and Release Non-steam Badges
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "18.3"
+          cache: "pnpm"
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run build
+
+      - name: Package
+        run: |
+          PKG=decky-nonsteam-badges
+          mkdir -p "$PKG/dist"
+          cp README.md LICENSE plugin.json package.json main.py "$PKG/"
+          cp -r py_modules "$PKG/"
+          cp dist/index.js "$PKG/dist/"
+          echo "Package contents:"
+          ls -R "$PKG"
+
+      - name: Upload package
+        uses: actions/upload-artifact@v4
+        with:
+          name: decky-nonsteam-badges
+          path: decky-nonsteam-badges
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: decky-nonsteam-badges
+          path: decky-nonsteam-badges
+
+      - name: Zip/Tar release
+        run: |
+          zip -r decky-nonsteam-badges.zip decky-nonsteam-badges
+          tar -czvf decky-nonsteam-badges.tar.gz decky-nonsteam-badges
+
+      - name: Create a release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "decky-nonsteam-badges.zip,decky-nonsteam-badges.tar.gz"
+          allowUpdates: true

@@ -1,0 +1,19 @@
+{
+  "css.validate": false,
+  "editor.codeActionsOnSave": [
+    "source.removeUnusedImports",
+    "source.addMissingImports",
+    "source.fixAll"
+  ],
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.detectIndentation": false,
+  "editor.formatOnSave": true,
+  "editor.tabSize": 2,
+  "eslint.workingDirectories": [{ "mode": "auto" }],
+  "search.exclude": { "pnpm-lock.yaml": true },
+  "typescript.preferences.importModuleSpecifier": "non-relative",
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "[css]": {
+    "editor.tabSize": 2
+  }
+}
