@@ -7,14 +7,15 @@
   color: white;
   pointer-events: none;
   animation: nonsteam-badge-fade-in 0.3s cubic-bezier(0.2, 0, 0.2, 1) forwards;
+  background: #0000002e;
+  z-index: 9999;
 }
 
 .detailsBadge {
   z-index: 0;
   box-sizing: border-box;
   padding: 5px;
-  background: #0000002e;
-  border-radius: 12px;
+  padding-bottom: 0;
 }
 
 .detailsBadgeWithButton {
@@ -22,45 +23,34 @@
   height: auto;
 }
 
+.detailsBadgeWithButton :global(svg.icon-badge) {
+  width: 48px;
+  height: 48px;
+}
+
 .libraryBadge {
-  width: 28px;
-  height: 28px;
-  z-index: 9999;
   padding: 2px;
-  background: #0000002e;
   border-radius: 2px;
 }
 
-.searchBadge {
-  width: 24px;
-  height: 24px;
-  z-index: 9999;
+.libraryBadge :global(svg.icon-badge) {
+  width: 28px;
+  height: 28px;
 }
 
-@keyframes nonsteam-badge-pulse {
-  0% {
-    transform: scale(0.9);
-    opacity: 0.4;
-  }
-  50% {
-    transform: scale(1.1);
-    opacity: 0.8;
-  }
-  100% {
-    transform: scale(0.9);
-    opacity: 0.4;
-  }
+.homeBadge {
+  padding: 2px;
+  border-radius: 2px;
 }
 
-@keyframes nonsteam-badge-fade-in {
-  from {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+.homeBadge :global(svg.icon-badge) {
+  width: 32px;
+  height: 32px;
+}
+
+.searchBadge :global(svg.icon-badge) {
+  width: 28px;
+  height: 28px;
 }
 
 .nonsteam-badge-pulsing {
@@ -87,10 +77,6 @@
   right: 4px;
 }
 
-.detailsBadge.details-top-left {
-  padding-bottom: 0;
-}
-
 .details-top-left {
   flex-direction: row;
   gap: 5px;
@@ -98,12 +84,49 @@
   left: 20px;
 }
 
+.details-top-left :global(svg.icon-badge) {
+  width: 42px;
+  height: 42px;
+}
+
+.detailsBadgeWithButton.details-top-left :global(svg.icon-badge) {
+  width: 32px;
+  height: 32px;
+}
+
 .details-top-right {
-  top: 50px;
+  top: 55px;
   right: 20px;
+  align-items: center;
 }
 
 .search-top-right {
   top: 10px;
   right: 5px;
+}
+
+@keyframes nonsteam-badge-pulse {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(0.9);
+    opacity: 0.4;
+  }
+}
+
+@keyframes nonsteam-badge-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }

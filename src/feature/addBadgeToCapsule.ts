@@ -128,7 +128,9 @@ export function addBadgeToCapsule(
       );
     } else {
       allStyles.push(
-        styles.libraryBadge,
+        effectiveContext === GameStoreContext.HOME
+          ? styles.homeBadge
+          : styles.libraryBadge,
         effectiveContext === GameStoreContext.HOME
           ? styles[settings.homePosition]
           : styles[settings.libraryPosition],
