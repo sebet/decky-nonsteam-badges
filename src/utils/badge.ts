@@ -1,4 +1,6 @@
+import { BadgePosition } from "src/types/settings";
 import { GameStoreName, GameStoreContext } from "src/types/store";
+import { log } from "src/utils/logger";
 
 export const PULSATING_CLASSNAME = "nonsteam-badge-pulsing";
 
@@ -21,6 +23,7 @@ function getBadgeStyle(
   gameStore: GameStoreName,
   prop: GameStoreProp,
   context: GameStoreContext,
+  position?: BadgePosition,
 ): string {
   const sizes: Record<string, { width: number; height: number }> = {
     library: {
@@ -28,8 +31,12 @@ function getBadgeStyle(
       height: 28,
     },
     details: {
-      width: 64,
-      height: 64,
+      width: 48,
+      height: 48,
+    },
+    detailsTopLeft: {
+      width: 32,
+      height: 32,
     },
     home: {
       width: 32,
@@ -41,8 +48,20 @@ function getBadgeStyle(
     },
   };
 
-  const width = sizes[context]?.width || 28;
-  const height = sizes[context]?.height || 28;
+  const currentContext =
+    position &&
+    context === GameStoreContext.DETAILS &&
+    position === BadgePosition.TOP_LEFT
+      ? "detailsTopLeft"
+      : context;
+
+  const width = sizes[currentContext]?.width || 28;
+  const height = sizes[currentContext]?.height || 28;
+
+  log(
+    "getBadgeStyle",
+    `context: ${context}, position: ${position}, width: ${width}, height: ${height}`,
+  );
 
   const badgeStyles = {
     gog: {
@@ -76,6 +95,11 @@ function getBadgeStyle(
 export function getBadgeIcon(
   gameStore: GameStoreName,
   context: GameStoreContext,
+  position?: BadgePosition,
 ): string {
-  return getBadgeStyle(gameStore, GameStoreProp.ICON, context);
+  log(
+    "getBadgeIcon",
+    `gameStore: ${gameStore}, context: ${context}, position: ${position}`,
+  );
+  return getBadgeStyle(gameStore, GameStoreProp.ICON, context, position);
 }

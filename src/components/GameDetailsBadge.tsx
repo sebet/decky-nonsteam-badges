@@ -90,7 +90,11 @@ export default function GameDetailsBadge(): ReactElement | null {
 
   const badge = loading
     ? getBadgeIcon(GameStoreName.DEFAULT, GameStoreContext.DETAILS)
-    : getBadgeIcon(gameStoreName, GameStoreContext.DETAILS);
+    : getBadgeIcon(
+        gameStoreName,
+        GameStoreContext.DETAILS,
+        settings.detailsPosition,
+      );
 
   if (loading) log(context, `Badge is loading`);
 

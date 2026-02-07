@@ -27,7 +27,7 @@ export interface PluginSettings {
 export const DEFAULT_SETTINGS: PluginSettings = {
   homePosition: BadgePosition.BOTTOM_RIGHT,
   libraryPosition: BadgePosition.BOTTOM_RIGHT,
-  detailsPosition: BadgePosition.TOP_LEFT,
+  detailsPosition: BadgePosition.TOP_RIGHT,
   addBadgesToAllNonSteamGames: true,
   showSteamStoreButton: true,
 };

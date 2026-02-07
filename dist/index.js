@@ -69,7 +69,7 @@ function removeStyleFromWindow(targetWindow) {
     }
 }
 
-var css_248z$1 = ".Badge-module_badge__MUvUi {\n  position: absolute;\n  display: flex;\n  border-radius: 5px;\n  backdrop-filter: blur(10px);\n  -webkit-backdrop-filter: blur(10px);\n  color: white;\n  pointer-events: none;\n  animation: Badge-module_nonsteam-badge-fade-in__0qQdz 0.3s cubic-bezier(0.2, 0, 0.2, 1) forwards;\n}\n\n.Badge-module_detailsBadge__ycul2 {\n  z-index: 0;\n  box-sizing: border-box;\n  padding: 5px;\n  background: #0000002e;\n  border-radius: 12px;\n  height: 74px;\n}\n\n.Badge-module_detailsBadgeWithButton__YG9ZN {\n  flex-direction: column;\n  height: auto;\n}\n\n.Badge-module_libraryBadge__nvyI6 {\n  width: 28px;\n  height: 28px;\n  z-index: 9999;\n  padding: 2px;\n  background: #0000002e;\n  border-radius: 2px;\n}\n\n.Badge-module_searchBadge__V2InQ {\n  width: 24px;\n  height: 24px;\n  z-index: 9999;\n}\n\n@keyframes Badge-module_nonsteam-badge-pulse__ux3h3 {\n  0% {\n    transform: scale(0.9);\n    opacity: 0.4;\n  }\n  50% {\n    transform: scale(1.1);\n    opacity: 0.8;\n  }\n  100% {\n    transform: scale(0.9);\n    opacity: 0.4;\n  }\n}\n\n@keyframes Badge-module_nonsteam-badge-fade-in__0qQdz {\n  from {\n    opacity: 0;\n    transform: scale(0.8);\n  }\n  to {\n    opacity: 1;\n    transform: scale(1);\n  }\n}\n\n.Badge-module_nonsteam-badge-pulsing__k7UJv {\n  animation: Badge-module_nonsteam-badge-pulse__ux3h3 2s infinite ease-in-out;\n}\n\n.Badge-module_top-left__vhIBr {\n  top: 4px;\n  left: 4px;\n}\n\n.Badge-module_top-right__k9tm2 {\n  top: 4px;\n  right: 4px;\n}\n\n.Badge-module_bottom-left__B0MGj {\n  bottom: 4px;\n  left: 4px;\n}\n\n.Badge-module_bottom-right__wK-WR {\n  bottom: 4px;\n  right: 4px;\n}\n\n.Badge-module_details-top-left__9FED9 {\n  top: 40px;\n  left: 42px;\n}\n\n.Badge-module_details-top-right__GADVk {\n  top: 100px;\n  right: 20px;\n}\n\n.Badge-module_search-top-right__V3fHe {\n  top: 10px;\n  right: 5px;\n}\n";
+var css_248z$1 = ".Badge-module_badge__MUvUi {\n  position: absolute;\n  display: flex;\n  border-radius: 5px;\n  backdrop-filter: blur(10px);\n  -webkit-backdrop-filter: blur(10px);\n  color: white;\n  pointer-events: none;\n  animation: Badge-module_nonsteam-badge-fade-in__0qQdz 0.3s cubic-bezier(0.2, 0, 0.2, 1) forwards;\n}\n\n.Badge-module_detailsBadge__ycul2 {\n  z-index: 0;\n  box-sizing: border-box;\n  padding: 5px;\n  background: #0000002e;\n  border-radius: 12px;\n}\n\n.Badge-module_detailsBadgeWithButton__YG9ZN {\n  flex-direction: column;\n  height: auto;\n}\n\n.Badge-module_libraryBadge__nvyI6 {\n  width: 28px;\n  height: 28px;\n  z-index: 9999;\n  padding: 2px;\n  background: #0000002e;\n  border-radius: 2px;\n}\n\n.Badge-module_searchBadge__V2InQ {\n  width: 24px;\n  height: 24px;\n  z-index: 9999;\n}\n\n@keyframes Badge-module_nonsteam-badge-pulse__ux3h3 {\n  0% {\n    transform: scale(0.9);\n    opacity: 0.4;\n  }\n  50% {\n    transform: scale(1.1);\n    opacity: 0.8;\n  }\n  100% {\n    transform: scale(0.9);\n    opacity: 0.4;\n  }\n}\n\n@keyframes Badge-module_nonsteam-badge-fade-in__0qQdz {\n  from {\n    opacity: 0;\n    transform: scale(0.8);\n  }\n  to {\n    opacity: 1;\n    transform: scale(1);\n  }\n}\n\n.Badge-module_nonsteam-badge-pulsing__k7UJv {\n  animation: Badge-module_nonsteam-badge-pulse__ux3h3 2s infinite ease-in-out;\n}\n\n.Badge-module_top-left__vhIBr {\n  top: 4px;\n  left: 4px;\n}\n\n.Badge-module_top-right__k9tm2 {\n  top: 4px;\n  right: 4px;\n}\n\n.Badge-module_bottom-left__B0MGj {\n  bottom: 4px;\n  left: 4px;\n}\n\n.Badge-module_bottom-right__wK-WR {\n  bottom: 4px;\n  right: 4px;\n}\n\n.Badge-module_detailsBadge__ycul2.Badge-module_details-top-left__9FED9 {\n  padding-bottom: 0;\n}\n\n.Badge-module_details-top-left__9FED9 {\n  flex-direction: row;\n  gap: 5px;\n  top: 45px;\n  left: 20px;\n}\n\n.Badge-module_details-top-right__GADVk {\n  top: 50px;\n  right: 20px;\n}\n\n.Badge-module_search-top-right__V3fHe {\n  top: 10px;\n  right: 5px;\n}\n";
 var styles$1 = {"badge":"Badge-module_badge__MUvUi","nonsteam-badge-fade-in":"Badge-module_nonsteam-badge-fade-in__0qQdz","detailsBadge":"Badge-module_detailsBadge__ycul2","detailsBadgeWithButton":"Badge-module_detailsBadgeWithButton__YG9ZN","libraryBadge":"Badge-module_libraryBadge__nvyI6","searchBadge":"Badge-module_searchBadge__V2InQ","nonsteam-badge-pulsing":"Badge-module_nonsteam-badge-pulsing__k7UJv","nonsteam-badge-pulse":"Badge-module_nonsteam-badge-pulse__ux3h3","top-left":"Badge-module_top-left__vhIBr","top-right":"Badge-module_top-right__k9tm2","bottom-left":"Badge-module_bottom-left__B0MGj","bottom-right":"Badge-module_bottom-right__wK-WR","details-top-left":"Badge-module_details-top-left__9FED9","details-top-right":"Badge-module_details-top-right__GADVk","search-top-right":"Badge-module_search-top-right__V3fHe"};
 injectStyle(css_248z$1);
 
@@ -133,7 +133,7 @@ var BadgePosition;
 const DEFAULT_SETTINGS = {
     homePosition: BadgePosition.BOTTOM_RIGHT,
     libraryPosition: BadgePosition.BOTTOM_RIGHT,
-    detailsPosition: BadgePosition.TOP_LEFT,
+    detailsPosition: BadgePosition.TOP_RIGHT,
     addBadgesToAllNonSteamGames: true,
     showSteamStoreButton: true,
 };
@@ -299,15 +299,19 @@ var GameStoreProp;
 /**
  * Get the badge styles for each context.
  */
-function getBadgeStyle(gameStore, prop, context) {
+function getBadgeStyle(gameStore, prop, context, position) {
     const sizes = {
         library: {
             width: 28,
             height: 28,
         },
         details: {
-            width: 64,
-            height: 64,
+            width: 48,
+            height: 48,
+        },
+        detailsTopLeft: {
+            width: 32,
+            height: 32,
         },
         home: {
             width: 32,
@@ -318,8 +322,14 @@ function getBadgeStyle(gameStore, prop, context) {
             height: 24,
         },
     };
-    const width = sizes[context]?.width || 28;
-    const height = sizes[context]?.height || 28;
+    const currentContext = position &&
+        context === GameStoreContext.DETAILS &&
+        position === BadgePosition.TOP_LEFT
+        ? "detailsTopLeft"
+        : context;
+    const width = sizes[currentContext]?.width || 28;
+    const height = sizes[currentContext]?.height || 28;
+    log("getBadgeStyle", `context: ${context}, position: ${position}, width: ${width}, height: ${height}`);
     const badgeStyles = {
         gog: {
             name: "GOG",
@@ -345,8 +355,9 @@ function getBadgeStyle(gameStore, prop, context) {
     return (badgeStyles?.[gameStore]?.[prop] ||
         badgeStyles?.[GameStoreName.DEFAULT]?.[prop]);
 }
-function getBadgeIcon(gameStore, context) {
-    return getBadgeStyle(gameStore, GameStoreProp.ICON, context);
+function getBadgeIcon(gameStore, context, position) {
+    log("getBadgeIcon", `gameStore: ${gameStore}, context: ${context}, position: ${position}`);
+    return getBadgeStyle(gameStore, GameStoreProp.ICON, context, position);
 }
 
 const BADGE_CLASSNAME = "nonsteam-badge";
@@ -684,7 +695,7 @@ function PluginIcon(props) {
 
 function r(e){var t,f,n="";if("string"==typeof e||"number"==typeof e)n+=e;else if("object"==typeof e)if(Array.isArray(e)){var o=e.length;for(t=0;t<o;t++)e[t]&&(f=r(e[t]))&&(n&&(n+=" "),n+=f);}else for(f in e)e[f]&&(n&&(n+=" "),n+=f);return n}function clsx(){for(var e,t,f=0,n="",o=arguments.length;f<o;f++)(e=arguments[f])&&(t=r(e))&&(n&&(n+=" "),n+=t);return n}
 
-var css_248z = ".SteamStoreButton-module_container__Ajz-- {\n  display: flex;\n  justify-content: center;\n  gap: 4px;\n}\n\nbutton.SteamStoreButton-module_steamStoreButton__W-gdi {\n  padding: 8px !important;\n  min-width: auto !important;\n  color: #000 !important;\n  background: #1b2838 !important;\n  animation: SteamStoreButton-module_nonsteam-badge-fade-in__giERj 0.3s cubic-bezier(0.2, 0, 0.2, 1) forwards;\n}\n\nbutton.SteamStoreButton-module_steamStoreButton__W-gdi:hover,\nbutton.SteamStoreButton-module_steamStoreButton__W-gdi:focus,\nbutton.SteamStoreButton-module_steamStoreButton__W-gdi:active {\n  background: #4b6479 !important;\n  outline: 1px solid black !important;\n}\n\n.SteamStoreButton-module_steamStoreButton__W-gdi svg {\n  color: #fff;\n}\n\n@keyframes SteamStoreButton-module_nonsteam-badge-fade-in__giERj {\n  from {\n    opacity: 0;\n    transform: scale(0.8);\n  }\n  to {\n    opacity: 1;\n    transform: scale(1);\n  }\n}\n";
+var css_248z = ".SteamStoreButton-module_container__Ajz-- {\n  display: flex;\n  justify-content: center;\n}\n\nbutton.SteamStoreButton-module_steamStoreButton__W-gdi {\n  padding: 8px !important;\n  min-width: auto !important;\n  color: #000 !important;\n  background: #1b2838 !important;\n  animation: SteamStoreButton-module_nonsteam-badge-fade-in__giERj 0.3s cubic-bezier(0.2, 0, 0.2, 1) forwards;\n}\n\nbutton.SteamStoreButton-module_steamStoreButton__W-gdi:hover,\nbutton.SteamStoreButton-module_steamStoreButton__W-gdi:focus,\nbutton.SteamStoreButton-module_steamStoreButton__W-gdi:active {\n  background: #4b6479 !important;\n  outline: 1px solid black !important;\n}\n\n.SteamStoreButton-module_steamStoreButton__W-gdi svg {\n  color: #fff;\n}\n\n@keyframes SteamStoreButton-module_nonsteam-badge-fade-in__giERj {\n  from {\n    opacity: 0;\n    transform: scale(0.8);\n  }\n  to {\n    opacity: 1;\n    transform: scale(1);\n  }\n}\n";
 var styles = {"container":"SteamStoreButton-module_container__Ajz--","steamStoreButton":"SteamStoreButton-module_steamStoreButton__W-gdi"};
 injectStyle(css_248z);
 
@@ -823,7 +834,7 @@ function GameDetailsBadge() {
     const gameStoreName = sanitizedGameStoreName(gameStore) ?? GameStoreName.DEFAULT;
     const badge = loading
         ? getBadgeIcon(GameStoreName.DEFAULT, GameStoreContext.DETAILS)
-        : getBadgeIcon(gameStoreName, GameStoreContext.DETAILS);
+        : getBadgeIcon(gameStoreName, GameStoreContext.DETAILS, settings.detailsPosition);
     if (loading)
         log(context$1, `Badge is loading`);
     log(context$1, `Badge valid: ${!!badge}`);
