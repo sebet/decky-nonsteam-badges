@@ -73,8 +73,6 @@ export function addBadgeToCapsule(
   if (!img) return;
 
   const appid = extractAppIdFromImage(img);
-  log(context, `Appid: ${appid}`);
-
   if (!appid || !isNonSteamApp(appid)) return;
 
   // Find the container to attach badge to

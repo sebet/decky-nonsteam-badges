@@ -17,7 +17,7 @@
     "steam-deck",
     "badge"
   ],
-  "author": "bruno",
+  "author": "sebet",
   "license": "BSD-3-Clause",
   "devDependencies": {
     "@decky/rollup": "^1.0.2",

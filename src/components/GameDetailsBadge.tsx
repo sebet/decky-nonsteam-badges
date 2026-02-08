@@ -1,5 +1,5 @@
 import React, { useState, useEffect, ReactElement } from "react";
-import styles from "./Badge.module.css";
+import styles from "./GameDetailsBadge.module.css";
 import clsx from "clsx";
 import { log } from "src/utils/logger";
 import useSettings from "src/hooks/useSettings";
