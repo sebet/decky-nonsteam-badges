@@ -39,7 +39,6 @@ const badgeDetailsPositions = [
 
 const Settings = () => {
   const topRef = useRef<HTMLDivElement>(null);
-
   const storedSettings = useSettings();
 
   useEffect(() => {
