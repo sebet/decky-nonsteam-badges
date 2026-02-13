@@ -48,6 +48,14 @@
   height: 32px;
 }
 
+:global(.Panel)
+  [role="listitem"]:first-of-type
+  .homeBadge
+  :global(svg.icon-badge) {
+  width: 40px;
+  height: 40px;
+}
+
 .searchBadge :global(svg.icon-badge) {
   width: 28px;
   height: 28px;

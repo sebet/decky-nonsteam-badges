@@ -1,6 +1,7 @@
 .container {
   display: flex;
   justify-content: center;
+  gap: 3px;
 }
 
 button.steamStoreButton {
