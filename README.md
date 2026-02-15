@@ -63,6 +63,10 @@ If you add non-Steam games to your Steam library manually or through the [Heroic
 
 <img alt="Non-Steam Library" src="https://github.com/user-attachments/assets/de8f34d9-39d3-49c8-a252-65bb7765ec8e" />
 
+### Settings
+
+<img alt="Settings" height="450px" src="https://github.com/user-attachments/assets/028913d2-babd-4e0a-8a99-983468cb225d" />
+
 ## Installation
 
 ### Decky Loader
