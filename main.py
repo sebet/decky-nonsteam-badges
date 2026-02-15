@@ -285,12 +285,12 @@ class Plugin:
 
             return None
 
-        # 1. Try exact/original match first
+        # Try exact/original match first
         result = fetch_and_check(game_name)
         if result:
             return result
 
-        # 2. If rejected/not found, try stripping suffixes
+        # If rejected/not found, try stripping suffixes
         separators = [" - ", " Edition", " Remaster", " Special", " Game of the Year"]
         new_name = game_name
 
