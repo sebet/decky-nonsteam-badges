@@ -8,6 +8,6 @@
   "publish": {
     "tags": ["utility", "ui", "badges", "nonsteam", "non-steam"],
     "description": "A Decky plugin that helps identifying non-Steam games using themed badges",
-    "image": "https://github.com/sebet/decky-nonsteam-badges/blob/main/assets/screenshot.jpg"
+    "image": "https://raw.githubusercontent.com/sebet/decky-nonsteam-badges/main/assets/screenshot.jpg"
   }
 }
