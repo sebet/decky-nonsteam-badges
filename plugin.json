@@ -3,7 +3,7 @@
   "name": "Non-Steam Badges",
   "author": "sebet",
   "version": "0.1.0",
-  "flags": ["_root"],
+  "flags": [],
   "api_version": 1,
   "publish": {
     "tags": ["utility", "ui", "badges", "nonsteam", "non-steam"],
