@@ -1,9 +1,15 @@
-const manifest = {"name":"Non-Steam Badges"};
+// Decky Loader will pass this api in, it's versioned to allow for backwards compatibility.
+// @ts-ignore
+
+// Prevents it from being duplicated in output.
+const manifest = {"id":"decky-nonsteam-badges","name":"Non-Steam Badges","author":"sebet","version":"0.1.0","flags":[],"api_version":1,"publish":{"tags":["utility","ui","badges","nonsteam","non-steam"],"description":"A Decky plugin that helps identifying non-Steam games using themed badges","image":"https://raw.githubusercontent.com/sebet/decky-nonsteam-badges/main/assets/screenshot.jpg"}};
 const API_VERSION = 2;
 const internalAPIConnection = window.__DECKY_SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED_deckyLoaderAPIInit;
+// Initialize
 if (!internalAPIConnection) {
     throw new Error('[@decky/api]: Failed to connect to the loader as as the loader API was not initialized. This is likely a bug in Decky Loader.');
 }
+// Version 1 throws on version mismatch so we have to account for that here.
 let api;
 try {
     api = internalAPIConnection.connect(API_VERSION, manifest.name);
@@ -15,20 +21,21 @@ catch {
 if (api._version != API_VERSION) {
     console.warn(`[@decky/api] Requested API version ${API_VERSION} but the running loader only supports version ${api._version}. Some features may not work.`);
 }
+// TODO these could use a lot of JSDoc
 const call = api.call;
 const routerHook = api.routerHook;
 const definePlugin = (fn) => {
     return (...args) => {
+        // TODO: Maybe wrap this
         return fn(...args);
     };
 };
 
 function log(context, message, level = "log") {
-    console[level](`[Non-Steam Badges][${context}] ${message}`);
+    return;
 }
 
 const PLUGIN_ID = "nonsteam-badges-decky";
-const context$6 = "styleInjector";
 let loadedCSS = "";
 function injectStyle(css) {
     if (!css)
@@ -57,7 +64,6 @@ function injectStyleIntoWindow(targetWindow) {
     style.setAttribute("data-plugin", PLUGIN_ID);
     style.innerHTML = css;
     targetWindow.document.head.appendChild(style);
-    log(context$6, "Injected styles into BigPicture window");
 }
 function removeStyleFromWindow(targetWindow) {
     if (!targetWindow || !targetWindow.document)
@@ -65,7 +71,6 @@ function removeStyleFromWindow(targetWindow) {
     const style = targetWindow.document.querySelector(`style[data-plugin="${PLUGIN_ID}"]`);
     if (style) {
         style.remove();
-        log(context$6, "Removed styles from BigPicture window");
     }
 }
 
@@ -112,7 +117,7 @@ function sanitizedGameStoreName(gameStore) {
  */
 function isNonSteamApp(appid) {
     const id = Number(appid);
-    return !isNaN(id) && (id > 2000000000 || id < -1e6);
+    return !isNaN(id) && (id > 2000000000 || id < -1000000);
 }
 
 const SETTINGS_CHANGED_EVENT = "nonsteam-badges-settings-changed";
@@ -138,7 +143,7 @@ const DEFAULT_SETTINGS = {
     showSteamStoreButton: true,
 };
 
-const context$5 = "settings";
+const context$3 = "settings";
 const SETTINGS_KEY = "nonsteam-badges-settings";
 function getSettings() {
     try {
@@ -148,24 +153,22 @@ function getSettings() {
         return { ...DEFAULT_SETTINGS, ...JSON.parse(stored) };
     }
     catch (e) {
-        log(context$5, "Error loading settings:", "error");
         return DEFAULT_SETTINGS;
     }
 }
 function saveSettings(settings) {
     try {
         localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-        log(context$5, `Settings saved: ${JSON.stringify(settings)}`);
+        log(context$3, `Settings saved: ${JSON.stringify(settings)}`);
         window.dispatchEvent(new CustomEvent(SETTINGS_CHANGED_EVENT, {
             detail: settings,
         }));
     }
     catch (e) {
-        log(context$5, "Error saving settings:", "error");
     }
 }
 
-const context$4 = "cache";
+const context$2 = "cache";
 const CACHE_TTL_MS = 60 * 1000; // 1 minute
 let gameStoreMappingsCache = {};
 let mappingsLoaded = false;
@@ -190,28 +193,18 @@ async function ensureMappingsLoaded(force = false) {
         });
     }
     isFetchingMappings = true;
-    if (isExpired) {
-        log(context$4, "Store mappings cache expired or missing, fetching...");
-    }
-    else {
-        log(context$4, "Fetching all store mappings...");
-    }
     try {
         const result = await call("get_all_store_mappings");
         if (result) {
             gameStoreMappingsCache = result;
             mappingsLoaded = true;
             lastFetchTime = Date.now();
-            log(context$4, `Loaded ${Object.keys(result).length} mappings`);
         }
         else {
-            log(context$4, "Failed to load mappings: API call returned unsuccessful", "error");
-            log(context$4, JSON.stringify(result), "error");
+            log(context$2, JSON.stringify(result), "error");
         }
     }
     catch (e) {
-        log(context$4, "Failed to load mappings", "error");
-        log(context$4, e, "error");
     }
     finally {
         isFetchingMappings = false;
@@ -239,7 +232,7 @@ function getFrontendStore(appid) {
             }
         }
         if (foundCollections.length > 0) {
-            log(context$4, `AppID ${appid} found in local collections: ${JSON.stringify(foundCollections)}`);
+            log(context$2, `AppID ${appid} found in local collections: ${JSON.stringify(foundCollections)}`);
             return foundCollections.reduce((acc, colName) => {
                 if (acc)
                     return acc;
@@ -253,7 +246,7 @@ function getFrontendStore(appid) {
         return null;
     }
     catch (e) {
-        log(context$4, "Could not check frontend collections: " + JSON.stringify(e), "warn");
+        log(context$2, "Could not check frontend collections: " + JSON.stringify(e), "warn");
         return null;
     }
 }
@@ -328,7 +321,6 @@ function getBadgeStyle(gameStore, prop) {
         badgeStyles?.[GameStoreName.DEFAULT]?.[prop]);
 }
 function getBadgeIcon(gameStore, context) {
-    log("getBadgeIcon", `gameStore: ${gameStore}, context: ${context}`);
     return getBadgeStyle(gameStore, GameStoreProp.ICON);
 }
 
@@ -406,14 +398,12 @@ function addBadgeToCapsule(capsule, bigPicWindow, context = GameStoreContext.LIB
     // Check if we have a store name mapping for this 'appid'
     const cachedGameStoreName = getStore(appid)?.toLowerCase();
     const gameStoreName = sanitizedGameStoreName(cachedGameStoreName);
-    log(context, `Adding badge to capsule. Store name: ${gameStoreName}`);
     // Determine the capsules context
     let effectiveContext = context;
     if (effectiveContext === GameStoreContext.LIBRARY) {
         const rect = img.getBoundingClientRect();
         if (rect.width > rect.height) {
             effectiveContext = GameStoreContext.SEARCH;
-            log(context, `Detected landscaped capsule for appid ${appid}, using SEARCH context`);
         }
     }
     // Get the settings/default position styles based on the effective context
@@ -442,14 +432,12 @@ function addBadgeToCapsule(capsule, bigPicWindow, context = GameStoreContext.LIB
     targetElement.appendChild(badge);
     badgedElements.add(capsule);
     if (gameStoreName) {
-        log(context, `Got a game store name for appid ${appid}: ${gameStoreName}. Injecting badge icon into the DOM.`);
         // Inject the badge icon in the DOM
-        badge.innerHTML = getBadgeIcon(gameStoreName, effectiveContext);
+        badge.innerHTML = getBadgeIcon(gameStoreName);
     }
     else {
-        log(context, `No game store name for appid ${appid}: ${gameStoreName}. Falling back to default	while fetching.`);
         // If we don't have a cached store name, show placeholder and pulse while fetching
-        badge.innerHTML = getBadgeIcon(GameStoreName.DEFAULT, effectiveContext);
+        badge.innerHTML = getBadgeIcon(GameStoreName.DEFAULT);
         badge.classList.add(styles$1[PULSATING_CLASSNAME]);
         // Fetch mapping if not available and not already loaded
         (async () => {
@@ -460,7 +448,7 @@ function addBadgeToCapsule(capsule, bigPicWindow, context = GameStoreContext.LIB
                 badge.classList.remove(styles$1[PULSATING_CLASSNAME]);
                 const newName = sanitizedGameStoreName(newStore);
                 if (newName) {
-                    badge.innerHTML = getBadgeIcon(newName, effectiveContext);
+                    badge.innerHTML = getBadgeIcon(newName);
                 }
             }
             else {
@@ -470,7 +458,6 @@ function addBadgeToCapsule(capsule, bigPicWindow, context = GameStoreContext.LIB
     }
 }
 
-const context$3 = "observer";
 let observer = null;
 let scanInterval = null;
 let debounceTimeout = null;
@@ -511,7 +498,6 @@ function getBigPictureWindow() {
         }
     }
     catch (error) {
-        log(context$3, "Error getting Big Picture window:", "error");
     }
     return null;
 }
@@ -520,7 +506,6 @@ function startObserving() {
     stopObserving();
     const bigPicWindow = getBigPictureWindow();
     if (!bigPicWindow) {
-        log(context$3, "Big Picture window not found, retrying...");
         setTimeout(startObserving, 1000);
         return;
     }
@@ -540,7 +525,6 @@ function startObserving() {
             childList: true,
             subtree: true,
         });
-        log(context$3, "Observer attached to tabpanel");
     }
     // Backup: scan every 2 seconds to catch anything missed
     scanInterval = setInterval(scanAndBadge, 2000);
@@ -586,17 +570,17 @@ function scanAndBadge() {
     }
 }
 
-const context$2 = "useSettings";
+const context$1 = "useSettings";
 function useSettings() {
     const [settings, setSettings] = SP_REACT.useState(getSettings());
     SP_REACT.useEffect(() => {
         const handleChange = (event) => {
             if (event instanceof CustomEvent && event.detail) {
-                log(context$2, "Settings changed (custom event): " + JSON.stringify(event.detail));
+                log(context$1, "Settings changed (custom event): " + JSON.stringify(event.detail));
                 setSettings(event.detail);
             }
             else {
-                log(context$2, "Settings changed (fallback): " + JSON.stringify(getSettings()));
+                log(context$1, "Settings changed (fallback): " + JSON.stringify(getSettings()));
                 setSettings(getSettings());
             }
         };
@@ -655,6 +639,7 @@ const Settings = () => {
                         });
                     } })))));
 };
+var Settings$1 = Settings;
 
 function PluginIcon(props) {
     return (SP_REACT.createElement("svg", { viewBox: "34 34 84 60", xmlns: "http://www.w3.org/2000/svg", fill: "currentColor", style: { width: "1em", height: "1em" }, ...props },
@@ -669,7 +654,7 @@ function PluginIcon(props) {
 function r(e){var t,f,n="";if("string"==typeof e||"number"==typeof e)n+=e;else if("object"==typeof e)if(Array.isArray(e)){var o=e.length;for(t=0;t<o;t++)e[t]&&(f=r(e[t]))&&(n&&(n+=" "),n+=f);}else for(f in e)e[f]&&(n&&(n+=" "),n+=f);return n}function clsx(){for(var e,t,f=0,n="",o=arguments.length;f<o;f++)(e=arguments[f])&&(t=r(e))&&(n&&(n+=" "),n+=t);return n}
 
 var css_248z = ".SteamStoreButton-module_container__Ajz-- {\n  display: flex;\n  justify-content: center;\n  gap: 3px;\n}\n\nbutton.SteamStoreButton-module_steamStoreButton__W-gdi {\n  padding: 8px !important;\n  min-width: auto !important;\n  color: #000 !important;\n  background: #1b2838 !important;\n  animation: SteamStoreButton-module_nonsteam-badge-fade-in__giERj 0.3s cubic-bezier(0.2, 0, 0.2, 1) forwards;\n}\n\nbutton.SteamStoreButton-module_steamStoreButton__W-gdi:hover,\nbutton.SteamStoreButton-module_steamStoreButton__W-gdi:focus,\nbutton.SteamStoreButton-module_steamStoreButton__W-gdi:active {\n  background: #4b6479 !important;\n  outline: 1px solid black !important;\n}\n\n.SteamStoreButton-module_steamStoreButton__W-gdi svg {\n  color: #fff;\n}\n\n@keyframes SteamStoreButton-module_nonsteam-badge-fade-in__giERj {\n  from {\n    opacity: 0;\n    transform: scale(0.8);\n  }\n  to {\n    opacity: 1;\n    transform: scale(1);\n  }\n}\n";
-var styles = {"container":"SteamStoreButton-module_container__Ajz--","steamStoreButton":"SteamStoreButton-module_steamStoreButton__W-gdi"};
+var styles = {"container":"SteamStoreButton-module_container__Ajz--","steamStoreButton":"SteamStoreButton-module_steamStoreButton__W-gdi","nonsteam-badge-fade-in":"SteamStoreButton-module_nonsteam-badge-fade-in__giERj"};
 injectStyle(css_248z);
 
 var DefaultContext = {
@@ -686,10 +671,10 @@ function _objectWithoutProperties(source, excluded) { if (source == null) return
 function _objectWithoutPropertiesLoose(source, excluded) { if (source == null) return {}; var target = {}; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { if (excluded.indexOf(key) >= 0) continue; target[key] = source[key]; } } return target; }
 function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
-function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), true).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
+function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == typeof i ? i : i + ""; }
-function _toPrimitive(t, r) { if ("object" != typeof t || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r); if ("object" != typeof i) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+function _toPrimitive(t, r) { if ("object" != typeof t || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != typeof i) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
 function Tree2Element(tree) {
   return tree && tree.map((node, i) => /*#__PURE__*/SP_REACT.createElement(node.tag, _objectSpread({
     key: i
@@ -731,12 +716,12 @@ function IconBase(props) {
 
 // THIS FILE IS AUTO GENERATED
 function LiaExternalLinkAltSolid (props) {
-  return GenIcon({"attr":{"viewBox":"0 0 32 32"},"child":[{"tag":"path","attr":{"d":"M 18 5 L 18 7 L 23.5625 7 L 11.28125 19.28125 L 12.71875 20.71875 L 25 8.4375 L 25 14 L 27 14 L 27 5 Z M 5 9 L 5 27 L 23 27 L 23 14 L 21 16 L 21 25 L 7 25 L 7 11 L 16 11 L 18 9 Z"},"child":[]}]})(props);
+  return GenIcon({"tag":"svg","attr":{"viewBox":"0 0 32 32"},"child":[{"tag":"path","attr":{"d":"M 18 5 L 18 7 L 23.5625 7 L 11.28125 19.28125 L 12.71875 20.71875 L 25 8.4375 L 25 14 L 27 14 L 27 5 Z M 5 9 L 5 27 L 23 27 L 23 14 L 21 16 L 21 25 L 7 25 L 7 11 L 16 11 L 18 9 Z"},"child":[]}]})(props);
 }
 
 // THIS FILE IS AUTO GENERATED
 function FaSteam (props) {
-  return GenIcon({"attr":{"viewBox":"0 0 496 512"},"child":[{"tag":"path","attr":{"d":"M496 256c0 137-111.2 248-248.4 248-113.8 0-209.6-76.3-239-180.4l95.2 39.3c6.4 32.1 34.9 56.4 68.9 56.4 39.2 0 71.9-32.4 70.2-73.5l84.5-60.2c52.1 1.3 95.8-40.9 95.8-93.5 0-51.6-42-93.5-93.7-93.5s-93.7 42-93.7 93.5v1.2L176.6 279c-15.5-.9-30.7 3.4-43.5 12.1L0 236.1C10.2 108.4 117.1 8 247.6 8 384.8 8 496 119 496 256zM155.7 384.3l-30.5-12.6a52.79 52.79 0 0 0 27.2 25.8c26.9 11.2 57.8-1.6 69-28.4 5.4-13 5.5-27.3.1-40.3-5.4-13-15.5-23.2-28.5-28.6-12.9-5.4-26.7-5.2-38.9-.6l31.5 13c19.8 8.2 29.2 30.9 20.9 50.7-8.3 19.9-31 29.2-50.8 21zm173.8-129.9c-34.4 0-62.4-28-62.4-62.3s28-62.3 62.4-62.3 62.4 28 62.4 62.3-27.9 62.3-62.4 62.3zm.1-15.6c25.9 0 46.9-21 46.9-46.8 0-25.9-21-46.8-46.9-46.8s-46.9 21-46.9 46.8c.1 25.8 21.1 46.8 46.9 46.8z"},"child":[]}]})(props);
+  return GenIcon({"tag":"svg","attr":{"viewBox":"0 0 496 512"},"child":[{"tag":"path","attr":{"d":"M496 256c0 137-111.2 248-248.4 248-113.8 0-209.6-76.3-239-180.4l95.2 39.3c6.4 32.1 34.9 56.4 68.9 56.4 39.2 0 71.9-32.4 70.2-73.5l84.5-60.2c52.1 1.3 95.8-40.9 95.8-93.5 0-51.6-42-93.5-93.7-93.5s-93.7 42-93.7 93.5v1.2L176.6 279c-15.5-.9-30.7 3.4-43.5 12.1L0 236.1C10.2 108.4 117.1 8 247.6 8 384.8 8 496 119 496 256zM155.7 384.3l-30.5-12.6a52.79 52.79 0 0 0 27.2 25.8c26.9 11.2 57.8-1.6 69-28.4 5.4-13 5.5-27.3.1-40.3-5.4-13-15.5-23.2-28.5-28.6-12.9-5.4-26.7-5.2-38.9-.6l31.5 13c19.8 8.2 29.2 30.9 20.9 50.7-8.3 19.9-31 29.2-50.8 21zm173.8-129.9c-34.4 0-62.4-28-62.4-62.3s28-62.3 62.4-62.3 62.4 28 62.4 62.3-27.9 62.3-62.4 62.3zm.1-15.6c25.9 0 46.9-21 46.9-46.8 0-25.9-21-46.8-46.9-46.8s-46.9 21-46.9 46.8c.1 25.8 21.1 46.8 46.9 46.8z"},"child":[]}]})(props);
 }
 
 function SteamStoreButton({ steamAppId, }) {
@@ -749,7 +734,7 @@ function SteamStoreButton({ steamAppId, }) {
                 SP_REACT.createElement(LiaExternalLinkAltSolid, null)))));
 }
 
-const context$1 = GameStoreContext.DETAILS;
+const context = GameStoreContext.DETAILS;
 function GameDetailsBadge() {
     const settings = useSettings();
     const [steamAppId, setSteamAppId] = SP_REACT.useState(null);
@@ -759,9 +744,9 @@ function GameDetailsBadge() {
     const currentPath = window.location.pathname;
     const match = currentPath.match(/\/library\/app\/(\d+)/);
     const appid = match ? match[1] : null;
-    log(context$1, `Badge appid: ${appid}`);
+    log(context);
     SP_REACT.useEffect(() => {
-        log(context$1, "Badge settings: " + JSON.stringify(settings));
+        log(context, "Badge settings: " + JSON.stringify(settings));
         // If setting is disabled, clear any existing ID and stop.
         if (!settings.showSteamStoreButton) {
             setSteamAppId(null);
@@ -770,32 +755,32 @@ function GameDetailsBadge() {
     // Fetch gameStore info from backend via cache
     SP_REACT.useEffect(() => {
         if (!appid || !isNonSteamApp(appid)) {
-            log(context$1, `Details page useEffect skipping - not a non-Steam app: ${appid}`);
+            log(context);
             setLoading(false);
             return;
         }
-        log(context$1, "Details page useEffect - ensuring mappings loaded");
+        log(context);
         (async () => {
             await ensureMappingsLoaded();
             const store = getStore(appid);
             const name = getName(appid);
             if (store) {
                 setGameStore(store);
-                log(context$1, `Identified Store via Cache: ${store}`);
+                log(context);
             }
             else {
-                log(context$1, `AppID ${appid} not found in cache.`);
+                log(context);
             }
             setLoading(false);
             if (name && settings.showSteamStoreButton) {
-                log(context$1, `Searching for Steam AppID using name: ${name}`);
+                log(context);
                 const steamId = await call("search_steam_id", name);
                 if (steamId) {
                     setSteamAppId(steamId);
-                    log(context$1, `Found Steam AppID: ${steamId}`);
+                    log(context);
                 }
                 else {
-                    log(context$1, `Could not find Steam AppID for ${name}`);
+                    log(context);
                 }
             }
         })();
@@ -806,11 +791,11 @@ function GameDetailsBadge() {
     }
     const gameStoreName = sanitizedGameStoreName(gameStore) ?? GameStoreName.DEFAULT;
     const badge = loading
-        ? getBadgeIcon(GameStoreName.DEFAULT, GameStoreContext.DETAILS)
-        : getBadgeIcon(gameStoreName, GameStoreContext.DETAILS);
+        ? getBadgeIcon(GameStoreName.DEFAULT)
+        : getBadgeIcon(gameStoreName);
     if (loading)
-        log(context$1, `Badge is loading`);
-    log(context$1, `Badge valid: ${!!badge}`);
+        log(context);
+    log(context);
     // If badge position is disabled but button is enabled, default button to top-left position
     const badgePositionStyle = settings.detailsPosition === "none" && settings.showSteamStoreButton
         ? styles$1[`details-${BadgePosition.TOP_LEFT}`]
@@ -821,7 +806,6 @@ function GameDetailsBadge() {
             steamAppId && SP_REACT.createElement(SteamStoreButton, { steamAppId: steamAppId }))));
 }
 
-const context = GameStoreContext.DETAILS;
 /**
  * Patch game details page (React-based).
  */
@@ -835,7 +819,6 @@ const patchGameDetails = (tree) => {
             const container = DFL.findInReactTree(ret, (x) => Array.isArray(x?.props?.children) &&
                 x?.props?.className?.includes(DFL.appDetailsClasses.InnerContainer));
             if (typeof container !== "object") {
-                log(context, "Patch FAILED to find container in 'ret'.");
                 return ret;
             }
             container.props.children.splice(1, 0, SP_REACT.createElement(GameDetailsBadge, null));
@@ -850,7 +833,6 @@ var index = definePlugin(() => {
     const settings = getSettings();
     // Patch library and home carousel (DOM-based)
     const handleLibraryPatch = (tree) => {
-        log(GameStoreContext.LIBRARY, "Library patch applied. Listening ...");
         setTimeout(startObserving, 50);
         return tree;
     };
@@ -862,7 +844,6 @@ var index = definePlugin(() => {
     };
     // Patch search results (DOM-based)
     const handleSearchPatch = (tree) => {
-        log(GameStoreContext.SEARCH, "Search patch applied. Listening ...");
         setTimeout(startObserving, 50);
         return tree;
     };
@@ -877,7 +858,6 @@ var index = definePlugin(() => {
         if (settings.detailsPosition === "none") {
             return;
         }
-        log(GameStoreContext.DETAILS, "Game details patching ...");
         return routerHook.addPatch("/library/app/:appid", patchGameDetails);
     };
     const handleSettingsChange = () => {
@@ -897,7 +877,7 @@ var index = definePlugin(() => {
     return {
         titleView: SP_REACT.createElement("div", null, "Non-Steam Badges"),
         name: "Non-Steam Badges",
-        content: SP_REACT.createElement(Settings, null),
+        content: SP_REACT.createElement(Settings$1, null),
         icon: SP_REACT.createElement(PluginIcon, null),
         onDismount() {
             stopObserving();
