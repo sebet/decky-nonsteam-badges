@@ -32,10 +32,11 @@ const definePlugin = (fn) => {
 };
 
 function log(context, message, level = "log") {
-    return;
+    console[level](`[Non-Steam Badges][${context}] ${message}`);
 }
 
 const PLUGIN_ID = "nonsteam-badges-decky";
+const context$6 = "styleInjector";
 let loadedCSS = "";
 function injectStyle(css) {
     if (!css)
@@ -64,6 +65,7 @@ function injectStyleIntoWindow(targetWindow) {
     style.setAttribute("data-plugin", PLUGIN_ID);
     style.innerHTML = css;
     targetWindow.document.head.appendChild(style);
+    log(context$6, "Injected styles into BigPicture window");
 }
 function removeStyleFromWindow(targetWindow) {
     if (!targetWindow || !targetWindow.document)
@@ -71,6 +73,7 @@ function removeStyleFromWindow(targetWindow) {
     const style = targetWindow.document.querySelector(`style[data-plugin="${PLUGIN_ID}"]`);
     if (style) {
         style.remove();
+        log(context$6, "Removed styles from BigPicture window");
     }
 }
 
@@ -117,7 +120,10 @@ function sanitizedGameStoreName(gameStore) {
  */
 function isNonSteamApp(appid) {
     const id = Number(appid);
-    return !isNaN(id) && (id > 2000000000 || id < -1000000);
+    // Real Steam app IDs are typically < 6,000,000. Non-Steam game IDs generated via CRC32 
+    // can be anywhere from 0 to 4.2 billion+, but occasionally end up < 2 billion.
+    // Using 10,000,000 as a safe upper threshold to ensure no Non-Steam apps get ignored.
+    return !isNaN(id) && (id > 10000000 || id < -1000000);
 }
 
 const SETTINGS_CHANGED_EVENT = "nonsteam-badges-settings-changed";
@@ -143,7 +149,7 @@ const DEFAULT_SETTINGS = {
     showSteamStoreButton: true,
 };
 
-const context$3 = "settings";
+const context$5 = "settings";
 const SETTINGS_KEY = "nonsteam-badges-settings";
 function getSettings() {
     try {
@@ -153,22 +159,24 @@ function getSettings() {
         return { ...DEFAULT_SETTINGS, ...JSON.parse(stored) };
     }
     catch (e) {
+        log(context$5, "Error loading settings:", "error");
         return DEFAULT_SETTINGS;
     }
 }
 function saveSettings(settings) {
     try {
         localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-        log(context$3, `Settings saved: ${JSON.stringify(settings)}`);
+        log(context$5, `Settings saved: ${JSON.stringify(settings)}`);
         window.dispatchEvent(new CustomEvent(SETTINGS_CHANGED_EVENT, {
             detail: settings,
         }));
     }
     catch (e) {
+        log(context$5, "Error saving settings:", "error");
     }
 }
 
-const context$2 = "cache";
+const context$4 = "cache";
 const CACHE_TTL_MS = 60 * 1000; // 1 minute
 let gameStoreMappingsCache = {};
 let mappingsLoaded = false;
@@ -193,18 +201,28 @@ async function ensureMappingsLoaded(force = false) {
         });
     }
     isFetchingMappings = true;
+    if (isExpired) {
+        log(context$4, "Store mappings cache expired or missing, fetching...");
+    }
+    else {
+        log(context$4, "Fetching all store mappings...");
+    }
     try {
         const result = await call("get_all_store_mappings");
         if (result) {
             gameStoreMappingsCache = result;
             mappingsLoaded = true;
             lastFetchTime = Date.now();
+            log(context$4, `Loaded ${Object.keys(result).length} mappings`);
         }
         else {
-            log(context$2, JSON.stringify(result), "error");
+            log(context$4, "Failed to load mappings: API call returned unsuccessful", "error");
+            log(context$4, JSON.stringify(result), "error");
         }
     }
     catch (e) {
+        log(context$4, "Failed to load mappings", "error");
+        log(context$4, e, "error");
     }
     finally {
         isFetchingMappings = false;
@@ -232,7 +250,7 @@ function getFrontendStore(appid) {
             }
         }
         if (foundCollections.length > 0) {
-            log(context$2, `AppID ${appid} found in local collections: ${JSON.stringify(foundCollections)}`);
+            log(context$4, `AppID ${appid} found in local collections: ${JSON.stringify(foundCollections)}`);
             return foundCollections.reduce((acc, colName) => {
                 if (acc)
                     return acc;
@@ -246,7 +264,7 @@ function getFrontendStore(appid) {
         return null;
     }
     catch (e) {
-        log(context$2, "Could not check frontend collections: " + JSON.stringify(e), "warn");
+        log(context$4, "Could not check frontend collections: " + JSON.stringify(e), "warn");
         return null;
     }
 }
@@ -321,6 +339,7 @@ function getBadgeStyle(gameStore, prop) {
         badgeStyles?.[GameStoreName.DEFAULT]?.[prop]);
 }
 function getBadgeIcon(gameStore, context) {
+    log("getBadgeIcon", `gameStore: ${gameStore}, context: ${context}`);
     return getBadgeStyle(gameStore, GameStoreProp.ICON);
 }
 
@@ -342,7 +361,7 @@ function cleanupBadges(bigPicWindow) {
     });
 }
 function extractAppIdFromImage(img) {
-    if (!img.src)
+    if (!img || !img.src)
         return null;
     // Try Steam CDN pattern: /assets/APPID/
     let match = img.src.match(/\/assets\/(\d+)\//);
@@ -352,11 +371,62 @@ function extractAppIdFromImage(img) {
     match = img.src.match(/\/customimages\/(\d+)p?\.(jpg|jpeg|png|webp)/i);
     if (match)
         return match[1];
-    // Try any numeric ID before extension
-    match = img.src.match(/\/(\d{6,})[\._-]?[a-z]*\.(jpg|png|webp)/i);
+    // Try rungameid
+    match = img.src.match(/rungameid\/(\d+)/i);
+    if (match)
+        return match[1];
+    // Try any numeric ID before extension or standalone
+    match = img.src.match(/\/(\d{6,})([p\._-]?[a-z]*\.(jpg|png|webp))?/i);
     if (match)
         return match[1];
     return null;
+}
+function getAppId(capsule) {
+    // Try React Fiber first for the most reliable AppID
+    try {
+        const key = Object.keys(capsule).find((k) => k.startsWith("__reactFiber$") || k.startsWith("__reactInternalInstance$"));
+        if (key) {
+            let fiber = capsule[key];
+            while (fiber) {
+                const props = fiber.memoizedProps || fiber.return?.memoizedProps;
+                if (props) {
+                    const id = props.appid ||
+                        props.appId ||
+                        props.unAppID ||
+                        props.nAppID ||
+                        props.m_unAppID ||
+                        props.overview?.appid ||
+                        props.appOverview?.appid ||
+                        props.app?.unAppID ||
+                        props.app?.nAppID ||
+                        props.app?.appid ||
+                        props.game?.appid ||
+                        props.item?.appid ||
+                        props.assetAppId ||
+                        props.strAppId;
+                    if (id)
+                        return String(id);
+                }
+                fiber = fiber.return;
+            }
+        }
+    }
+    catch (e) { }
+    // Look for any anchor tag with a game URL (e.g. steam://nav/games/details/APPID)
+    try {
+        const anchor = capsule.tagName.toLowerCase() === "a" ? capsule : capsule.querySelector("a");
+        if (anchor) {
+            const href = anchor.getAttribute("href");
+            if (href) {
+                const match = href.match(/\/app\/(\d+)/i) || href.match(/\/details\/(\d+)/i) || href.match(/run\/(\d+)/i);
+                if (match)
+                    return match[1];
+            }
+        }
+    }
+    catch (e) { }
+    // Fallback to image
+    return extractAppIdFromImage(capsule.querySelector("img"));
 }
 function addBadgeToCapsule(capsule, bigPicWindow, context = GameStoreContext.LIBRARY) {
     const settings = getSettings();
@@ -366,30 +436,53 @@ function addBadgeToCapsule(capsule, bigPicWindow, context = GameStoreContext.LIB
         (context === GameStoreContext.HOME && settings.homePosition === "none")) {
         return;
     }
-    // Skip if already badged
-    if (badgedElements.has(capsule))
+    // Clean up any improperly attached or orphaned badges before proceeding
+    const existingBadge = capsule.querySelector(`.${BADGE_CLASSNAME}`);
+    let appid = getAppId(capsule);
+    // If we can't find a Steam ID through any method (no artwork URL, no visible anchor tag, no fiber prop), 
+    // Native Steam games NEVER have a missing ID. So it is inherently a generic/blank non-Steam app.
+    if (!appid) {
+        appid = "unknown_generic_app";
+    }
+    else if (!isNonSteamApp(appid)) {
         return;
+    }
     const img = capsule.querySelector("img");
-    if (!img)
-        return;
-    const appid = extractAppIdFromImage(img);
-    if (!appid || !isNonSteamApp(appid))
-        return;
-    // Find the container to attach badge to
-    const role = capsule.getAttribute("role");
     let targetElement = null;
+    const role = capsule.getAttribute("role");
     if (role === "gridcell") {
-        // Library grid view
-        targetElement = capsule.querySelector("div");
+        if (img) {
+            targetElement = capsule.querySelector("div") || capsule;
+        }
+        else {
+            // If there is no image, Steam uses heavily clipped CSS inner blocks for the text box.
+            // We must attach directly to the gridcell itself for the badge to be visible.
+            targetElement = capsule;
+        }
     }
     else if (role === "listitem") {
-        // Home carousel
-        targetElement =
-            img.closest('div[class*="_1pwP4"]') ||
-                img.closest("div");
+        if (img) {
+            targetElement =
+                img.closest('div[class*="_1pwP4"]') ||
+                    img.closest("div") ||
+                    capsule;
+        }
+        else {
+            targetElement = capsule;
+        }
     }
     if (!targetElement)
         return;
+    // Navigation Persistence Fix: If the badge exists but isn't a direct child of the exact current targetElement
+    // (caused by React throwing away and regenerating the DOM on back-navigation), destroy the ghost badge.
+    if (existingBadge) {
+        if (existingBadge.parentElement !== targetElement) {
+            existingBadge.remove();
+        }
+        else {
+            return; // It's perfectly placed, ignore.
+        }
+    }
     // Ensure relative positioning
     const computedStyle = bigPicWindow.getComputedStyle(targetElement);
     if (computedStyle.position === "static") {
@@ -398,12 +491,14 @@ function addBadgeToCapsule(capsule, bigPicWindow, context = GameStoreContext.LIB
     // Check if we have a store name mapping for this 'appid'
     const cachedGameStoreName = getStore(appid)?.toLowerCase();
     const gameStoreName = sanitizedGameStoreName(cachedGameStoreName);
+    log(context, `Adding badge to capsule. Store name: ${gameStoreName}`);
     // Determine the capsules context
     let effectiveContext = context;
-    if (effectiveContext === GameStoreContext.LIBRARY) {
+    if (effectiveContext === GameStoreContext.LIBRARY && img) {
         const rect = img.getBoundingClientRect();
         if (rect.width > rect.height) {
             effectiveContext = GameStoreContext.SEARCH;
+            log(context, `Detected landscaped capsule for appid ${appid}, using SEARCH context`);
         }
     }
     // Get the settings/default position styles based on the effective context
@@ -432,12 +527,14 @@ function addBadgeToCapsule(capsule, bigPicWindow, context = GameStoreContext.LIB
     targetElement.appendChild(badge);
     badgedElements.add(capsule);
     if (gameStoreName) {
+        log(context, `Got a game store name for appid ${appid}: ${gameStoreName}. Injecting badge icon into the DOM.`);
         // Inject the badge icon in the DOM
-        badge.innerHTML = getBadgeIcon(gameStoreName);
+        badge.innerHTML = getBadgeIcon(gameStoreName, effectiveContext);
     }
     else {
+        log(context, `No game store name for appid ${appid}: ${gameStoreName}. Falling back to default	while fetching.`);
         // If we don't have a cached store name, show placeholder and pulse while fetching
-        badge.innerHTML = getBadgeIcon(GameStoreName.DEFAULT);
+        badge.innerHTML = getBadgeIcon(GameStoreName.DEFAULT, effectiveContext);
         badge.classList.add(styles$1[PULSATING_CLASSNAME]);
         // Fetch mapping if not available and not already loaded
         (async () => {
@@ -448,7 +545,7 @@ function addBadgeToCapsule(capsule, bigPicWindow, context = GameStoreContext.LIB
                 badge.classList.remove(styles$1[PULSATING_CLASSNAME]);
                 const newName = sanitizedGameStoreName(newStore);
                 if (newName) {
-                    badge.innerHTML = getBadgeIcon(newName);
+                    badge.innerHTML = getBadgeIcon(newName, effectiveContext);
                 }
             }
             else {
@@ -458,6 +555,7 @@ function addBadgeToCapsule(capsule, bigPicWindow, context = GameStoreContext.LIB
     }
 }
 
+const context$3 = "observer";
 let observer = null;
 let scanInterval = null;
 let debounceTimeout = null;
@@ -498,6 +596,7 @@ function getBigPictureWindow() {
         }
     }
     catch (error) {
+        log(context$3, "Error getting Big Picture window:", "error");
     }
     return null;
 }
@@ -506,6 +605,7 @@ function startObserving() {
     stopObserving();
     const bigPicWindow = getBigPictureWindow();
     if (!bigPicWindow) {
+        log(context$3, "Big Picture window not found, retrying...");
         setTimeout(startObserving, 1000);
         return;
     }
@@ -525,6 +625,7 @@ function startObserving() {
             childList: true,
             subtree: true,
         });
+        log(context$3, "Observer attached to tabpanel");
     }
     // Backup: scan every 2 seconds to catch anything missed
     scanInterval = setInterval(scanAndBadge, 2000);
@@ -570,17 +671,17 @@ function scanAndBadge() {
     }
 }
 
-const context$1 = "useSettings";
+const context$2 = "useSettings";
 function useSettings() {
     const [settings, setSettings] = SP_REACT.useState(getSettings());
     SP_REACT.useEffect(() => {
         const handleChange = (event) => {
             if (event instanceof CustomEvent && event.detail) {
-                log(context$1, "Settings changed (custom event): " + JSON.stringify(event.detail));
+                log(context$2, "Settings changed (custom event): " + JSON.stringify(event.detail));
                 setSettings(event.detail);
             }
             else {
-                log(context$1, "Settings changed (fallback): " + JSON.stringify(getSettings()));
+                log(context$2, "Settings changed (fallback): " + JSON.stringify(getSettings()));
                 setSettings(getSettings());
             }
         };
@@ -734,7 +835,7 @@ function SteamStoreButton({ steamAppId, }) {
                 SP_REACT.createElement(LiaExternalLinkAltSolid, null)))));
 }
 
-const context = GameStoreContext.DETAILS;
+const context$1 = GameStoreContext.DETAILS;
 function GameDetailsBadge() {
     const settings = useSettings();
     const [steamAppId, setSteamAppId] = SP_REACT.useState(null);
@@ -744,9 +845,9 @@ function GameDetailsBadge() {
     const currentPath = window.location.pathname;
     const match = currentPath.match(/\/library\/app\/(\d+)/);
     const appid = match ? match[1] : null;
-    log(context);
+    log(context$1, `Badge appid: ${appid}`);
     SP_REACT.useEffect(() => {
-        log(context, "Badge settings: " + JSON.stringify(settings));
+        log(context$1, "Badge settings: " + JSON.stringify(settings));
         // If setting is disabled, clear any existing ID and stop.
         if (!settings.showSteamStoreButton) {
             setSteamAppId(null);
@@ -755,32 +856,32 @@ function GameDetailsBadge() {
     // Fetch gameStore info from backend via cache
     SP_REACT.useEffect(() => {
         if (!appid || !isNonSteamApp(appid)) {
-            log(context);
+            log(context$1, `Details page useEffect skipping - not a non-Steam app: ${appid}`);
             setLoading(false);
             return;
         }
-        log(context);
+        log(context$1, "Details page useEffect - ensuring mappings loaded");
         (async () => {
             await ensureMappingsLoaded();
             const store = getStore(appid);
             const name = getName(appid);
             if (store) {
                 setGameStore(store);
-                log(context);
+                log(context$1, `Identified Store via Cache: ${store}`);
             }
             else {
-                log(context);
+                log(context$1, `AppID ${appid} not found in cache.`);
             }
             setLoading(false);
             if (name && settings.showSteamStoreButton) {
-                log(context);
+                log(context$1, `Searching for Steam AppID using name: ${name}`);
                 const steamId = await call("search_steam_id", name);
                 if (steamId) {
                     setSteamAppId(steamId);
-                    log(context);
+                    log(context$1, `Found Steam AppID: ${steamId}`);
                 }
                 else {
-                    log(context);
+                    log(context$1, `Could not find Steam AppID for ${name}`);
                 }
             }
         })();
@@ -791,11 +892,11 @@ function GameDetailsBadge() {
     }
     const gameStoreName = sanitizedGameStoreName(gameStore) ?? GameStoreName.DEFAULT;
     const badge = loading
-        ? getBadgeIcon(GameStoreName.DEFAULT)
-        : getBadgeIcon(gameStoreName);
+        ? getBadgeIcon(GameStoreName.DEFAULT, GameStoreContext.DETAILS)
+        : getBadgeIcon(gameStoreName, GameStoreContext.DETAILS);
     if (loading)
-        log(context);
-    log(context);
+        log(context$1, `Badge is loading`);
+    log(context$1, `Badge valid: ${!!badge}`);
     // If badge position is disabled but button is enabled, default button to top-left position
     const badgePositionStyle = settings.detailsPosition === "none" && settings.showSteamStoreButton
         ? styles$1[`details-${BadgePosition.TOP_LEFT}`]
@@ -806,6 +907,7 @@ function GameDetailsBadge() {
             steamAppId && SP_REACT.createElement(SteamStoreButton, { steamAppId: steamAppId }))));
 }
 
+const context = GameStoreContext.DETAILS;
 /**
  * Patch game details page (React-based).
  */
@@ -819,6 +921,7 @@ const patchGameDetails = (tree) => {
             const container = DFL.findInReactTree(ret, (x) => Array.isArray(x?.props?.children) &&
                 x?.props?.className?.includes(DFL.appDetailsClasses.InnerContainer));
             if (typeof container !== "object") {
+                log(context, "Patch FAILED to find container in 'ret'.");
                 return ret;
             }
             container.props.children.splice(1, 0, SP_REACT.createElement(GameDetailsBadge, null));
@@ -833,6 +936,7 @@ var index = definePlugin(() => {
     const settings = getSettings();
     // Patch library and home carousel (DOM-based)
     const handleLibraryPatch = (tree) => {
+        log(GameStoreContext.LIBRARY, "Library patch applied. Listening ...");
         setTimeout(startObserving, 50);
         return tree;
     };
@@ -844,6 +948,7 @@ var index = definePlugin(() => {
     };
     // Patch search results (DOM-based)
     const handleSearchPatch = (tree) => {
+        log(GameStoreContext.SEARCH, "Search patch applied. Listening ...");
         setTimeout(startObserving, 50);
         return tree;
     };
@@ -858,6 +963,7 @@ var index = definePlugin(() => {
         if (settings.detailsPosition === "none") {
             return;
         }
+        log(GameStoreContext.DETAILS, "Game details patching ...");
         return routerHook.addPatch("/library/app/:appid", patchGameDetails);
     };
     const handleSettingsChange = () => {

@@ -32,8 +32,8 @@ export function cleanupBadges(bigPicWindow: Window): void {
   });
 }
 
-function extractAppIdFromImage(img: HTMLImageElement): string | null {
-  if (!img.src) return null;
+function extractAppIdFromImage(img: HTMLImageElement | null): string | null {
+  if (!img || !img.src) return null;
 
   // Try Steam CDN pattern: /assets/APPID/
   let match = img.src.match(/\/assets\/(\d+)\//);
@@ -43,11 +43,63 @@ function extractAppIdFromImage(img: HTMLImageElement): string | null {
   match = img.src.match(/\/customimages\/(\d+)p?\.(jpg|jpeg|png|webp)/i);
   if (match) return match[1];
 
-  // Try any numeric ID before extension
-  match = img.src.match(/\/(\d{6,})[\._-]?[a-z]*\.(jpg|png|webp)/i);
+  // Try rungameid
+  match = img.src.match(/rungameid\/(\d+)/i);
+  if (match) return match[1];
+
+  // Try any numeric ID before extension or standalone
+  match = img.src.match(/\/(\d{6,})([p\._-]?[a-z]*\.(jpg|png|webp))?/i);
   if (match) return match[1];
 
   return null;
+}
+
+function getAppId(capsule: Element): string | null {
+  // Try React Fiber first for the most reliable AppID
+  try {
+    const key = Object.keys(capsule).find((k) => k.startsWith("__reactFiber$") || k.startsWith("__reactInternalInstance$"));
+    if (key) {
+      let fiber = (capsule as any)[key];
+      while (fiber) {
+        const props = fiber.memoizedProps || fiber.return?.memoizedProps;
+        if (props) {
+          const id = 
+            props.appid || 
+            props.appId || 
+            props.unAppID ||
+            props.nAppID ||
+            props.m_unAppID || 
+            props.overview?.appid || 
+            props.appOverview?.appid ||
+            props.app?.unAppID || 
+            props.app?.nAppID ||
+            props.app?.appid ||
+            props.game?.appid ||
+            props.item?.appid ||
+            props.assetAppId ||
+            props.strAppId;
+          if (id) return String(id);
+        }
+        fiber = fiber.return;
+      }
+    }
+  } catch (e) {}
+
+  // Look for any anchor tag with a game URL (e.g. steam://nav/games/details/APPID)
+  try {
+    const anchor = capsule.tagName.toLowerCase() === "a" ? capsule : capsule.querySelector("a");
+    if (anchor) {
+      const href = anchor.getAttribute("href");
+      if (href) {
+        const match = href.match(/\/app\/(\d+)/i) || href.match(/\/details\/(\d+)/i) || href.match(/run\/(\d+)/i);
+        if (match) return match[1];
+      }
+    }
+  } catch (e) {}
+
+  // Fallback to image
+
+  return extractAppIdFromImage(capsule.querySelector("img"));
 }
 
 export function addBadgeToCapsule(
@@ -66,30 +118,54 @@ export function addBadgeToCapsule(
     return;
   }
 
-  // Skip if already badged
-  if (badgedElements.has(capsule)) return;
+  // Clean up any improperly attached or orphaned badges before proceeding
+  const existingBadge = capsule.querySelector(`.${BADGE_CLASSNAME}`);
+
+  let appid = getAppId(capsule);
+  
+  // If we can't find a Steam ID through any method (no artwork URL, no visible anchor tag, no fiber prop), 
+  // Native Steam games NEVER have a missing ID. So it is inherently a generic/blank non-Steam app.
+  if (!appid) {
+    appid = "unknown_generic_app";
+  } else if (!isNonSteamApp(appid)) {
+    return;
+  }
 
   const img = capsule.querySelector("img");
-  if (!img) return;
 
-  const appid = extractAppIdFromImage(img);
-  if (!appid || !isNonSteamApp(appid)) return;
-
-  // Find the container to attach badge to
-  const role = capsule.getAttribute("role");
   let targetElement: HTMLElement | null = null;
+  const role = capsule.getAttribute("role");
 
   if (role === "gridcell") {
-    // Library grid view
-    targetElement = capsule.querySelector("div") as HTMLElement;
+    if (img) {
+      targetElement = (capsule.querySelector("div") as HTMLElement) || (capsule as HTMLElement);
+    } else {
+      // If there is no image, Steam uses heavily clipped CSS inner blocks for the text box.
+      // We must attach directly to the gridcell itself for the badge to be visible.
+      targetElement = capsule as HTMLElement;
+    }
   } else if (role === "listitem") {
-    // Home carousel
-    targetElement =
-      (img.closest('div[class*="_1pwP4"]') as HTMLElement) ||
-      (img.closest("div") as HTMLElement);
+    if (img) {
+      targetElement =
+        (img.closest('div[class*="_1pwP4"]') as HTMLElement) ||
+        (img.closest("div") as HTMLElement) ||
+        (capsule as HTMLElement);
+    } else {
+      targetElement = capsule as HTMLElement;
+    }
   }
 
   if (!targetElement) return;
+
+  // Navigation Persistence Fix: If the badge exists but isn't a direct child of the exact current targetElement
+  // (caused by React throwing away and regenerating the DOM on back-navigation), destroy the ghost badge.
+  if (existingBadge) {
+    if (existingBadge.parentElement !== targetElement) {
+      existingBadge.remove();
+    } else {
+      return; // It's perfectly placed, ignore.
+    }
+  }
 
   // Ensure relative positioning
   const computedStyle = bigPicWindow.getComputedStyle(targetElement);
@@ -105,7 +181,7 @@ export function addBadgeToCapsule(
 
   // Determine the capsules context
   let effectiveContext = context;
-  if (effectiveContext === GameStoreContext.LIBRARY) {
+  if (effectiveContext === GameStoreContext.LIBRARY && img) {
     const rect = img.getBoundingClientRect();
     if (rect.width > rect.height) {
       effectiveContext = GameStoreContext.SEARCH;
