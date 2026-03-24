@@ -81,13 +81,18 @@ export function startObserving(): void {
     }
   });
 
-  const tabPanel = bigPicWindow.document.querySelector('div[role="tabpanel"]');
-  if (tabPanel) {
-    observer.observe(tabPanel, {
-      childList: true,
-      subtree: true,
-    });
-    log(context, "Observer attached to tabpanel");
+  const containers = bigPicWindow.document.querySelectorAll('div[role="tabpanel"], div[class*="Panel"]');
+  containers.forEach((container) => {
+    if (observer) {
+      observer.observe(container, {
+        childList: true,
+        subtree: true,
+      });
+    }
+  });
+  
+  if (containers.length > 0) {
+    log(context, "Observer attached to containers");
   }
 
   // Backup: scan every 2 seconds to catch anything missed
@@ -118,11 +123,11 @@ function scanAndBadge(): void {
 
   const contexts = [
     {
-      selector: 'div[role="gridcell"]',
+      selector: 'div[role="tabpanel"] div[role="gridcell"]',
       context: GameStoreContext.LIBRARY,
     },
     {
-      selector: 'div[role="listitem"]',
+      selector: 'div[class*="Panel"] div[role="listitem"]',
       context: GameStoreContext.HOME,
     },
   ];

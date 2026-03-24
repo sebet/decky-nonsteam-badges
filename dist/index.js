@@ -383,31 +383,39 @@ function extractAppIdFromImage(img) {
 }
 function getAppId(capsule) {
     // Try React Fiber first for the most reliable AppID
+    // We check the capsule itself and its descendants to ensure we find the props
+    // even if they are placed on a wrapper or deep inner element.
     try {
-        const key = Object.keys(capsule).find((k) => k.startsWith("__reactFiber$") || k.startsWith("__reactInternalInstance$"));
-        if (key) {
-            let fiber = capsule[key];
-            while (fiber) {
-                const props = fiber.memoizedProps || fiber.return?.memoizedProps;
-                if (props) {
-                    const id = props.appid ||
-                        props.appId ||
-                        props.unAppID ||
-                        props.nAppID ||
-                        props.m_unAppID ||
-                        props.overview?.appid ||
-                        props.appOverview?.appid ||
-                        props.app?.unAppID ||
-                        props.app?.nAppID ||
-                        props.app?.appid ||
-                        props.game?.appid ||
-                        props.item?.appid ||
-                        props.assetAppId ||
-                        props.strAppId;
-                    if (id)
-                        return String(id);
+        const elementsToCheck = [capsule, ...Array.from(capsule.querySelectorAll('*'))];
+        for (const el of elementsToCheck) {
+            const key = Object.keys(el).find((k) => k.startsWith("__reactFiber$") || k.startsWith("__reactInternalInstance$"));
+            if (key) {
+                let fiber = el[key];
+                // Only traverse up a few levels to avoid matching parent wrappers
+                let depth = 0;
+                while (fiber && depth < 5) {
+                    const props = fiber.memoizedProps || fiber.return?.memoizedProps;
+                    if (props) {
+                        const id = props.appid ||
+                            props.appId ||
+                            props.unAppID ||
+                            props.nAppID ||
+                            props.m_unAppID ||
+                            props.overview?.appid ||
+                            props.appOverview?.appid ||
+                            props.app?.unAppID ||
+                            props.app?.nAppID ||
+                            props.app?.appid ||
+                            props.game?.appid ||
+                            props.item?.appid ||
+                            props.assetAppId ||
+                            props.strAppId;
+                        if (id)
+                            return String(id);
+                    }
+                    fiber = fiber.return;
+                    depth++;
                 }
-                fiber = fiber.return;
             }
         }
     }
@@ -619,13 +627,17 @@ function startObserving() {
             debouncedScan();
         }
     });
-    const tabPanel = bigPicWindow.document.querySelector('div[role="tabpanel"]');
-    if (tabPanel) {
-        observer.observe(tabPanel, {
-            childList: true,
-            subtree: true,
-        });
-        log(context$3, "Observer attached to tabpanel");
+    const containers = bigPicWindow.document.querySelectorAll('div[role="tabpanel"], div[class*="Panel"]');
+    containers.forEach((container) => {
+        if (observer) {
+            observer.observe(container, {
+                childList: true,
+                subtree: true,
+            });
+        }
+    });
+    if (containers.length > 0) {
+        log(context$3, "Observer attached to containers");
     }
     // Backup: scan every 2 seconds to catch anything missed
     scanInterval = setInterval(scanAndBadge, 2000);
@@ -652,11 +664,11 @@ function scanAndBadge() {
         return;
     const contexts = [
         {
-            selector: 'div[role="gridcell"]',
+            selector: 'div[role="tabpanel"] div[role="gridcell"]',
             context: GameStoreContext.LIBRARY,
         },
         {
-            selector: 'div[role="listitem"]',
+            selector: 'div[class*="Panel"] div[role="listitem"]',
             context: GameStoreContext.HOME,
         },
     ];

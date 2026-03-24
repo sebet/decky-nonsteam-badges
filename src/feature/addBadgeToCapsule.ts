@@ -56,31 +56,39 @@ function extractAppIdFromImage(img: HTMLImageElement | null): string | null {
 
 function getAppId(capsule: Element): string | null {
   // Try React Fiber first for the most reliable AppID
+  // We check the capsule itself and its descendants to ensure we find the props
+  // even if they are placed on a wrapper or deep inner element.
   try {
-    const key = Object.keys(capsule).find((k) => k.startsWith("__reactFiber$") || k.startsWith("__reactInternalInstance$"));
-    if (key) {
-      let fiber = (capsule as any)[key];
-      while (fiber) {
-        const props = fiber.memoizedProps || fiber.return?.memoizedProps;
-        if (props) {
-          const id = 
-            props.appid || 
-            props.appId || 
-            props.unAppID ||
-            props.nAppID ||
-            props.m_unAppID || 
-            props.overview?.appid || 
-            props.appOverview?.appid ||
-            props.app?.unAppID || 
-            props.app?.nAppID ||
-            props.app?.appid ||
-            props.game?.appid ||
-            props.item?.appid ||
-            props.assetAppId ||
-            props.strAppId;
-          if (id) return String(id);
+    const elementsToCheck = [capsule, ...Array.from(capsule.querySelectorAll('*'))];
+    for (const el of elementsToCheck) {
+      const key = Object.keys(el).find((k) => k.startsWith("__reactFiber$") || k.startsWith("__reactInternalInstance$"));
+      if (key) {
+        let fiber = (el as any)[key];
+        // Only traverse up a few levels to avoid matching parent wrappers
+        let depth = 0;
+        while (fiber && depth < 5) {
+          const props = fiber.memoizedProps || fiber.return?.memoizedProps;
+          if (props) {
+            const id = 
+              props.appid || 
+              props.appId || 
+              props.unAppID ||
+              props.nAppID ||
+              props.m_unAppID || 
+              props.overview?.appid || 
+              props.appOverview?.appid ||
+              props.app?.unAppID || 
+              props.app?.nAppID ||
+              props.app?.appid ||
+              props.game?.appid ||
+              props.item?.appid ||
+              props.assetAppId ||
+              props.strAppId;
+            if (id) return String(id);
+          }
+          fiber = fiber.return;
+          depth++;
         }
-        fiber = fiber.return;
       }
     }
   } catch (e) {}
@@ -98,7 +106,6 @@ function getAppId(capsule: Element): string | null {
   } catch (e) {}
 
   // Fallback to image
-
   return extractAppIdFromImage(capsule.querySelector("img"));
 }
 
