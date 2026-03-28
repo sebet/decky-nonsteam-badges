@@ -668,7 +668,7 @@ function scanAndBadge() {
             context: GameStoreContext.LIBRARY,
         },
         {
-            selector: 'div[class*="Panel"] div[role="listitem"]',
+            selector: '.ReactVirtualized__Grid__innerScrollContainer div[role="listitem"]',
             context: GameStoreContext.HOME,
         },
     ];
@@ -679,7 +679,13 @@ function scanAndBadge() {
     for (const selector of selectors) {
         const capsules = bigPicWindow.document.querySelectorAll(selector);
         const context = contexts.find((c) => c.selector === selector)?.context;
-        capsules.forEach((capsule) => addBadgeToCapsule(capsule, bigPicWindow, context));
+        capsules.forEach((capsule) => {
+            // True game capsules contain a clickable wrapper with role="link".
+            // Without this, empty UI placeholders and news panels are mistakenly identified as generic non-steam apps.
+            if (capsule.querySelector('div[role="link"]')) {
+                addBadgeToCapsule(capsule, bigPicWindow, context);
+            }
+        });
     }
 }
 
