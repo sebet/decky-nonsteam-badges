@@ -70,7 +70,12 @@ export async function ensureMappingsLoaded(force = false): Promise<void> {
   }
 }
 
+const frontendStoreCache = new Map<string, string | null>();
+
 function getFrontendStore(appid: string): string | null {
+  if (frontendStoreCache.has(appid)) {
+    return frontendStoreCache.get(appid) as string | null;
+  }
   try {
     const supportedStores = Object.values(SupportedStores);
     const collectionStore = (window as any).collectionStore;
@@ -102,7 +107,7 @@ function getFrontendStore(appid: string): string | null {
         `AppID ${appid} found in local collections: ${JSON.stringify(foundCollections)}`,
       );
 
-      return foundCollections.reduce((acc: string | null, colName: string) => {
+      const result = foundCollections.reduce((acc: string | null, colName: string) => {
         if (acc) return acc;
         return supportedStores.find((store) => {
           // Match whole word, or separated by non-word chars/underscores/hyphens
@@ -113,8 +118,12 @@ function getFrontendStore(appid: string): string | null {
           return regex.test(colName);
         });
       }, null);
+
+      frontendStoreCache.set(appid, result);
+      return result;
     }
 
+    frontendStoreCache.set(appid, null);
     return null;
   } catch (e) {
     log(

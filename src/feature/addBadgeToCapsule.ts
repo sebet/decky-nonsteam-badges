@@ -11,6 +11,7 @@ const BADGE_CLASSNAME = "nonsteam-badge";
 
 // Track which elements already have badges
 let badgedElements = new WeakSet<Element>();
+const domBadgeCache = new Map<string, string>();
 
 /**
  * Remove existing badges from DOM
@@ -55,13 +56,26 @@ function extractAppIdFromImage(img: HTMLImageElement | null): string | null {
 }
 
 function getAppId(capsule: Element): string | null {
+  // lookup on Home Screen virtualized lists
+  const dataId = capsule.getAttribute("data-id");
+  if (dataId && !dataId.startsWith("placeholder")) {
+    return dataId;
+  }
+
   // Try React Fiber first for the most reliable AppID
   // We check the capsule itself and its descendants to ensure we find the props
   // even if they are placed on a wrapper or deep inner element.
   try {
-    const elementsToCheck = [capsule, ...Array.from(capsule.querySelectorAll('*'))];
+    const elementsToCheck = [
+      capsule,
+      ...Array.from(capsule.querySelectorAll("*")),
+    ];
     for (const el of elementsToCheck) {
-      const key = Object.keys(el).find((k) => k.startsWith("__reactFiber$") || k.startsWith("__reactInternalInstance$"));
+      const key = Object.keys(el).find(
+        (k) =>
+          k.startsWith("__reactFiber$") ||
+          k.startsWith("__reactInternalInstance$"),
+      );
       if (key) {
         let fiber = (el as any)[key];
         // Only traverse up a few levels to avoid matching parent wrappers
@@ -69,15 +83,15 @@ function getAppId(capsule: Element): string | null {
         while (fiber && depth < 5) {
           const props = fiber.memoizedProps || fiber.return?.memoizedProps;
           if (props) {
-            const id = 
-              props.appid || 
-              props.appId || 
+            const id =
+              props.appid ||
+              props.appId ||
               props.unAppID ||
               props.nAppID ||
-              props.m_unAppID || 
-              props.overview?.appid || 
+              props.m_unAppID ||
+              props.overview?.appid ||
               props.appOverview?.appid ||
-              props.app?.unAppID || 
+              props.app?.unAppID ||
               props.app?.nAppID ||
               props.app?.appid ||
               props.game?.appid ||
@@ -95,11 +109,17 @@ function getAppId(capsule: Element): string | null {
 
   // Look for any anchor tag with a game URL (e.g. steam://nav/games/details/APPID)
   try {
-    const anchor = capsule.tagName.toLowerCase() === "a" ? capsule : capsule.querySelector("a");
+    const anchor =
+      capsule.tagName.toLowerCase() === "a"
+        ? capsule
+        : capsule.querySelector("a");
     if (anchor) {
       const href = anchor.getAttribute("href");
       if (href) {
-        const match = href.match(/\/app\/(\d+)/i) || href.match(/\/details\/(\d+)/i) || href.match(/run\/(\d+)/i);
+        const match =
+          href.match(/\/app\/(\d+)/i) ||
+          href.match(/\/details\/(\d+)/i) ||
+          href.match(/run\/(\d+)/i);
         if (match) return match[1];
       }
     }
@@ -129,8 +149,8 @@ export function addBadgeToCapsule(
   const existingBadge = capsule.querySelector(`.${BADGE_CLASSNAME}`);
 
   let appid = getAppId(capsule);
-  
-  // If we can't find a Steam ID through any method (no artwork URL, no visible anchor tag, no fiber prop), 
+
+  // If we can't find a Steam ID through any method (no artwork URL, no visible anchor tag, no fiber prop),
   // Native Steam games NEVER have a missing ID. So it is inherently a generic/blank non-Steam app.
   if (!appid) {
     appid = "unknown_generic_app";
@@ -145,7 +165,9 @@ export function addBadgeToCapsule(
 
   if (role === "gridcell") {
     if (img) {
-      targetElement = (capsule.querySelector("div") as HTMLElement) || (capsule as HTMLElement);
+      targetElement =
+        (capsule.querySelector("div") as HTMLElement) ||
+        (capsule as HTMLElement);
     } else {
       // If there is no image, Steam uses heavily clipped CSS inner blocks for the text box.
       // We must attach directly to the gridcell itself for the badge to be visible.
@@ -167,10 +189,13 @@ export function addBadgeToCapsule(
   // Navigation Persistence Fix: If the badge exists but isn't a direct child of the exact current targetElement
   // (caused by React throwing away and regenerating the DOM on back-navigation), destroy the ghost badge.
   if (existingBadge) {
-    if (existingBadge.parentElement !== targetElement) {
+    if (
+      existingBadge.parentElement !== targetElement ||
+      existingBadge.getAttribute("data-appid") !== String(appid)
+    ) {
       existingBadge.remove();
     } else {
-      return; // It's perfectly placed, ignore.
+      return;
     }
   }
 
@@ -222,6 +247,9 @@ export function addBadgeToCapsule(
   };
 
   const badge = bigPicWindow.document.createElement("div");
+  badge.setAttribute("data-appid", String(appid));
+
+  const cacheKey = `${appid}-${effectiveContext}`;
 
   badge.className = BADGE_CLASSNAME;
   badge.classList.add(styles.badge, ...positionStyles(effectiveContext));
@@ -235,6 +263,13 @@ export function addBadgeToCapsule(
   targetElement.appendChild(badge);
   badgedElements.add(capsule);
 
+  // Use DOM cache immediately if we already rendered this badge before
+  if (domBadgeCache.has(cacheKey)) {
+    log(context, `Loading cached badge DOM for appid ${appid}`);
+    badge.innerHTML = domBadgeCache.get(cacheKey)!;
+    return;
+  }
+
   if (gameStoreName) {
     log(
       context,
@@ -243,6 +278,7 @@ export function addBadgeToCapsule(
 
     // Inject the badge icon in the DOM
     badge.innerHTML = getBadgeIcon(gameStoreName, effectiveContext);
+    domBadgeCache.set(cacheKey, badge.innerHTML);
   } else {
     log(
       context,
@@ -264,6 +300,7 @@ export function addBadgeToCapsule(
         const newName = sanitizedGameStoreName(newStore);
         if (newName) {
           badge.innerHTML = getBadgeIcon(newName, effectiveContext);
+          domBadgeCache.set(cacheKey, badge.innerHTML);
         }
       } else {
         badge.classList.remove(styles[PULSATING_CLASSNAME]);

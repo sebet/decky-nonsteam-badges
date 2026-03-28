@@ -228,7 +228,11 @@ async function ensureMappingsLoaded(force = false) {
         isFetchingMappings = false;
     }
 }
+const frontendStoreCache = new Map();
 function getFrontendStore(appid) {
+    if (frontendStoreCache.has(appid)) {
+        return frontendStoreCache.get(appid);
+    }
     try {
         const supportedStores = Object.values(SupportedStores);
         const collectionStore = window.collectionStore;
@@ -251,7 +255,7 @@ function getFrontendStore(appid) {
         }
         if (foundCollections.length > 0) {
             log(context$4, `AppID ${appid} found in local collections: ${JSON.stringify(foundCollections)}`);
-            return foundCollections.reduce((acc, colName) => {
+            const result = foundCollections.reduce((acc, colName) => {
                 if (acc)
                     return acc;
                 return supportedStores.find((store) => {
@@ -260,7 +264,10 @@ function getFrontendStore(appid) {
                     return regex.test(colName);
                 });
             }, null);
+            frontendStoreCache.set(appid, result);
+            return result;
         }
+        frontendStoreCache.set(appid, null);
         return null;
     }
     catch (e) {
@@ -346,6 +353,7 @@ function getBadgeIcon(gameStore, context) {
 const BADGE_CLASSNAME = "nonsteam-badge";
 // Track which elements already have badges
 let badgedElements = new WeakSet();
+const domBadgeCache = new Map();
 /**
  * Remove existing badges from DOM
  */
@@ -382,6 +390,11 @@ function extractAppIdFromImage(img) {
     return null;
 }
 function getAppId(capsule) {
+    // O(1) lookup on Home Screen virtualized lists
+    const dataId = capsule.getAttribute("data-id");
+    if (dataId && !dataId.startsWith("placeholder")) {
+        return dataId;
+    }
     // Try React Fiber first for the most reliable AppID
     // We check the capsule itself and its descendants to ensure we find the props
     // even if they are placed on a wrapper or deep inner element.
@@ -484,11 +497,11 @@ function addBadgeToCapsule(capsule, bigPicWindow, context = GameStoreContext.LIB
     // Navigation Persistence Fix: If the badge exists but isn't a direct child of the exact current targetElement
     // (caused by React throwing away and regenerating the DOM on back-navigation), destroy the ghost badge.
     if (existingBadge) {
-        if (existingBadge.parentElement !== targetElement) {
+        if (existingBadge.parentElement !== targetElement || existingBadge.getAttribute("data-appid") !== String(appid)) {
             existingBadge.remove();
         }
         else {
-            return; // It's perfectly placed, ignore.
+            return; // It's perfectly placed and belongs to this appid, ignore.
         }
     }
     // Ensure relative positioning
@@ -525,6 +538,8 @@ function addBadgeToCapsule(capsule, bigPicWindow, context = GameStoreContext.LIB
         return allStyles;
     };
     const badge = bigPicWindow.document.createElement("div");
+    badge.setAttribute("data-appid", String(appid));
+    const cacheKey = `${appid}-${effectiveContext}`;
     badge.className = BADGE_CLASSNAME;
     badge.classList.add(styles$1.badge, ...positionStyles(effectiveContext));
     // Hide the default non-steam badge if it exists
@@ -534,10 +549,17 @@ function addBadgeToCapsule(capsule, bigPicWindow, context = GameStoreContext.LIB
     }
     targetElement.appendChild(badge);
     badgedElements.add(capsule);
+    // Use DOM cache immediately if we already rendered this badge before
+    if (domBadgeCache.has(cacheKey)) {
+        log(context, `Loading cached badge DOM for appid ${appid}`);
+        badge.innerHTML = domBadgeCache.get(cacheKey);
+        return;
+    }
     if (gameStoreName) {
         log(context, `Got a game store name for appid ${appid}: ${gameStoreName}. Injecting badge icon into the DOM.`);
         // Inject the badge icon in the DOM
         badge.innerHTML = getBadgeIcon(gameStoreName, effectiveContext);
+        domBadgeCache.set(cacheKey, badge.innerHTML);
     }
     else {
         log(context, `No game store name for appid ${appid}: ${gameStoreName}. Falling back to default	while fetching.`);
@@ -554,6 +576,7 @@ function addBadgeToCapsule(capsule, bigPicWindow, context = GameStoreContext.LIB
                 const newName = sanitizedGameStoreName(newStore);
                 if (newName) {
                     badge.innerHTML = getBadgeIcon(newName, effectiveContext);
+                    domBadgeCache.set(cacheKey, badge.innerHTML);
                 }
             }
             else {
