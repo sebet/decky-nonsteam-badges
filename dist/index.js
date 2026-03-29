@@ -390,7 +390,7 @@ function extractAppIdFromImage(img) {
     return null;
 }
 function getAppId(capsule) {
-    // O(1) lookup on Home Screen virtualized lists
+    // lookup on Home Screen virtualized lists
     const dataId = capsule.getAttribute("data-id");
     if (dataId && !dataId.startsWith("placeholder")) {
         return dataId;
@@ -399,9 +399,13 @@ function getAppId(capsule) {
     // We check the capsule itself and its descendants to ensure we find the props
     // even if they are placed on a wrapper or deep inner element.
     try {
-        const elementsToCheck = [capsule, ...Array.from(capsule.querySelectorAll('*'))];
+        const elementsToCheck = [
+            capsule,
+            ...Array.from(capsule.querySelectorAll("*")),
+        ];
         for (const el of elementsToCheck) {
-            const key = Object.keys(el).find((k) => k.startsWith("__reactFiber$") || k.startsWith("__reactInternalInstance$"));
+            const key = Object.keys(el).find((k) => k.startsWith("__reactFiber$") ||
+                k.startsWith("__reactInternalInstance$"));
             if (key) {
                 let fiber = el[key];
                 // Only traverse up a few levels to avoid matching parent wrappers
@@ -435,11 +439,15 @@ function getAppId(capsule) {
     catch (e) { }
     // Look for any anchor tag with a game URL (e.g. steam://nav/games/details/APPID)
     try {
-        const anchor = capsule.tagName.toLowerCase() === "a" ? capsule : capsule.querySelector("a");
+        const anchor = capsule.tagName.toLowerCase() === "a"
+            ? capsule
+            : capsule.querySelector("a");
         if (anchor) {
             const href = anchor.getAttribute("href");
             if (href) {
-                const match = href.match(/\/app\/(\d+)/i) || href.match(/\/details\/(\d+)/i) || href.match(/run\/(\d+)/i);
+                const match = href.match(/\/app\/(\d+)/i) ||
+                    href.match(/\/details\/(\d+)/i) ||
+                    href.match(/run\/(\d+)/i);
                 if (match)
                     return match[1];
             }
@@ -460,7 +468,7 @@ function addBadgeToCapsule(capsule, bigPicWindow, context = GameStoreContext.LIB
     // Clean up any improperly attached or orphaned badges before proceeding
     const existingBadge = capsule.querySelector(`.${BADGE_CLASSNAME}`);
     let appid = getAppId(capsule);
-    // If we can't find a Steam ID through any method (no artwork URL, no visible anchor tag, no fiber prop), 
+    // If we can't find a Steam ID through any method (no artwork URL, no visible anchor tag, no fiber prop),
     // Native Steam games NEVER have a missing ID. So it is inherently a generic/blank non-Steam app.
     if (!appid) {
         appid = "unknown_generic_app";
@@ -473,7 +481,9 @@ function addBadgeToCapsule(capsule, bigPicWindow, context = GameStoreContext.LIB
     const role = capsule.getAttribute("role");
     if (role === "gridcell") {
         if (img) {
-            targetElement = capsule.querySelector("div") || capsule;
+            targetElement =
+                capsule.querySelector("div") ||
+                    capsule;
         }
         else {
             // If there is no image, Steam uses heavily clipped CSS inner blocks for the text box.
@@ -497,11 +507,12 @@ function addBadgeToCapsule(capsule, bigPicWindow, context = GameStoreContext.LIB
     // Navigation Persistence Fix: If the badge exists but isn't a direct child of the exact current targetElement
     // (caused by React throwing away and regenerating the DOM on back-navigation), destroy the ghost badge.
     if (existingBadge) {
-        if (existingBadge.parentElement !== targetElement || existingBadge.getAttribute("data-appid") !== String(appid)) {
+        if (existingBadge.parentElement !== targetElement ||
+            existingBadge.getAttribute("data-appid") !== String(appid)) {
             existingBadge.remove();
         }
         else {
-            return; // It's perfectly placed and belongs to this appid, ignore.
+            return;
         }
     }
     // Ensure relative positioning
@@ -704,9 +715,13 @@ function scanAndBadge() {
         const context = contexts.find((c) => c.selector === selector)?.context;
         capsules.forEach((capsule) => {
             // True game capsules contain a clickable wrapper with role="link".
-            // Without this, empty UI placeholders and news panels are mistakenly identified as generic non-steam apps.
             if (capsule.querySelector('div[role="link"]')) {
-                addBadgeToCapsule(capsule, bigPicWindow, context);
+                // Smart structural check: Collection grids place role="link" uniquely as the direct 
+                // child of the gridcell. Real game capsules nest it under a .Panel DOM layer first.
+                const isCollectionTile = capsule.firstElementChild?.getAttribute("role") === "link";
+                if (!isCollectionTile) {
+                    addBadgeToCapsule(capsule, bigPicWindow, context);
+                }
             }
         });
     }

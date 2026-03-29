@@ -81,7 +81,9 @@ export function startObserving(): void {
     }
   });
 
-  const containers = bigPicWindow.document.querySelectorAll('div[role="tabpanel"], div[class*="Panel"]');
+  const containers = bigPicWindow.document.querySelectorAll(
+    'div[role="tabpanel"], div[class*="Panel"]',
+  );
   containers.forEach((container) => {
     if (observer) {
       observer.observe(container, {
@@ -90,7 +92,7 @@ export function startObserving(): void {
       });
     }
   });
-  
+
   if (containers.length > 0) {
     log(context, "Observer attached to containers");
   }
@@ -127,7 +129,8 @@ function scanAndBadge(): void {
       context: GameStoreContext.LIBRARY,
     },
     {
-      selector: '.ReactVirtualized__Grid__innerScrollContainer div[role="listitem"]',
+      selector:
+        '.ReactVirtualized__Grid__innerScrollContainer div[role="listitem"]',
       context: GameStoreContext.HOME,
     },
   ];
@@ -144,9 +147,15 @@ function scanAndBadge(): void {
 
     capsules.forEach((capsule) => {
       // True game capsules contain a clickable wrapper with role="link".
-      // Without this, empty UI placeholders and news panels are mistakenly identified as generic non-steam apps.
       if (capsule.querySelector('div[role="link"]')) {
-        addBadgeToCapsule(capsule, bigPicWindow, context);
+        // Collection grids place role="link" uniquely as the direct
+        // child of the gridcell. Real game capsules nest it under a .Panel DOM layer first.
+        const isCollectionTile =
+          capsule.firstElementChild?.getAttribute("role") === "link";
+
+        if (!isCollectionTile) {
+          addBadgeToCapsule(capsule, bigPicWindow, context);
+        }
       }
     });
   }
