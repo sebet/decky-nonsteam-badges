@@ -716,7 +716,7 @@ function scanAndBadge() {
         capsules.forEach((capsule) => {
             // True game capsules contain a clickable wrapper with role="link".
             if (capsule.querySelector('div[role="link"]')) {
-                // Smart structural check: Collection grids place role="link" uniquely as the direct 
+                // Collection grids place role="link" uniquely as the direct
                 // child of the gridcell. Real game capsules nest it under a .Panel DOM layer first.
                 const isCollectionTile = capsule.firstElementChild?.getAttribute("role") === "link";
                 if (!isCollectionTile) {
