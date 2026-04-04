@@ -3,12 +3,12 @@
   "version": "0.1.0",
   "description": "Decky plugin to identify non-Steam games and display a badge on their library capsules",
   "type": "module",
-  "packageManager": "pnpm@7.33.6",
+  "packageManager": "pnpm@9.0.0",
   "scripts": {
-    "preinstall": "node -e \"const ua=process.env.npm_config_user_agent||''; let ok=/pnpm\\/7\\./.test(ua); if(!ok){try{const v=require('child_process').execSync('pnpm -v',{encoding:'utf8'}).trim(); ok=/^7\\./.test(v);}catch{ok=false}} if(!ok){console.error('Please use pnpm v7 (corepack prepare pnpm@7.33.6 --activate) to keep lockfileVersion 6.0'); process.exit(1);} \"",
+    "preinstall": "node -e \"const ua=process.env.npm_config_user_agent||''; let ok=/pnpm\\/9\\./.test(ua); if(!ok){try{const v=require('child_process').execSync('pnpm -v',{encoding:'utf8'}).trim(); ok=/^9\\./.test(v);}catch{ok=false}} if(!ok){console.error('Please use pnpm v9 (corepack prepare pnpm@9.0.0 --activate) to keep lockfileVersion 9.0'); process.exit(1);} \"",
     "build": "rollup -c",
     "watch": "rollup -c -w",
-    "deps:install": "corepack enable && corepack prepare pnpm@7.33.6 --activate && pnpm install"
+    "deps:install": "corepack enable && corepack prepare pnpm@9.0.0 --activate && pnpm install"
   },
   "repository": {
     "type": "git",
