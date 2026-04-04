@@ -15,14 +15,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v2
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
         with:
           version: 9.0.0
+          cache: true
 
       - uses: actions/setup-node@v4
         with:
           node-version: "18.3"
-          cache: "pnpm"
 
       - run: pnpm install --frozen-lockfile
       - run: pnpm run build
