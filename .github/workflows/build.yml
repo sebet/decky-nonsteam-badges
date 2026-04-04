@@ -63,3 +63,4 @@ jobs:
         with:
           artifacts: "decky-nonsteam-badges.zip,decky-nonsteam-badges.tar.gz"
           allowUpdates: true
+          replacesArtifacts: true
