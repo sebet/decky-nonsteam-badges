@@ -2,6 +2,9 @@ export enum GameStoreName {
   GOG = "gog",
   EPIC = "epic",
   AMAZON = "amazon",
+  UBISOFT = "ubisoft",
+  XBOX = "xbox",
+  EA = "ea",
   DEFAULT = "default",
 }
 

@@ -2,7 +2,7 @@
 // @ts-ignore
 
 // Prevents it from being duplicated in output.
-const manifest = {"id":"decky-nonsteam-badges","name":"Non-Steam Badges","author":"sebet","version":"0.1.0","flags":[],"api_version":1,"publish":{"tags":["utility","ui","badges","nonsteam","non-steam"],"description":"A Decky plugin that helps identifying non-Steam games using themed badges","image":"https://raw.githubusercontent.com/sebet/decky-nonsteam-badges/main/assets/screenshot.jpg"}};
+const manifest = {"id":"decky-nonsteam-badges","name":"Non-Steam Badges","author":"sebet","version":"0.2.0","flags":[],"api_version":1,"publish":{"tags":["utility","ui","badges","nonsteam","non-steam"],"description":"A Decky plugin that helps identifying non-Steam games using themed badges","image":"https://raw.githubusercontent.com/sebet/decky-nonsteam-badges/main/assets/screenshot.jpg"}};
 const API_VERSION = 2;
 const internalAPIConnection = window.__DECKY_SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED_deckyLoaderAPIInit;
 // Initialize
@@ -77,7 +77,7 @@ function removeStyleFromWindow(targetWindow) {
     }
 }
 
-var css_248z$1 = ".Badge-module_badge__MUvUi {\n  position: absolute;\n  display: flex;\n  border-radius: 5px;\n  backdrop-filter: blur(10px);\n  -webkit-backdrop-filter: blur(10px);\n  color: white;\n  pointer-events: none;\n  animation: Badge-module_nonsteam-badge-fade-in__0qQdz 0.3s cubic-bezier(0.2, 0, 0.2, 1) forwards;\n  background: #0000002e;\n  z-index: 9999;\n}\n\n.Badge-module_detailsBadge__ycul2 {\n  z-index: 0;\n  box-sizing: border-box;\n  padding: 5px;\n  padding-bottom: 0;\n}\n\n.Badge-module_detailsBadgeWithButton__YG9ZN {\n  flex-direction: column;\n  height: auto;\n}\n\n.Badge-module_detailsBadgeWithButton__YG9ZN svg.icon-badge {\n  width: 48px;\n  height: 48px;\n}\n\n.Badge-module_libraryBadge__nvyI6 {\n  padding: 2px;\n  border-radius: 2px;\n}\n\n.Badge-module_libraryBadge__nvyI6 svg.icon-badge {\n  width: 28px;\n  height: 28px;\n}\n\n.Badge-module_homeBadge__VBw7G {\n  padding: 2px;\n  border-radius: 2px;\n}\n\n.Badge-module_homeBadge__VBw7G svg.icon-badge {\n  width: 32px;\n  height: 32px;\n}\n\n.Panel\n  [role=\"listitem\"]:first-of-type\n  .Badge-module_homeBadge__VBw7G\n  svg.icon-badge {\n  width: 40px;\n  height: 40px;\n}\n\n.Badge-module_searchBadge__V2InQ svg.icon-badge {\n  width: 28px;\n  height: 28px;\n}\n\n.Badge-module_nonsteam-badge-pulsing__k7UJv {\n  animation: Badge-module_nonsteam-badge-pulse__ux3h3 2s infinite ease-in-out;\n}\n\n.Badge-module_top-left__vhIBr {\n  top: 4px;\n  left: 4px;\n}\n\n.Badge-module_top-right__k9tm2 {\n  top: 4px;\n  right: 4px;\n}\n\n.Badge-module_bottom-left__B0MGj {\n  bottom: 4px;\n  left: 4px;\n}\n\n.Badge-module_bottom-right__wK-WR {\n  bottom: 4px;\n  right: 4px;\n}\n\n.Badge-module_details-top-left__9FED9 {\n  flex-direction: row;\n  gap: 5px;\n  top: 45px;\n  left: 20px;\n}\n\n.Badge-module_details-top-left__9FED9 svg.icon-badge {\n  width: 42px;\n  height: 42px;\n}\n\n.Badge-module_detailsBadgeWithButton__YG9ZN.Badge-module_details-top-left__9FED9 svg.icon-badge {\n  width: 32px;\n  height: 32px;\n}\n\n.Badge-module_details-top-right__GADVk {\n  top: 55px;\n  right: 20px;\n  align-items: center;\n}\n\n.Badge-module_search-top-right__V3fHe {\n  top: 10px;\n  right: 5px;\n}\n\n@keyframes Badge-module_nonsteam-badge-pulse__ux3h3 {\n  0% {\n    transform: scale(0.9);\n    opacity: 0.4;\n  }\n  50% {\n    transform: scale(1.1);\n    opacity: 0.8;\n  }\n  100% {\n    transform: scale(0.9);\n    opacity: 0.4;\n  }\n}\n\n@keyframes Badge-module_nonsteam-badge-fade-in__0qQdz {\n  from {\n    opacity: 0;\n    transform: scale(0.8);\n  }\n  to {\n    opacity: 1;\n    transform: scale(1);\n  }\n}\n";
+var css_248z$1 = ".Badge-module_badge__MUvUi {\n  position: absolute;\n  display: flex;\n  border-radius: 5px;\n  backdrop-filter: blur(10px);\n  -webkit-backdrop-filter: blur(10px);\n  color: white;\n  pointer-events: none;\n  animation: Badge-module_nonsteam-badge-fade-in__0qQdz 0.3s cubic-bezier(0.2, 0, 0.2, 1) forwards;\n  background: #0000002e;\n  z-index: 9999;\n}\n\n.Badge-module_detailsBadge__ycul2 {\n  z-index: 0;\n  box-sizing: border-box;\n  padding: 5px;\n  padding-bottom: 0;\n}\n\n.Badge-module_detailsBadgeWithButton__YG9ZN {\n  flex-direction: column;\n  height: auto;\n}\n\n.Badge-module_detailsBadgeWithButton__YG9ZN svg.icon-badge {\n  width: 48px;\n  height: 48px;\n}\n\n.Badge-module_libraryBadge__nvyI6 {\n  padding: 2px;\n  border-radius: 2px;\n}\n\n.Badge-module_libraryBadge__nvyI6 svg.icon-badge {\n  width: 28px;\n  height: 28px;\n}\n\n.Badge-module_homeBadge__VBw7G {\n  padding: 2px;\n  border-radius: 2px;\n}\n\n.Badge-module_homeBadge__VBw7G svg.icon-badge {\n  width: 28px;\n  height: 28px;\n}\n\n.Panel\n  [role=\"listitem\"]:first-of-type\n  .Badge-module_homeBadge__VBw7G\n  svg.icon-badge {\n  width: 40px;\n  height: 40px;\n}\n\n.Badge-module_searchBadge__V2InQ svg.icon-badge {\n  width: 24px;\n  height: 24px;\n}\n\n.Badge-module_nonsteam-badge-pulsing__k7UJv {\n  animation: Badge-module_nonsteam-badge-pulse__ux3h3 2s infinite ease-in-out;\n}\n\n.Badge-module_top-left__vhIBr {\n  top: 4px;\n  left: 4px;\n}\n\n.Badge-module_top-right__k9tm2 {\n  top: 4px;\n  right: 4px;\n}\n\n.Badge-module_bottom-left__B0MGj {\n  bottom: 4px;\n  left: 4px;\n}\n\n.Badge-module_bottom-right__wK-WR {\n  bottom: 4px;\n  right: 4px;\n}\n\n.Badge-module_details-top-left__9FED9 {\n  flex-direction: row;\n  gap: 5px;\n  top: 45px;\n  left: 20px;\n}\n\n.Badge-module_details-top-left__9FED9 svg.icon-badge {\n  width: 42px;\n  height: 42px;\n}\n\n.Badge-module_detailsBadgeWithButton__YG9ZN.Badge-module_details-top-left__9FED9 svg.icon-badge {\n  width: 32px;\n  height: 32px;\n}\n\n.Badge-module_details-top-right__GADVk {\n  top: 55px;\n  right: 20px;\n  align-items: center;\n}\n\n.Badge-module_search-top-right__V3fHe {\n  top: 10px;\n  right: 5px;\n}\n\n@keyframes Badge-module_nonsteam-badge-pulse__ux3h3 {\n  0% {\n    transform: scale(0.9);\n    opacity: 0.4;\n  }\n  50% {\n    transform: scale(1.1);\n    opacity: 0.8;\n  }\n  100% {\n    transform: scale(0.9);\n    opacity: 0.4;\n  }\n}\n\n@keyframes Badge-module_nonsteam-badge-fade-in__0qQdz {\n  from {\n    opacity: 0;\n    transform: scale(0.8);\n  }\n  to {\n    opacity: 1;\n    transform: scale(1);\n  }\n}\n";
 var styles$1 = {"badge":"Badge-module_badge__MUvUi","nonsteam-badge-fade-in":"Badge-module_nonsteam-badge-fade-in__0qQdz","detailsBadge":"Badge-module_detailsBadge__ycul2","detailsBadgeWithButton":"Badge-module_detailsBadgeWithButton__YG9ZN","libraryBadge":"Badge-module_libraryBadge__nvyI6","homeBadge":"Badge-module_homeBadge__VBw7G","searchBadge":"Badge-module_searchBadge__V2InQ","nonsteam-badge-pulsing":"Badge-module_nonsteam-badge-pulsing__k7UJv","nonsteam-badge-pulse":"Badge-module_nonsteam-badge-pulse__ux3h3","top-left":"Badge-module_top-left__vhIBr","top-right":"Badge-module_top-right__k9tm2","bottom-left":"Badge-module_bottom-left__B0MGj","bottom-right":"Badge-module_bottom-right__wK-WR","details-top-left":"Badge-module_details-top-left__9FED9","details-top-right":"Badge-module_details-top-right__GADVk","search-top-right":"Badge-module_search-top-right__V3fHe"};
 injectStyle(css_248z$1);
 
@@ -86,6 +86,9 @@ var GameStoreName;
     GameStoreName["GOG"] = "gog";
     GameStoreName["EPIC"] = "epic";
     GameStoreName["AMAZON"] = "amazon";
+    GameStoreName["UBISOFT"] = "ubisoft";
+    GameStoreName["XBOX"] = "xbox";
+    GameStoreName["EA"] = "ea";
     GameStoreName["DEFAULT"] = "default";
 })(GameStoreName || (GameStoreName = {}));
 var GameStoreContext;
@@ -104,6 +107,9 @@ function gameStoreIsValid(gameStore) {
         GameStoreName.GOG,
         GameStoreName.EPIC,
         GameStoreName.AMAZON,
+        GameStoreName.UBISOFT,
+        GameStoreName.XBOX,
+        GameStoreName.EA,
         GameStoreName.DEFAULT,
     ].includes(gameStore);
 }
@@ -132,6 +138,9 @@ var SupportedStores;
     SupportedStores["GOG"] = "gog";
     SupportedStores["EPIC"] = "epic";
     SupportedStores["AMAZON"] = "amazon";
+    SupportedStores["UBISOFT"] = "ubisoft";
+    SupportedStores["XBOX"] = "xbox";
+    SupportedStores["EA"] = "ea";
 })(SupportedStores || (SupportedStores = {}));
 var BadgePosition;
 (function (BadgePosition) {
@@ -175,6 +184,39 @@ function saveSettings(settings) {
         log(context$5, "Error saving settings:", "error");
     }
 }
+
+var gog = [
+	"gog"
+];
+var epic = [
+	"epic"
+];
+var amazon = [
+	"amazon",
+	"luna"
+];
+var ubisoft = [
+	"ubisoft",
+	"uplay"
+];
+var xbox = [
+	"xbox",
+	"microsoft"
+];
+var ea = [
+	"ea",
+	"origin",
+	"electronic arts",
+	"electronicarts"
+];
+var storeMappings = {
+	gog: gog,
+	epic: epic,
+	amazon: amazon,
+	ubisoft: ubisoft,
+	xbox: xbox,
+	ea: ea
+};
 
 const context$4 = "cache";
 const CACHE_TTL_MS = 60 * 1000; // 1 minute
@@ -228,11 +270,7 @@ async function ensureMappingsLoaded(force = false) {
         isFetchingMappings = false;
     }
 }
-const frontendStoreCache = new Map();
 function getFrontendStore(appid) {
-    if (frontendStoreCache.has(appid)) {
-        return frontendStoreCache.get(appid);
-    }
     try {
         const supportedStores = Object.values(SupportedStores);
         const collectionStore = window.collectionStore;
@@ -254,20 +292,22 @@ function getFrontendStore(appid) {
             }
         }
         if (foundCollections.length > 0) {
-            log(context$4, `AppID ${appid} found in local collections: ${JSON.stringify(foundCollections)}`);
             const result = foundCollections.reduce((acc, colName) => {
                 if (acc)
                     return acc;
-                return supportedStores.find((store) => {
-                    // Match whole word, or separated by non-word chars/underscores/hyphens
-                    const regex = new RegExp(`[\\b_\\-]${store}[\\b_\\-]|^${store}|${store}$`, "i");
-                    return regex.test(colName);
-                });
+                for (const store of supportedStores) {
+                    const aliases = storeMappings[store] || [store];
+                    for (const alias of aliases) {
+                        const regex = new RegExp(`\\b${alias}\\b`, "i");
+                        if (regex.test(colName)) {
+                            return store;
+                        }
+                    }
+                }
+                return null;
             }, null);
-            frontendStoreCache.set(appid, result);
             return result;
         }
-        frontendStoreCache.set(appid, null);
         return null;
     }
     catch (e) {
@@ -336,6 +376,21 @@ function getBadgeStyle(gameStore, prop) {
             gradient: "linear-gradient(135deg, #FF9900 0%, #FFB84D 100%)",
             icon: `<svg class="icon-badge" width="${width}" height="${height}" viewBox="0 0 343 335" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g id="f9146ffff"><path fill="white" opacity="1.00" d=" M 165.30 1.16 C 172.35 -0.68 180.19 0.63 186.14 4.87 C 193.44 9.93 197.75 19.08 196.63 27.95 C 195.42 40.06 195.15 53.38 201.88 64.07 C 206.08 71.23 210.19 78.45 214.36 85.63 C 219.72 95.12 228.83 102.37 239.23 105.59 C 247.67 108.12 254.92 114.34 258.68 122.31 C 263.93 133.06 262.51 146.69 255.05 156.07 C 246.93 166.74 231.85 171.05 219.24 166.62 C 212.62 164.58 207.89 159.16 201.62 156.43 C 183.52 147.43 162.68 147.15 142.97 148.81 C 132.38 149.60 122.34 153.30 112.27 156.39 C 104.93 158.45 96.54 154.84 92.87 148.19 C 88.02 140.00 91.36 128.19 100.03 124.05 C 107.97 119.81 113.37 112.41 117.88 104.85 C 126.10 90.71 134.22 76.52 142.41 62.37 C 147.15 54.12 147.48 44.29 147.25 35.02 C 147.22 30.34 145.86 25.65 146.91 21.00 C 148.46 11.54 156.01 3.44 165.30 1.16 M 165.44 59.63 C 159.97 61.71 156.88 67.09 153.62 71.60 C 145.55 83.65 138.50 96.39 132.56 109.62 C 129.21 117.31 132.66 127.04 140.00 131.02 C 144.87 133.69 150.60 133.45 155.97 134.03 C 169.95 134.79 184.05 134.78 197.95 132.95 C 205.36 131.94 211.11 125.31 212.03 118.05 C 212.78 113.27 210.57 108.74 208.45 104.60 C 204.63 96.34 199.99 88.49 195.44 80.62 C 191.79 74.44 188.02 68.20 182.95 63.06 C 178.49 58.48 171.30 57.73 165.44 59.63 Z"/></g><g id="f280f32ff"><path fill="white" opacity="1.00" d=" M 1.77 188.43 C 7.69 187.94 13.83 187.36 19.65 188.82 C 19.96 190.53 20.26 192.25 20.26 193.99 C 20.24 232.35 20.25 270.71 20.25 309.06 C 20.27 311.57 20.77 314.57 23.21 315.86 C 26.95 317.99 31.34 316.26 35.37 316.79 C 36.23 320.47 36.13 324.29 35.91 328.04 C 35.93 330.69 32.90 331.38 30.86 331.87 C 23.54 333.26 15.27 333.51 8.84 329.17 C 3.02 325.14 0.83 317.76 0.76 310.98 C 0.73 273.66 0.77 236.33 0.74 199.00 C 0.79 195.46 0.33 191.78 1.77 188.43 Z"/><path fill="white" opacity="1.00" d=" M 177.16 243.90 C 187.28 236.39 199.36 231.13 212.06 230.46 C 220.44 229.90 229.69 231.00 236.27 236.71 C 242.34 241.90 244.62 250.20 244.75 257.93 C 244.76 280.64 244.74 303.35 244.76 326.07 C 244.77 327.78 244.48 329.47 244.15 331.16 C 238.89 332.18 233.47 331.76 228.15 331.63 C 225.42 331.33 225.17 328.23 225.24 326.08 C 225.25 305.39 225.25 284.69 225.25 264.00 C 225.16 259.16 224.11 253.95 220.66 250.34 C 216.84 246.53 211.07 245.84 205.93 246.17 C 195.96 246.57 186.49 250.54 178.24 255.98 C 178.25 279.68 178.25 303.37 178.25 327.07 C 178.24 328.77 178.07 331.51 175.81 331.59 C 171.26 331.92 166.68 331.79 162.12 331.68 C 160.16 331.83 158.73 329.92 159.02 328.06 C 158.99 297.69 158.99 267.32 159.02 236.95 C 158.74 235.11 160.19 233.17 162.13 233.32 C 166.43 233.19 170.82 232.91 175.05 233.88 C 176.15 237.13 176.62 240.53 177.16 243.90 Z"/><path fill="white" opacity="1.00" d=" M 275.32 235.32 C 287.01 231.30 299.55 229.84 311.87 230.53 C 321.19 231.15 331.53 233.75 337.21 241.80 C 341.10 246.86 341.64 253.37 343.00 259.38 L 343.00 328.46 C 340.82 333.69 334.40 331.33 330.03 331.72 C 324.89 331.84 325.70 325.54 324.79 322.11 C 315.47 329.39 304.03 334.62 292.00 334.28 C 282.39 334.35 272.24 330.32 266.91 322.01 C 258.63 308.83 261.60 288.74 275.40 280.40 C 289.89 271.23 308.00 273.98 323.89 277.18 C 323.77 269.47 325.18 261.27 322.02 253.98 C 319.83 248.83 314.00 246.71 308.82 246.22 C 298.08 245.36 287.17 246.66 276.89 249.89 C 274.68 250.53 272.43 251.18 270.10 251.13 C 268.22 248.13 269.08 244.33 269.06 240.97 C 268.93 237.50 272.71 236.34 275.32 235.32 M 290.72 289.77 C 281.53 293.30 279.39 305.89 284.30 313.65 C 287.00 317.86 292.23 319.46 297.00 319.52 C 306.81 319.51 316.16 315.43 323.99 309.75 C 324.00 303.19 324.00 296.62 324.00 290.06 C 313.16 287.84 301.38 285.77 290.72 289.77 Z"/><path fill="white" opacity="1.00" d=" M 51.03 236.94 C 50.82 235.12 52.15 233.16 54.12 233.32 C 59.28 233.26 64.52 232.86 69.63 233.79 C 70.12 235.80 70.58 237.84 70.52 239.93 C 70.48 259.95 70.52 279.97 70.49 300.00 C 70.46 305.01 71.44 310.32 74.68 314.31 C 77.50 317.46 81.84 318.72 85.95 318.90 C 96.42 319.30 106.49 315.26 115.22 309.77 C 115.28 288.51 115.23 267.26 115.25 246.00 C 115.31 241.97 114.90 237.86 115.90 233.90 C 121.87 232.86 128.13 232.86 134.10 233.90 C 134.44 235.56 134.77 237.23 134.76 238.93 C 134.75 265.95 134.75 292.97 134.76 320.00 C 134.73 323.72 135.03 327.50 134.09 331.14 C 129.60 332.06 124.93 331.94 120.40 331.52 C 116.72 329.87 117.66 324.77 116.53 321.54 C 105.14 329.79 91.33 335.48 77.05 334.62 C 70.15 334.29 62.97 332.01 58.18 326.80 C 53.02 321.25 51.00 313.45 50.99 306.02 C 51.03 283.00 50.95 259.97 51.03 236.94 Z"/></g></svg>`,
         },
+        ubisoft: {
+            name: "UBISOFT",
+            gradient: "linear-gradient(135deg, #0078FF 0%, #0012FF 100%)",
+            icon: `<svg class="icon-badge" width="${width}" height="${height}" role="img" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg"><path d="M23.561 11.988C23.301-.304 6.954-4.89.656 6.634c.282.206.661.477.943.672a11.747 11.747 0 00-.976 3.067 11.885 11.885 0 00-.184 2.071C.439 18.818 5.621 24 12.005 24c6.385 0 11.556-5.17 11.556-11.556v-.455zm-20.27 2.06c-.152 1.246-.054 1.636-.054 1.788l-.282.098c-.108-.206-.37-.932-.488-1.908C2.163 10.308 4.7 6.96 8.57 6.33c3.544-.52 6.937 1.68 7.728 4.758l-.282.098c-.087-.087-.228-.336-.77-.878-4.281-4.281-11.002-2.32-11.956 3.74zm11.002 2.081a3.145 3.145 0 01-2.59 1.355 3.15 3.15 0 01-3.155-3.155 3.159 3.159 0 012.927-3.144c1.018-.043 1.972.51 2.416 1.398a2.58 2.58 0 01-.455 2.95c.293.205.575.4.856.595zm6.58.12c-1.669 3.782-5.106 5.766-8.77 5.712-7.034-.347-9.083-8.466-4.38-11.393l.207.206c-.076.108-.358.325-.791 1.182-.51 1.041-.672 2.081-.607 2.732.369 5.67 8.314 6.83 11.045 1.214C21.057 8.217 11.822.401 3.626 6.374l-.184-.184C5.599 2.808 9.816 1.3 13.837 2.309c6.147 1.55 9.453 7.956 7.035 13.94z" /></svg>`,
+        },
+        xbox: {
+            name: "XBOX",
+            gradient: "linear-gradient(135deg, #107C10 0%, #17A917 100%)",
+            icon: `<svg class="icon-badge" width="${width}" height="${height}" viewBox="-48 -48 608 608" fill="white" xmlns="http://www.w3.org/2000/svg"><path d="M369.9 318.2c44.3 54.3 64.7 98.8 54.4 118.7-7.9 15.1-56.7 44.6-92.6 55.9-29.6 9.3-68.4 13.3-100.4 10.2-38.2-3.7-76.9-17.4-110.1-39C93.3 445.8 87 438.3 87 423.4c0-29.9 32.9-82.3 89.2-142.1 32-33.9 76.5-73.7 81.4-72.6 9.4 2.1 84.3 75.1 112.3 109.5zM188.6 143.8c-29.7-26.9-58.1-53.9-86.4-63.4-15.2-5.1-16.3-4.8-28.7 8.1-29.2 30.4-53.5 79.7-60.3 122.4-5.4 34.2-6.1 43.8-4.2 60.5 5.6 50.5 17.3 85.4 40.5 120.9 9.5 14.6 12.1 17.3 9.3 9.9-4.2-11-.3-37.5 9.5-64 14.3-39 53.9-112.9 120.3-194.4zm311.6 63.5C483.3 127.3 432.7 77 425.6 77c-7.3 0-24.2 6.5-36 13.9-23.3 14.5-41 31.4-64.3 52.8C367.7 197 427.5 283.1 448.2 346c6.8 20.7 9.7 41.1 7.4 52.3-1.7 8.5-1.7 8.5 1.4 4.6 6.1-7.7 19.9-31.3 25.4-43.5 7.4-16.2 15-40.2 18.6-58.7 4.3-22.5 3.9-70.8-.8-93.4zM141.3 43C189 40.5 251 77.5 255.6 78.4c.7.1 10.4-4.2 21.6-9.7 63.9-31.1 94-25.8 107.4-25.2-63.9-39.3-152.7-50-233.9-11.7-23.4 11.1-24 11.9-9.4 11.2z" /></svg>`,
+        },
+        ea: {
+            name: "EA",
+            gradient: "linear-gradient(135deg, #111111 0%, #333333 100%)",
+            icon: `<svg class="icon-badge" width="${width}" height="${height}" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/><path d="M17.5 15l-3 -6l-3 6h-5l1.5 -3"/><path d="M17 14h-2"/><path d="M6.5 12h3.5"/><path d="M8 9h3"/></svg>`,
+        },
         default: {
             name: "NON-STEAM",
             gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
@@ -353,7 +408,6 @@ function getBadgeIcon(gameStore, context) {
 const BADGE_CLASSNAME = "nonsteam-badge";
 // Track which elements already have badges
 let badgedElements = new WeakSet();
-const domBadgeCache = new Map();
 /**
  * Remove existing badges from DOM
  */
@@ -474,6 +528,9 @@ function addBadgeToCapsule(capsule, bigPicWindow, context = GameStoreContext.LIB
         appid = "unknown_generic_app";
     }
     else if (!isNonSteamApp(appid)) {
+        if (existingBadge) {
+            existingBadge.remove();
+        }
         return;
     }
     const img = capsule.querySelector("img");
@@ -550,7 +607,6 @@ function addBadgeToCapsule(capsule, bigPicWindow, context = GameStoreContext.LIB
     };
     const badge = bigPicWindow.document.createElement("div");
     badge.setAttribute("data-appid", String(appid));
-    const cacheKey = `${appid}-${effectiveContext}`;
     badge.className = BADGE_CLASSNAME;
     badge.classList.add(styles$1.badge, ...positionStyles(effectiveContext));
     // Hide the default non-steam badge if it exists
@@ -560,17 +616,10 @@ function addBadgeToCapsule(capsule, bigPicWindow, context = GameStoreContext.LIB
     }
     targetElement.appendChild(badge);
     badgedElements.add(capsule);
-    // Use DOM cache immediately if we already rendered this badge before
-    if (domBadgeCache.has(cacheKey)) {
-        log(context, `Loading cached badge DOM for appid ${appid}`);
-        badge.innerHTML = domBadgeCache.get(cacheKey);
-        return;
-    }
     if (gameStoreName) {
         log(context, `Got a game store name for appid ${appid}: ${gameStoreName}. Injecting badge icon into the DOM.`);
         // Inject the badge icon in the DOM
         badge.innerHTML = getBadgeIcon(gameStoreName, effectiveContext);
-        domBadgeCache.set(cacheKey, badge.innerHTML);
     }
     else {
         log(context, `No game store name for appid ${appid}: ${gameStoreName}. Falling back to default	while fetching.`);
@@ -587,7 +636,6 @@ function addBadgeToCapsule(capsule, bigPicWindow, context = GameStoreContext.LIB
                 const newName = sanitizedGameStoreName(newStore);
                 if (newName) {
                     badge.innerHTML = getBadgeIcon(newName, effectiveContext);
-                    domBadgeCache.set(cacheKey, badge.innerHTML);
                 }
             }
             else {
@@ -786,8 +834,7 @@ const Settings = () => {
             SP_REACT.createElement(DFL.PanelSectionRow, null,
                 SP_REACT.createElement(DFL.DropdownItem, { label: "Details", menuLabel: "Game Details Position", description: "Position of the badge on the Details page", selectedOption: settings.detailsPosition ?? DEFAULT_SETTINGS.detailsPosition, rgOptions: badgeDetailsPositions, onChange: (option) => {
                         updateSetting({ key: "detailsPosition", value: option.data });
-                    } }))),
-        SP_REACT.createElement(DFL.PanelSection, { title: "Steam Store Button" },
+                    } })),
             SP_REACT.createElement(DFL.PanelSectionRow, null,
                 SP_REACT.createElement(DFL.ToggleField, { label: "Steam Store Button", description: "Show Steam store button on game details page, when available", checked: settings.showSteamStoreButton, onChange: (checked) => {
                         updateSetting({

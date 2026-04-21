@@ -11,7 +11,6 @@ const BADGE_CLASSNAME = "nonsteam-badge";
 
 // Track which elements already have badges
 let badgedElements = new WeakSet<Element>();
-const domBadgeCache = new Map<string, string>();
 
 /**
  * Remove existing badges from DOM
@@ -155,6 +154,9 @@ export function addBadgeToCapsule(
   if (!appid) {
     appid = "unknown_generic_app";
   } else if (!isNonSteamApp(appid)) {
+    if (existingBadge) {
+      existingBadge.remove();
+    }
     return;
   }
 
@@ -263,13 +265,6 @@ export function addBadgeToCapsule(
   targetElement.appendChild(badge);
   badgedElements.add(capsule);
 
-  // Use DOM cache immediately if we already rendered this badge before
-  if (domBadgeCache.has(cacheKey)) {
-    log(context, `Loading cached badge DOM for appid ${appid}`);
-    badge.innerHTML = domBadgeCache.get(cacheKey)!;
-    return;
-  }
-
   if (gameStoreName) {
     log(
       context,
@@ -278,7 +273,6 @@ export function addBadgeToCapsule(
 
     // Inject the badge icon in the DOM
     badge.innerHTML = getBadgeIcon(gameStoreName, effectiveContext);
-    domBadgeCache.set(cacheKey, badge.innerHTML);
   } else {
     log(
       context,
@@ -300,7 +294,6 @@ export function addBadgeToCapsule(
         const newName = sanitizedGameStoreName(newStore);
         if (newName) {
           badge.innerHTML = getBadgeIcon(newName, effectiveContext);
-          domBadgeCache.set(cacheKey, badge.innerHTML);
         }
       } else {
         badge.classList.remove(styles[PULSATING_CLASSNAME]);

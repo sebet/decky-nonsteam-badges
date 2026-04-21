@@ -39,6 +39,7 @@ scp plugin.json deck@$DECK_IP:$DECK_USER_HOME/homebrew/plugins/$PLUGIN_NAME/
 scp package.json deck@$DECK_IP:$DECK_USER_HOME/homebrew/plugins/$PLUGIN_NAME/
 scp .env deck@$DECK_IP:$DECK_USER_HOME/homebrew/plugins/$PLUGIN_NAME/
 scp main.py deck@$DECK_IP:$DECK_USER_HOME/homebrew/plugins/$PLUGIN_NAME/
+scp store_mappings.json deck@$DECK_IP:$DECK_USER_HOME/homebrew/plugins/$PLUGIN_NAME/
 
 echo "Starting plugin loader..."
 ssh -t ${DECK_USER}@$DECK_IP "sudo systemctl start plugin_loader"

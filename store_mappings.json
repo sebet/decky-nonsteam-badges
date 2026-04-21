@@ -1,0 +1,8 @@
+{
+  "gog": ["gog"],
+  "epic": ["epic"],
+  "amazon": ["amazon", "luna"],
+  "ubisoft": ["ubisoft", "uplay"],
+  "xbox": ["xbox", "microsoft"],
+  "ea": ["ea", "origin", "electronic arts", "electronicarts"]
+}

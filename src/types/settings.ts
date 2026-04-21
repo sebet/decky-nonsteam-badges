@@ -6,6 +6,9 @@ export enum SupportedStores {
   GOG = "gog",
   EPIC = "epic",
   AMAZON = "amazon",
+  UBISOFT = "ubisoft",
+  XBOX = "xbox",
+  EA = "ea",
 }
 
 export enum BadgePosition {

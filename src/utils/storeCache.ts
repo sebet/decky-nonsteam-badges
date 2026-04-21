@@ -1,6 +1,7 @@
 import { SupportedStores } from "src/types/settings";
 import { log } from "./logger";
 import { call } from "@decky/api";
+import storeMappings from "../../store_mappings.json";
 
 interface StoreMapping {
   store: string;
@@ -70,12 +71,7 @@ export async function ensureMappingsLoaded(force = false): Promise<void> {
   }
 }
 
-const frontendStoreCache = new Map<string, string | null>();
-
 function getFrontendStore(appid: string): string | null {
-  if (frontendStoreCache.has(appid)) {
-    return frontendStoreCache.get(appid) as string | null;
-  }
   try {
     const supportedStores = Object.values(SupportedStores);
     const collectionStore = (window as any).collectionStore;
@@ -102,28 +98,24 @@ function getFrontendStore(appid: string): string | null {
     }
 
     if (foundCollections.length > 0) {
-      log(
-        context,
-        `AppID ${appid} found in local collections: ${JSON.stringify(foundCollections)}`,
-      );
-
       const result = foundCollections.reduce((acc: string | null, colName: string) => {
         if (acc) return acc;
-        return supportedStores.find((store) => {
-          // Match whole word, or separated by non-word chars/underscores/hyphens
-          const regex = new RegExp(
-            `[\\b_\\-]${store}[\\b_\\-]|^${store}|${store}$`,
-            "i",
-          );
-          return regex.test(colName);
-        });
+        
+        for (const store of supportedStores) {
+          const aliases = (storeMappings as Record<string, string[]>)[store as string] || [store];
+          for (const alias of aliases) {
+            const regex = new RegExp(`\\b${alias}\\b`, "i");
+            if (regex.test(colName)) {
+              return store;
+            }
+          }
+        }
+        return null;
       }, null);
 
-      frontendStoreCache.set(appid, result);
       return result;
     }
 
-    frontendStoreCache.set(appid, null);
     return null;
   } catch (e) {
     log(

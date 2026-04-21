@@ -44,8 +44,8 @@
 }
 
 .homeBadge :global(svg.icon-badge) {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
 }
 
 :global(.Panel)
@@ -57,8 +57,8 @@
 }
 
 .searchBadge :global(svg.icon-badge) {
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
 }
 
 .nonsteam-badge-pulsing {

@@ -8,6 +8,9 @@ function gameStoreIsValid(gameStore: string): gameStore is GameStoreName {
     GameStoreName.GOG,
     GameStoreName.EPIC,
     GameStoreName.AMAZON,
+    GameStoreName.UBISOFT,
+    GameStoreName.XBOX,
+    GameStoreName.EA,
     GameStoreName.DEFAULT,
   ].includes(gameStore as GameStoreName);
 }

@@ -101,8 +101,6 @@ const Settings = () => {
             }}
           />
         </PanelSectionRow>
-      </PanelSection>
-      <PanelSection title="Steam Store Button">
         <PanelSectionRow>
           <ToggleField
             label="Steam Store Button"

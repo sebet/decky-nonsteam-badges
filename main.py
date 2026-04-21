@@ -3,6 +3,7 @@ import json
 import urllib.request
 from pathlib import Path
 import sys
+import re
 
 # Add py_modules to path for local vdf library
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'py_modules'))
@@ -172,6 +173,21 @@ class Plugin:
             if not os.path.exists(vdf_path):
                 return {}
 
+            try:
+                mappings_path = os.path.join(os.path.dirname(__file__), "store_mappings.json")
+                with open(mappings_path, "r") as mf:
+                    store_aliases = json.load(mf)
+            except Exception as e:
+                decky.logger.error(f"Error loading store_mappings.json: {e}")
+                store_aliases = {
+                    "gog": ["gog"],
+                    "epic": ["epic"],
+                    "amazon": ["amazon", "luna"],
+                    "ubisoft": ["ubisoft", "uplay"],
+                    "xbox": ["xbox", "microsoft"],
+                    "ea": ["ea", "origin", "electronic arts", "electronicarts"]
+                }
+
             with open(vdf_path, "rb") as f:
                 # Load the binary VDF data
                 data = vdf.binary_load(f)
@@ -181,6 +197,8 @@ class Plugin:
                     name = entry.get('AppName', "")
                     # Unifideck puts the store info in LaunchOptions
                     opts = entry.get('LaunchOptions', "").lower()
+                    exe = entry.get('Exe', "").lower()
+                    start_dir = entry.get('StartDir', "").lower()
                     vdf_appid = entry.get('appid')
 
                     if vdf_appid is None:
@@ -192,14 +210,18 @@ class Plugin:
                     else:
                         vdf_appid_unsigned = vdf_appid
 
+                    tags = local_tags.get(str(vdf_appid_unsigned), [])
+                    check_string = opts + " " + exe + " " + start_dir + " " + " ".join(tags).lower()
+
                     store = None
 
-                    if "gog" in opts:
-                        store = "gog"
-                    elif "epic" in opts:
-                        store = "epic"
-                    elif "amazon" in opts or "luna" in opts:
-                        store = "amazon"
+                    for s_key, aliases in store_aliases.items():
+                        for alias in aliases:
+                            if re.search(r'\b' + re.escape(alias) + r'\b', check_string):
+                                store = s_key
+                                break
+                        if store:
+                            break
 
                     if store:
                         mapping[str(vdf_appid_unsigned)] = {"store": store, "name": name}
