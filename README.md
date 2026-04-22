@@ -36,10 +36,16 @@ If it finds matches, it overlays the relevant badge. If there are no matches, it
 
 **Matching rules priority:**
 
-The plugin will look for storefront matches on:
+The plugin looks for storefront matches in two distinct phases:
 
-1. **Launch Options**
-2. **Collection Name**
+**Phase 1:** Custom Overrides
+1. **Collection Name**: The plugin strictly searches your assigned Steam Collections first. Custom tags take absolute priority.
+
+**Phase 2:** Automated Fallbacks
+If no matches are found in your collections, it groups together the underlying program configurations to search for automated tags or installation folder names:
+2. **Target** (Executable file path)
+3. **Start In** (Installation directory)
+4. **Launch Options**
 
 If you use [Unifideck](https://github.com/mubaraknumann/unifideck), you shouldn't need any additional steps, since Unifideck already adds the correct collection names for non-Steam games as well as launch options.
 If you add non-Steam games to your Steam library manually or through the [Heroic Games Launcher](https://heroicgameslauncher.com/), you just need to add the correct collection names, for the plugin to identify it (i.e: `gog`, `epic`, `amazon`, `luna`, `ubisoft`, `xbox`, or `ea`).

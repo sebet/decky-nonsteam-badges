@@ -98,20 +98,25 @@ function getFrontendStore(appid: string): string | null {
     }
 
     if (foundCollections.length > 0) {
-      const result = foundCollections.reduce((acc: string | null, colName: string) => {
-        if (acc) return acc;
-        
-        for (const store of supportedStores) {
-          const aliases = (storeMappings as Record<string, string[]>)[store as string] || [store];
-          for (const alias of aliases) {
-            const regex = new RegExp(`\\b${alias}\\b`, "i");
-            if (regex.test(colName)) {
-              return store;
+      const result = foundCollections.reduce(
+        (acc: string | null, colName: string) => {
+          if (acc) return acc;
+
+          for (const store of supportedStores) {
+            const aliases = (storeMappings as Record<string, string[]>)[
+              store as string
+            ] || [store];
+            for (const alias of aliases) {
+              const regex = new RegExp(`\\b${alias}\\b`, "i");
+              if (regex.test(colName)) {
+                return store;
+              }
             }
           }
-        }
-        return null;
-      }, null);
+          return null;
+        },
+        null,
+      );
 
       return result;
     }
@@ -127,21 +132,18 @@ function getFrontendStore(appid: string): string | null {
   }
 }
 
-/**
- * Try to get the store name for a given AppID from the cache.
- */
 export function getStore(appid: string): string | null {
-  // Check backend cache (Launch Options)
+  // Check Collections first to give them priority
+  const frontendStore = getFrontendStore(appid);
+  if (frontendStore) {
+    return frontendStore;
+  }
+
+  // Check backend cache (Launch Options / localconfig.vdf)
   if (mappingsLoaded && gameStoreMappingsCache[appid]) {
     const entry = gameStoreMappingsCache[appid];
     if (typeof entry === "string") return entry;
     if (entry.store) return entry.store;
-  }
-
-  // Check Collections (Real-time in browser)
-  const frontendStore = getFrontendStore(appid);
-  if (frontendStore) {
-    return frontendStore;
   }
 
   return null;

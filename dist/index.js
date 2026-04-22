@@ -315,22 +315,19 @@ function getFrontendStore(appid) {
         return null;
     }
 }
-/**
- * Try to get the store name for a given AppID from the cache.
- */
 function getStore(appid) {
-    // Check backend cache (Launch Options)
+    // Check Collections (Real-time in browser) first to give them priority
+    const frontendStore = getFrontendStore(appid);
+    if (frontendStore) {
+        return frontendStore;
+    }
+    // Check backend cache (Launch Options / localconfig.vdf)
     if (mappingsLoaded && gameStoreMappingsCache[appid]) {
         const entry = gameStoreMappingsCache[appid];
         if (typeof entry === "string")
             return entry;
         if (entry.store)
             return entry.store;
-    }
-    // Check Collections (Real-time in browser)
-    const frontendStore = getFrontendStore(appid);
-    if (frontendStore) {
-        return frontendStore;
     }
     return null;
 }

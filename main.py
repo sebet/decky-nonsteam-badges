@@ -211,17 +211,29 @@ class Plugin:
                         vdf_appid_unsigned = vdf_appid
 
                     tags = local_tags.get(str(vdf_appid_unsigned), [])
-                    check_string = opts + " " + exe + " " + start_dir + " " + " ".join(tags).lower()
+                    tags_string = " ".join(tags).lower()
+                    fallback_string = f"{opts} {exe} {start_dir}"
 
                     store = None
 
+                    # 1. Check user collections (tags) first
                     for s_key, aliases in store_aliases.items():
                         for alias in aliases:
-                            if re.search(r'\b' + re.escape(alias) + r'\b', check_string):
+                            if re.search(r'\b' + re.escape(alias) + r'\b', tags_string):
                                 store = s_key
                                 break
                         if store:
                             break
+
+                    # 2. Check automated launcher paths / options second
+                    if not store:
+                        for s_key, aliases in store_aliases.items():
+                            for alias in aliases:
+                                if re.search(r'\b' + re.escape(alias) + r'\b', fallback_string):
+                                    store = s_key
+                                    break
+                            if store:
+                                break
 
                     if store:
                         mapping[str(vdf_appid_unsigned)] = {"store": store, "name": name}
