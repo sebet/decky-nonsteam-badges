@@ -1,4 +1,4 @@
-import { GameStoreContext } from "src/types/store";
+import { GameStoreContext } from "../types/store.js";
 
 const DEBUG_MODE = process.env.DEBUG_MODE === "true";
 

@@ -1,4 +1,4 @@
-import { GameStoreName } from "src/types/store";
+import { GameStoreName } from "../types/store.js";
 
 /**
  * Check if a game store name is valid

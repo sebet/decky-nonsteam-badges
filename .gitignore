@@ -4,3 +4,4 @@ node_modules/
 *.tsbuildinfo
 .env
 __pycache__
+.test-dist/

@@ -11,6 +11,16 @@ import React from "react";
 import { GameStoreContext } from "src/types/store";
 
 const context = GameStoreContext.DETAILS;
+let cleanupRenderPatch: (() => void) | null = null;
+let patchedRouteProps: any = null;
+
+export function cleanupGameDetailsPatches(): void {
+  if (cleanupRenderPatch) {
+    cleanupRenderPatch();
+    cleanupRenderPatch = null;
+  }
+  patchedRouteProps = null;
+}
 
 /**
  * Patch game details page (React-based).
@@ -18,7 +28,9 @@ const context = GameStoreContext.DETAILS;
 export const patchGameDetails = (tree: any) => {
   const routeProps = findInReactTree(tree, (x: any) => x?.renderFunc);
 
-  if (routeProps) {
+  if (routeProps && routeProps !== patchedRouteProps) {
+    cleanupGameDetailsPatches();
+
     const patchHandler = createReactTreePatcher(
       [
         (tree: any) =>
@@ -44,7 +56,10 @@ export const patchGameDetails = (tree: any) => {
       },
     );
 
-    afterPatch(routeProps, "renderFunc", patchHandler);
+    const unpatch = afterPatch(routeProps, "renderFunc", patchHandler);
+    cleanupRenderPatch =
+      typeof unpatch === "function" ? unpatch : null;
+    patchedRouteProps = routeProps;
   }
 
   return tree;

@@ -7,8 +7,12 @@ const context = "observer";
 
 let observer: MutationObserver | null = null;
 let scanInterval: number | null = null;
+let retryTimeout: number | null = null;
+let visibilityTimeout: number | null = null;
 
 let debounceTimeout: number | null = null;
+let visibilityDocument: Document | null = null;
+let visibilityChangeHandler: (() => void) | null = null;
 
 const debouncedScan = () => {
   if (debounceTimeout) return;
@@ -65,7 +69,10 @@ export function startObserving(): void {
 
   if (!bigPicWindow) {
     log(context, "Big Picture window not found, retrying...");
-    setTimeout(startObserving, 1000);
+    retryTimeout = window.setTimeout(() => {
+      retryTimeout = null;
+      startObserving();
+    }, 1000);
     return;
   }
 
@@ -101,11 +108,22 @@ export function startObserving(): void {
   scanInterval = setInterval(scanAndBadge, 2000) as unknown as number;
 
   // Visibility change listener
-  bigPicWindow.document.addEventListener("visibilitychange", () => {
+  visibilityDocument = bigPicWindow.document;
+  visibilityChangeHandler = () => {
     if (!bigPicWindow.document.hidden) {
-      setTimeout(scanAndBadge, 100);
+      if (visibilityTimeout) {
+        clearTimeout(visibilityTimeout);
+      }
+      visibilityTimeout = window.setTimeout(() => {
+        visibilityTimeout = null;
+        scanAndBadge();
+      }, 100);
     }
-  });
+  };
+  visibilityDocument.addEventListener(
+    "visibilitychange",
+    visibilityChangeHandler,
+  );
 }
 
 export function stopObserving(): void {
@@ -117,6 +135,26 @@ export function stopObserving(): void {
     clearInterval(scanInterval);
     scanInterval = null;
   }
+  if (retryTimeout) {
+    clearTimeout(retryTimeout);
+    retryTimeout = null;
+  }
+  if (visibilityTimeout) {
+    clearTimeout(visibilityTimeout);
+    visibilityTimeout = null;
+  }
+  if (debounceTimeout) {
+    cancelAnimationFrame(debounceTimeout);
+    debounceTimeout = null;
+  }
+  if (visibilityDocument && visibilityChangeHandler) {
+    visibilityDocument.removeEventListener(
+      "visibilitychange",
+      visibilityChangeHandler,
+    );
+  }
+  visibilityDocument = null;
+  visibilityChangeHandler = null;
 }
 
 function scanAndBadge(): void {

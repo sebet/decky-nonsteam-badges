@@ -16,6 +16,9 @@ let gameStoreMappingsCache: Record<string, StoreMapping | string> = {};
 let mappingsLoaded = false;
 let isFetchingMappings = false;
 let lastFetchTime = 0;
+let frontendStoreByAppId = new Map<string, string | null>();
+let lastUserCollectionsRef: unknown = null;
+let collectionVersion = 0;
 
 /**
  * Wait for store mappings to be loaded from the backend before attempting to access the cache.
@@ -82,10 +85,18 @@ function getFrontendStore(appid: string): string | null {
     const userCollections = collectionStore.userCollections;
     if (!userCollections) return null;
 
+    if (userCollections !== lastUserCollectionsRef) {
+      frontendStoreByAppId.clear();
+      lastUserCollectionsRef = userCollections;
+      collectionVersion++;
+    }
+
+    if (frontendStoreByAppId.has(appid)) {
+      return frontendStoreByAppId.get(appid) ?? null;
+    }
+
     const numericAppId = parseInt(appid);
     if (isNaN(numericAppId)) return null;
-
-    const foundCollections: string[] = [];
 
     for (const collection of userCollections) {
       if (
@@ -93,34 +104,24 @@ function getFrontendStore(appid: string): string | null {
         collection.apps.has &&
         collection.apps.has(numericAppId)
       ) {
-        foundCollections.push(collection.displayName);
+        const colName = collection.displayName;
+        for (const store of supportedStores) {
+          const aliases = (storeMappings as Record<string, string[]>)[
+            store as string
+          ] || [store];
+          for (const alias of aliases) {
+            const regex = new RegExp(`\\b${alias}\\b`, "i");
+            if (regex.test(colName)) {
+              frontendStoreByAppId.set(appid, store);
+              return store;
+            }
+          }
+        }
+        break;
       }
     }
 
-    if (foundCollections.length > 0) {
-      const result = foundCollections.reduce(
-        (acc: string | null, colName: string) => {
-          if (acc) return acc;
-
-          for (const store of supportedStores) {
-            const aliases = (storeMappings as Record<string, string[]>)[
-              store as string
-            ] || [store];
-            for (const alias of aliases) {
-              const regex = new RegExp(`\\b${alias}\\b`, "i");
-              if (regex.test(colName)) {
-                return store;
-              }
-            }
-          }
-          return null;
-        },
-        null,
-      );
-
-      return result;
-    }
-
+    frontendStoreByAppId.set(appid, null);
     return null;
   } catch (e) {
     log(
@@ -147,6 +148,10 @@ export function getStore(appid: string): string | null {
   }
 
   return null;
+}
+
+export function getCollectionVersion(): number {
+  return collectionVersion;
 }
 
 /**

@@ -17,6 +17,19 @@ except ImportError:
 # Decky plugin imports
 import decky
 
+DEBUG_MODE = False
+
+
+def _debug_info(message: str) -> None:
+    if DEBUG_MODE:
+        decky.logger.info(message)
+
+
+def _debug_warning(message: str) -> None:
+    if DEBUG_MODE:
+        decky.logger.warning(message)
+
+
 class Plugin:
     """Main plugin class"""
 
@@ -36,14 +49,17 @@ class Plugin:
                             value = line.split("=")[1].strip().lower()
                             self.debug_mode = (value == "true")
                             break
-            # Diagnostic log (Unconditional)
-            decky.logger.info(f"Diagnostics: env_path={env_path}, exists={os.path.exists(env_path)}, debug_mode={self.debug_mode}")
+            global DEBUG_MODE
+            DEBUG_MODE = self.debug_mode
+
+            _debug_info(
+                f"Diagnostics: env_path={env_path}, exists={os.path.exists(env_path)}, debug_mode={self.debug_mode}"
+            )
 
         except Exception as e:
             decky.logger.error(f"Error reading .env: {e}")
 
-        if getattr(self, "debug_mode", False):
-            decky.logger.info(f"NonSteam Badges initialized - Debug Mode: {self.debug_mode}")
+        _debug_info(f"NonSteam Badges initialized - Debug Mode: {self.debug_mode}")
 
     def _load_setting(self, key: str, default=None):
         """Load a setting from the JSON file"""
@@ -84,21 +100,21 @@ class Plugin:
             base_path = Path("/home/deck/.steam/steam/userdata/")
 
             if not base_path.exists():
-                decky.logger.warning("Steam userdata directory not found")
+                _debug_warning("Steam userdata directory not found")
                 return None
 
             # Find the first user directory (filter out '0', 'ac', 'anonymous')
             user_folders = [f for f in os.listdir(base_path) if f.isdigit() and f != '0']
 
             if not user_folders:
-                decky.logger.warning("No user folders found")
+                _debug_warning("No user folders found")
                 return None
 
             shortcuts_file = base_path / user_folders[0] / "config" / "shortcuts.vdf"
             if shortcuts_file.exists():
                 return str(shortcuts_file)
 
-            decky.logger.warning("shortcuts.vdf not found")
+            _debug_warning("shortcuts.vdf not found")
             return None
         except Exception as e:
             decky.logger.error(f"Error finding shortcuts.vdf: {e}")
@@ -286,12 +302,11 @@ class Plugin:
                     result = json.loads(response.read().decode('utf-8'))
                     items = result.get('items', [])
 
-                    if getattr(self, "debug_mode", False):
-                        decky.logger.info(f"Steam hits for '{search_term}': {len(items)}")
+                    _debug_info(f"Steam hits for '{search_term}': {len(items)}")
 
                     if len(items) == 0:
-                      decky.logger.info(f"No Steam hits for '{search_term}'")
-                      decky.logger.info(f"URL: {url}")
+                      _debug_info(f"No Steam hits for '{search_term}'")
+                      _debug_info(f"URL: {url}")
 
                     if items:
                         # Check the top hit for similarity
@@ -304,16 +319,20 @@ class Plugin:
                         query_name_clean = search_term.lower()
 
                         ratio = difflib.SequenceMatcher(None, repo_name_clean, query_name_clean).ratio()
-                        if getattr(self, "debug_mode", False):
-                            decky.logger.info(f"Similarity check: '{search_term}' vs '{hit_name}' = {ratio:.2f}")
+                        _debug_info(
+                            f"Similarity check: '{search_term}' vs '{hit_name}' = {ratio:.2f}"
+                        )
 
                         # Threshold (0.6 should be a decent fuzzy match)
                         if ratio > 0.6 or query_name_clean in repo_name_clean or repo_name_clean in query_name_clean:
-                            if getattr(self, "debug_mode", False):
-                                decky.logger.info(f"Found Steam App ID for '{search_term}' ({hit_name}): {appid}")
+                            _debug_info(
+                                f"Found Steam App ID for '{search_term}' ({hit_name}): {appid}"
+                            )
                             return appid
                         else:
-                            decky.logger.warning(f"Rejected search result due to low similarity: '{search_term}' vs '{hit_name}' ({ratio:.2f})")
+                            _debug_warning(
+                                f"Rejected search result due to low similarity: '{search_term}' vs '{hit_name}' ({ratio:.2f})"
+                            )
             except Exception as e:
                 decky.logger.error(f"Error executing Steam search for '{search_term}': {e}")
 
@@ -338,8 +357,7 @@ class Plugin:
                     new_name = new_name[:idx].strip()
 
         if new_name != game_name and len(new_name) > 2:
-            if getattr(self, "debug_mode", False):
-                decky.logger.info(f"Retrying search with refined name: '{new_name}'")
+            _debug_info(f"Retrying search with refined name: '{new_name}'")
             return fetch_and_check(new_name)
 
         return None

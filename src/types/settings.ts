@@ -25,6 +25,7 @@ export interface PluginSettings {
   detailsPosition: BadgePosition;
   addBadgesToAllNonSteamGames: boolean;
   showSteamStoreButton: boolean;
+  disableBadges: boolean;
 }
 
 export const DEFAULT_SETTINGS: PluginSettings = {
@@ -33,4 +34,5 @@ export const DEFAULT_SETTINGS: PluginSettings = {
   detailsPosition: BadgePosition.TOP_RIGHT,
   addBadgesToAllNonSteamGames: true,
   showSteamStoreButton: true,
+  disableBadges: false,
 };

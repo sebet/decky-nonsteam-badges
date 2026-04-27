@@ -15,13 +15,15 @@ import useSettings from "src/hooks/useSettings";
 
 type UpdateSettingProps =
   | {
-      key: keyof Omit<PluginSettings, "addBadgesToAllNonSteamGames">;
+      key: "homePosition" | "libraryPosition" | "detailsPosition";
       value: BadgePosition;
     }
   | {
-      key: "showSteamStoreButton";
+      key: "showSteamStoreButton" | "disableBadges";
       value: boolean;
     };
+
+const DEBUG_MODE = process.env.DEBUG_MODE === "true";
 
 const badgePositions = [
   { label: "None", data: BadgePosition.NONE },
@@ -114,6 +116,21 @@ const Settings = () => {
             }}
           />
         </PanelSectionRow>
+        {DEBUG_MODE ? (
+          <PanelSectionRow>
+            <ToggleField
+              label="Disable Badges"
+              description="Dev-only toggle to disable badge rendering for performance checks"
+              checked={settings.disableBadges}
+              onChange={(checked: boolean) => {
+                updateSetting({
+                  key: "disableBadges",
+                  value: checked,
+                });
+              }}
+            />
+          </PanelSectionRow>
+        ) : null}
       </PanelSection>
     </div>
   );

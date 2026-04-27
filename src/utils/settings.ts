@@ -1,9 +1,9 @@
-import { log } from "src/utils/logger";
+import { log } from "./logger.js";
 import {
   DEFAULT_SETTINGS,
   PluginSettings,
   SETTINGS_CHANGED_EVENT,
-} from "../types/settings";
+} from "../types/settings.js";
 
 const context = "settings";
 

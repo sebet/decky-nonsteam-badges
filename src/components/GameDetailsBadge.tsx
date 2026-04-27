@@ -7,9 +7,9 @@ import SteamStoreButton from "src/components/SteamStoreButton";
 import { ensureMappingsLoaded, getStore, getName } from "../utils/storeCache";
 import { isNonSteamApp, sanitizedGameStoreName } from "src/utils/store";
 import { getBadgeIcon, PULSATING_CLASSNAME } from "src/utils/badge";
-import { BadgePosition } from "src/types/settings";
 import { GameStoreName, GameStoreContext } from "src/types/store";
 import { call } from "@decky/api";
+import { getDetailsBadgePositionClassKey } from "../utils/badgePlacement.js";
 
 const context = GameStoreContext.DETAILS;
 
@@ -31,10 +31,10 @@ export default function GameDetailsBadge(): ReactElement | null {
     log(context, "Badge settings: " + JSON.stringify(settings));
 
     // If setting is disabled, clear any existing ID and stop.
-    if (!settings.showSteamStoreButton) {
+    if (settings.disableBadges || !settings.showSteamStoreButton) {
       setSteamAppId(null);
     }
-  }, [settings.showSteamStoreButton]);
+  }, [settings.disableBadges, settings.showSteamStoreButton]);
 
   // Fetch gameStore info from backend via cache
   useEffect(() => {
@@ -47,10 +47,24 @@ export default function GameDetailsBadge(): ReactElement | null {
       return;
     }
 
+    if (settings.disableBadges) {
+      setLoading(false);
+      setGameStore(null);
+      setSteamAppId(null);
+      return;
+    }
+
+    let cancelled = false;
+
+    setLoading(true);
+    setGameStore(null);
+    setSteamAppId(null);
+
     log(context, "Details page useEffect - ensuring mappings loaded");
 
     (async () => {
       await ensureMappingsLoaded();
+      if (cancelled) return;
 
       const store = getStore(appid);
       const name = getName(appid);
@@ -61,6 +75,7 @@ export default function GameDetailsBadge(): ReactElement | null {
       } else {
         log(context, `AppID ${appid} not found in cache.`);
       }
+      if (cancelled) return;
       setLoading(false);
 
       if (name && settings.showSteamStoreButton) {
@@ -69,6 +84,7 @@ export default function GameDetailsBadge(): ReactElement | null {
           "search_steam_id",
           name,
         );
+        if (cancelled) return;
 
         if (steamId) {
           setSteamAppId(steamId);
@@ -78,10 +94,14 @@ export default function GameDetailsBadge(): ReactElement | null {
         }
       }
     })();
-  }, [appid, settings.detailsPosition, settings.showSteamStoreButton]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [appid, settings.disableBadges, settings.showSteamStoreButton]);
 
   // Only render for non-Steam games
-  if (!appid || !isNonSteamApp(appid)) {
+  if (!appid || !isNonSteamApp(appid) || settings.disableBadges) {
     return null;
   }
 
@@ -98,9 +118,12 @@ export default function GameDetailsBadge(): ReactElement | null {
 
   // If badge position is disabled but button is enabled, default button to top-left position
   const badgePositionStyle =
-    settings.detailsPosition === "none" && settings.showSteamStoreButton
-      ? styles[`details-${BadgePosition.TOP_LEFT}`]
-      : styles[`details-${settings.detailsPosition}`];
+    styles[
+      getDetailsBadgePositionClassKey(
+        settings.detailsPosition,
+        settings.showSteamStoreButton,
+      )
+    ];
 
   return (
     <>
