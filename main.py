@@ -199,6 +199,7 @@ class Plugin:
                     "gog": ["gog"],
                     "epic": ["epic"],
                     "amazon": ["amazon", "luna"],
+                    "rockstar": ["rockstar", "rockstar games", "rockstargames", "social club"],
                     "ubisoft": ["ubisoft", "uplay"],
                     "xbox": ["xbox", "microsoft"],
                     "ea": ["ea", "origin", "electronic arts", "electronicarts"]

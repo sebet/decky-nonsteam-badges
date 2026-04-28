@@ -86,6 +86,7 @@ var GameStoreName;
     GameStoreName["GOG"] = "gog";
     GameStoreName["EPIC"] = "epic";
     GameStoreName["AMAZON"] = "amazon";
+    GameStoreName["ROCKSTAR"] = "rockstar";
     GameStoreName["UBISOFT"] = "ubisoft";
     GameStoreName["XBOX"] = "xbox";
     GameStoreName["EA"] = "ea";
@@ -107,6 +108,7 @@ function gameStoreIsValid(gameStore) {
         GameStoreName.GOG,
         GameStoreName.EPIC,
         GameStoreName.AMAZON,
+        GameStoreName.ROCKSTAR,
         GameStoreName.UBISOFT,
         GameStoreName.XBOX,
         GameStoreName.EA,
@@ -138,6 +140,7 @@ var SupportedStores;
     SupportedStores["GOG"] = "gog";
     SupportedStores["EPIC"] = "epic";
     SupportedStores["AMAZON"] = "amazon";
+    SupportedStores["ROCKSTAR"] = "rockstar";
     SupportedStores["UBISOFT"] = "ubisoft";
     SupportedStores["XBOX"] = "xbox";
     SupportedStores["EA"] = "ea";
@@ -196,6 +199,12 @@ var amazon = [
 	"amazon",
 	"luna"
 ];
+var rockstar = [
+	"rockstar",
+	"rockstar games",
+	"rockstargames",
+	"social club"
+];
 var ubisoft = [
 	"ubisoft",
 	"uplay"
@@ -214,6 +223,7 @@ var storeMappings = {
 	gog: gog,
 	epic: epic,
 	amazon: amazon,
+	rockstar: rockstar,
 	ubisoft: ubisoft,
 	xbox: xbox,
 	ea: ea
@@ -225,8 +235,8 @@ let gameStoreMappingsCache = {};
 let mappingsLoaded = false;
 let isFetchingMappings = false;
 let lastFetchTime = 0;
-let frontendStoreByAppId = new Map();
 let lastUserCollectionsRef = null;
+let lastUserCollectionsSignature = "";
 let collectionVersion = 0;
 /**
  * Wait for store mappings to be loaded from the backend before attempting to access the cache.
@@ -284,13 +294,22 @@ function getFrontendStore(appid) {
         const userCollections = collectionStore.userCollections;
         if (!userCollections)
             return null;
-        if (userCollections !== lastUserCollectionsRef) {
-            frontendStoreByAppId.clear();
+        const collectionStateSignature = userCollections
+            .map((collection) => {
+            const apps = collection?.apps;
+            const appCount = typeof apps?.size === "number"
+                ? apps.size
+                : Array.isArray(apps)
+                    ? apps.length
+                    : 0;
+            return `${collection?.displayName ?? ""}:${appCount}`;
+        })
+            .join("|");
+        if (userCollections !== lastUserCollectionsRef ||
+            collectionStateSignature !== lastUserCollectionsSignature) {
             lastUserCollectionsRef = userCollections;
+            lastUserCollectionsSignature = collectionStateSignature;
             collectionVersion++;
-        }
-        if (frontendStoreByAppId.has(appid)) {
-            return frontendStoreByAppId.get(appid) ?? null;
         }
         const numericAppId = parseInt(appid);
         if (isNaN(numericAppId))
@@ -299,21 +318,18 @@ function getFrontendStore(appid) {
             if (collection.apps &&
                 collection.apps.has &&
                 collection.apps.has(numericAppId)) {
-                const colName = collection.displayName;
+                const colName = String(collection.displayName ?? "");
                 for (const store of supportedStores) {
                     const aliases = storeMappings[store] || [store];
                     for (const alias of aliases) {
                         const regex = new RegExp(`\\b${alias}\\b`, "i");
                         if (regex.test(colName)) {
-                            frontendStoreByAppId.set(appid, store);
                             return store;
                         }
                     }
                 }
-                break;
             }
         }
-        frontendStoreByAppId.set(appid, null);
         return null;
     }
     catch (e) {
@@ -377,6 +393,11 @@ const BADGE_STYLES = {
         name: "AMAZON",
         gradient: "linear-gradient(135deg, #FF9900 0%, #FFB84D 100%)",
         icon: `<svg class="icon-badge" width="${width}" height="${height}" viewBox="0 -1 20 20" fill="white" xmlns="http://www.w3.org/2000/svg"><path d="M17.251 13.716c.393-.102 1.304-.265 1.691-.18.545.049.873.139.982.271.231.343-.115 1.543-.273 1.935-.139.344-.79 1.449-1.127 1.449-.103 0-.181-.075-.128-.216 1.237-2.88.684-2.804-1.145-2.646-.236.028-1.102.201-1-.001 0-.239.761-.55 1-.612zm-8.618-5.238c0 .468.118.843.354 1.124.676.806 1.91.374 2.428-.584.285-.489.581-1.444.581-2.682-1 0-1.318.048-1.681.144-1.067.3-1.682.966-1.682 1.998zm-3.127.36c0-1.687.908-2.869 2.309-3.456 1.237-.522 2.944-.665 4.181-.739 0-1.483-.203-2.664-1.763-2.664-.501 0-1.396.555-1.6 1.481-.049.239-.17.411-.364.447l-2.091-.235c-.253-.059-.351-.198-.291-.437C6.309 1.05 8.145.117 10.233 0c1 0 2.512-.013 3.691 1.062 1.274 1.262 1.072 2.852 1.072 6.967 0 .988.015 1.083.691 1.961.136.202.148.394-.05.541-1.006.864-1.553 1.331-1.638 1.403-.146.108-.323.12-.529.036-.895-.759-.68-.714-1.237-1.404-1.129 1.218-2.016 1.549-3.527 1.549-1.796 0-3.2-1.11-3.2-3.276zM.324 13.95c3.03 1.74 6.327 2.61 9.891 2.61 2.375 0 4.721-.438 7.036-1.314.351-.139.721-.409.936-.108.103.145.07.277-.1.396C15.844 17.138 12.718 18 9.996 18c-3.851 0-7.277-1.415-9.89-3.744-.233-.191-.047-.473.218-.307"/></svg>`,
+    },
+    rockstar: {
+        name: "ROCKSTAR",
+        gradient: "linear-gradient(135deg, #FCAF17 0%, #FFD166 100%)",
+        icon: `<svg class="icon-badge" width="${width}" height="${height}" role="img" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg"><path d="M5.971 6.816h3.241c1.469 0 2.741-.448 2.741-2.084 0-1.3-1.117-1.576-2.19-1.576H6.748l-.777 3.66Zm12.834 8.753h5.168l-4.664 3.228.755 5.087-4.041-3.07L10.599 24l2.536-5.392s-2.95-3.075-2.947-3.075c-.198-.262-.265-.936-.265-1.226 0-.367.024-.739.049-1.134.028-.451.058-.933.058-1.476 0-1.338-.59-2.038-2.036-2.038H5.283l-1.18 5.525H.026L3.269 0h7.672c2.852 0 5.027.702 5.027 3.936 0 2.276-1.12 3.894-3.592 4.233v.045c1.162.276 1.598 1.062 1.598 2.527 0 .585-.018 1.098-.034 1.581-.015.428-.03.834-.03 1.243 0 .525.137 1.382.48 1.968h.567l3.028-5.06.82 5.096Zm-1.233-2.948-2.187 3.654h-3.457l2.103 2.189-1.73 3.672 3.777-2.218 2.976 2.263-.553-3.731 3.093-2.139h-3.43l-.592-3.69Z"/></svg>`,
     },
     ubisoft: {
         name: "UBISOFT",

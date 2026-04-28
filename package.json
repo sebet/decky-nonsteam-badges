@@ -9,7 +9,7 @@
     "build": "rollup -c",
     "watch": "rollup -c -w",
     "test": "pnpm run test:build && node --test tests/*.test.mjs && python3 -m unittest discover -s tests -p '*.py'",
-    "test:build": "tsc --noEmit false --outDir .test-dist --rootDir src --module ESNext --target ES2020 --moduleResolution bundler --types node --skipLibCheck src/utils/store.ts src/utils/settings.ts src/utils/logger.ts src/utils/badgePlacement.ts src/utils/observerRoute.ts src/types/store.ts src/types/settings.ts",
+    "test:build": "tsc --noEmit false --outDir .test-dist --rootDir src --module ESNext --target ES2020 --moduleResolution bundler --types node --skipLibCheck src/utils/store.ts src/utils/settings.ts src/utils/logger.ts src/utils/badgePlacement.ts src/utils/observerRoute.ts src/utils/storeCache.ts src/types/store.ts src/types/settings.ts",
     "deps:install": "corepack enable && corepack prepare pnpm@9.0.0 --activate && pnpm install"
   },
   "repository": {

@@ -1,5 +1,5 @@
-import { SupportedStores } from "src/types/settings";
-import { log } from "./logger";
+import { SupportedStores } from "../types/settings.js";
+import { log } from "./logger.js";
 import { call } from "@decky/api";
 import storeMappings from "../../store_mappings.json";
 
@@ -16,8 +16,8 @@ let gameStoreMappingsCache: Record<string, StoreMapping | string> = {};
 let mappingsLoaded = false;
 let isFetchingMappings = false;
 let lastFetchTime = 0;
-let frontendStoreByAppId = new Map<string, string | null>();
 let lastUserCollectionsRef: unknown = null;
+let lastUserCollectionsSignature = "";
 let collectionVersion = 0;
 
 /**
@@ -82,17 +82,30 @@ function getFrontendStore(appid: string): string | null {
       return null;
     }
 
-    const userCollections = collectionStore.userCollections;
+    const userCollections = collectionStore.userCollections as any[] | undefined;
     if (!userCollections) return null;
 
-    if (userCollections !== lastUserCollectionsRef) {
-      frontendStoreByAppId.clear();
-      lastUserCollectionsRef = userCollections;
-      collectionVersion++;
-    }
+    const collectionStateSignature = userCollections
+      .map((collection) => {
+        const apps = collection?.apps;
+        const appCount =
+          typeof apps?.size === "number"
+            ? apps.size
+            : Array.isArray(apps)
+              ? apps.length
+              : 0;
 
-    if (frontendStoreByAppId.has(appid)) {
-      return frontendStoreByAppId.get(appid) ?? null;
+        return `${collection?.displayName ?? ""}:${appCount}`;
+      })
+      .join("|");
+
+    if (
+      userCollections !== lastUserCollectionsRef ||
+      collectionStateSignature !== lastUserCollectionsSignature
+    ) {
+      lastUserCollectionsRef = userCollections;
+      lastUserCollectionsSignature = collectionStateSignature;
+      collectionVersion++;
     }
 
     const numericAppId = parseInt(appid);
@@ -104,7 +117,7 @@ function getFrontendStore(appid: string): string | null {
         collection.apps.has &&
         collection.apps.has(numericAppId)
       ) {
-        const colName = collection.displayName;
+        const colName = String(collection.displayName ?? "");
         for (const store of supportedStores) {
           const aliases = (storeMappings as Record<string, string[]>)[
             store as string
@@ -112,16 +125,13 @@ function getFrontendStore(appid: string): string | null {
           for (const alias of aliases) {
             const regex = new RegExp(`\\b${alias}\\b`, "i");
             if (regex.test(colName)) {
-              frontendStoreByAppId.set(appid, store);
               return store;
             }
           }
         }
-        break;
       }
     }
 
-    frontendStoreByAppId.set(appid, null);
     return null;
   } catch (e) {
     log(

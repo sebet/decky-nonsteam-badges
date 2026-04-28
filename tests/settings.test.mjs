@@ -5,6 +5,7 @@ import {
   BadgePosition,
   DEFAULT_SETTINGS,
   SETTINGS_CHANGED_EVENT,
+  SupportedStores,
 } from '../.test-dist/types/settings.js';
 
 function createLocalStorage() {
@@ -98,4 +99,8 @@ test('saveSettings persists settings and dispatches the settings-changed event',
     assert.equal(events[0].type, SETTINGS_CHANGED_EVENT);
     assert.deepEqual(events[0].detail, settings);
   });
+});
+
+test('SupportedStores includes rockstar for frontend collection overrides', () => {
+  assert.equal(SupportedStores.ROCKSTAR, 'rockstar');
 });

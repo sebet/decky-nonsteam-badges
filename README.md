@@ -4,7 +4,7 @@ A [Decky](https://github.com/SteamDeckHomebrew/decky-loader) plugin that helps i
 
 ## What does it do?
 
-If like me, you keep collecting free games from _Epic_, _GOG_ and _Amazon Luna_, or buy games from those, or other stores, this plugin will help you easily identify which games on your Steam library are non-Steam games. It overlays a themed badge on non-Steam games capsules for _Epic_, _GOG_ or _Amazon Luna_ games. Other non-Steam games will display a custom non-Steam badge.
+If like me, you keep collecting free games from _Epic_, _GOG_, _Amazon_, or _Rockstar_, or buy games from those and other stores, this plugin will help you easily identify which games on your Steam library are non-Steam games. It overlays a themed badge on non-Steam game capsules for supported storefronts. Other non-Steam games will display a custom non-Steam badge.
 
 Since non-Steam games also lack a 'game info' tab, I also took the opportunity to add a "Steam Page" button to the game details screen (whenever applicable). It links directly to the Steam game page, to get the full game details. This button will (optionally) show up if a Steam game is properly identified.
 
@@ -14,7 +14,8 @@ Since non-Steam games also lack a 'game info' tab, I also took the opportunity t
 - **Store Badges**: Displays themed badges for various storefronts:
   - **GOG**
   - **Epic Games**
-  - **Amazon Luna**
+  - **Amazon**
+  - **Rockstar Games**
   - **Ubisoft**
   - **Xbox**
   - **Electronic Arts (EA)**
@@ -31,7 +32,7 @@ Since non-Steam games also lack a 'game info' tab, I also took the opportunity t
 
 ## How It Works
 
-Non-Steam Badges works by scanning your Steam games collection. It looks for common patterns in launcher options and collection names (like `gog`, `epic`, `amazon`, `ubisoft`, `xbox`, or `ea`) and maps these to the correct storefront.
+Non-Steam Badges works by scanning your Steam games collection. It looks for common patterns in launcher options and collection names (like `gog`, `epic`, `amazon`, `rockstar`, `ubisoft`, `xbox`, or `ea`) and maps these to the correct storefront.
 If it finds matches, it overlays the relevant badge. If there are no matches, it overlays a custom non-Steam badge.
 
 **Matching rules priority:**
@@ -48,7 +49,7 @@ If no matches are found in your collections, it groups together the underlying p
 4. **Launch Options**
 
 If you use [Unifideck](https://github.com/mubaraknumann/unifideck), you shouldn't need any additional steps, since Unifideck already adds the correct collection names for non-Steam games as well as launch options.
-If you add non-Steam games to your Steam library manually or through the [Heroic Games Launcher](https://heroicgameslauncher.com/), you just need to add the correct collection names, for the plugin to identify it (i.e: `gog`, `epic`, `amazon`, `luna`, `ubisoft`, `xbox`, or `ea`).
+If you add non-Steam games to your Steam library manually or through the [Heroic Games Launcher](https://heroicgameslauncher.com/), you just need to add the correct collection names for the plugin to identify it (i.e. `gog`, `epic`, `amazon`, `rockstar`, `ubisoft`, `xbox`, or `ea`).
 
 ## Screenshots
 

@@ -10,7 +10,7 @@
 const { renderToString } = require('react-dom/server');
 const React = require('react');
 
-const { SiUbisoft, SiEpicgames, SiGogdotcom, SiAmazon } = require('react-icons/si');
+const { SiUbisoft, SiEpicgames, SiGogdotcom, SiAmazon, SiRockstargames } = require('react-icons/si');
 const { FaXbox } = require('react-icons/fa');
 const { TbBrandElectronicArts } = require('react-icons/tb');
 
@@ -28,6 +28,9 @@ console.log(renderToString(React.createElement(SiGogdotcom)));
 
 console.log('\nSiAmazon:');
 console.log(renderToString(React.createElement(SiAmazon)));
+
+console.log('\nSiRockstargames:');
+console.log(renderToString(React.createElement(SiRockstargames)));
 
 console.log('\nTbBrandElectronicArts:');
 console.log(renderToString(React.createElement(TbBrandElectronicArts)));

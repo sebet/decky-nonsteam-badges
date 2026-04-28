@@ -85,6 +85,13 @@ class StoreMappingTests(unittest.TestCase):
                             "appid": 123456789,
                         },
                         "2": {
+                            "AppName": "Rockstar Game",
+                            "LaunchOptions": "",
+                            "Exe": "/home/deck/Games/Rockstar Games/Launcher.exe",
+                            "StartDir": "",
+                            "appid": 444444444,
+                        },
+                        "3": {
                             "AppName": "Unknown Game",
                             "LaunchOptions": "",
                             "Exe": "",
@@ -104,6 +111,7 @@ class StoreMappingTests(unittest.TestCase):
                         {
                             "gog": ["gog"],
                             "epic": ["epic"],
+                            "rockstar": ["rockstar", "rockstar games", "rockstargames", "social club"],
                             "ubisoft": ["ubisoft", "uplay"],
                         },
                     ),
@@ -128,6 +136,10 @@ class StoreMappingTests(unittest.TestCase):
         self.assertEqual(
             mapping["123456789"],
             {"store": "ubisoft", "name": "Path Game"},
+        )
+        self.assertEqual(
+            mapping["444444444"],
+            {"store": "rockstar", "name": "Rockstar Game"},
         )
         self.assertEqual(
             mapping["987654321"],
@@ -177,6 +189,13 @@ class StoreMappingTests(unittest.TestCase):
                             "StartDir": "/home/deck/Games/Amazon Luna/Game",
                             "appid": 333333333,
                         },
+                        "3": {
+                            "AppName": "Social Club Game",
+                            "LaunchOptions": "--launcher social club",
+                            "Exe": "",
+                            "StartDir": "",
+                            "appid": 444444444,
+                        },
                     },
                 }
 
@@ -191,6 +210,7 @@ class StoreMappingTests(unittest.TestCase):
                             "gog": ["gog"],
                             "epic": ["epic"],
                             "amazon": ["amazon", "luna"],
+                            "rockstar": ["rockstar", "rockstar games", "rockstargames", "social club"],
                         },
                     ),
                 )
@@ -218,6 +238,10 @@ class StoreMappingTests(unittest.TestCase):
         self.assertEqual(
             mapping["333333333"],
             {"store": "amazon", "name": "StartDir Game"},
+        )
+        self.assertEqual(
+            mapping["444444444"],
+            {"store": "rockstar", "name": "Social Club Game"},
         )
 
 
