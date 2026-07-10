@@ -10,6 +10,9 @@ export enum SupportedStores {
   UBISOFT = "ubisoft",
   XBOX = "xbox",
   EA = "ea",
+  ITCH = "itch",
+  SIDELOADED = "sideloaded",
+  EMULATORS = "emulators",
 }
 
 export enum BadgePosition {

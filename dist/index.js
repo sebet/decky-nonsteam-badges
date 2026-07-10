@@ -2,7 +2,7 @@
 // @ts-ignore
 
 // Prevents it from being duplicated in output.
-const manifest = {"id":"decky-nonsteam-badges","name":"Non-Steam Badges","author":"sebet","version":"0.2.0","flags":[],"api_version":1,"publish":{"tags":["utility","ui","badges","nonsteam","non-steam"],"description":"A Decky plugin that helps identifying non-Steam games using themed badges","image":"https://raw.githubusercontent.com/sebet/decky-nonsteam-badges/main/assets/screenshot.jpg"}};
+const manifest = {"id":"decky-nonsteam-badges","name":"Non-Steam Badges","author":"sebet","version":"0.2.1","flags":[],"api_version":1,"publish":{"tags":["utility","ui","badges","nonsteam","non-steam"],"description":"A Decky plugin that helps identifying non-Steam games using themed badges","image":"https://raw.githubusercontent.com/sebet/decky-nonsteam-badges/main/assets/screenshot.jpg"}};
 const API_VERSION = 2;
 const internalAPIConnection = window.__DECKY_SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED_deckyLoaderAPIInit;
 // Initialize
@@ -32,11 +32,10 @@ const definePlugin = (fn) => {
 };
 
 function log(context, message, level = "log") {
-    console[level](`[Non-Steam Badges][${context}] ${message}`);
+    return;
 }
 
 const PLUGIN_ID = "nonsteam-badges-decky";
-const context$6 = "styleInjector";
 let loadedCSS = "";
 function injectStyle(css) {
     if (!css)
@@ -65,7 +64,6 @@ function injectStyleIntoWindow(targetWindow) {
     style.setAttribute("data-plugin", PLUGIN_ID);
     style.innerHTML = css;
     targetWindow.document.head.appendChild(style);
-    log(context$6, "Injected styles into BigPicture window");
 }
 function removeStyleFromWindow(targetWindow) {
     if (!targetWindow || !targetWindow.document)
@@ -73,11 +71,10 @@ function removeStyleFromWindow(targetWindow) {
     const style = targetWindow.document.querySelector(`style[data-plugin="${PLUGIN_ID}"]`);
     if (style) {
         style.remove();
-        log(context$6, "Removed styles from BigPicture window");
     }
 }
 
-var css_248z$1 = ".Badge-module_badge__MUvUi {\n  position: absolute;\n  display: flex;\n  border-radius: 5px;\n  backdrop-filter: blur(10px);\n  -webkit-backdrop-filter: blur(10px);\n  color: white;\n  pointer-events: none;\n  background: #0000002e;\n  z-index: 9999;\n}\n\n.Badge-module_detailsBadge__ycul2 {\n  z-index: 0;\n  box-sizing: border-box;\n  padding: 5px;\n  padding-bottom: 0;\n}\n\n.Badge-module_detailsBadgeWithButton__YG9ZN {\n  flex-direction: column;\n  height: auto;\n}\n\n.Badge-module_detailsBadgeWithButton__YG9ZN svg.icon-badge {\n  width: 48px;\n  height: 48px;\n}\n\n.Badge-module_libraryBadge__nvyI6 {\n  padding: 2px;\n  border-radius: 2px;\n}\n\n.Badge-module_libraryBadge__nvyI6 svg.icon-badge {\n  width: 28px;\n  height: 28px;\n}\n\n.Badge-module_homeBadge__VBw7G {\n  padding: 2px;\n  border-radius: 2px;\n}\n\n.Badge-module_homeBadge__VBw7G svg.icon-badge {\n  width: 28px;\n  height: 28px;\n}\n\n.Panel\n  [role=\"listitem\"]:first-of-type\n  .Badge-module_homeBadge__VBw7G\n  svg.icon-badge {\n  width: 40px;\n  height: 40px;\n}\n\n.Badge-module_searchBadge__V2InQ svg.icon-badge {\n  width: 24px;\n  height: 24px;\n}\n\n.Badge-module_nonsteam-badge-pulsing__k7UJv {\n  animation: Badge-module_nonsteam-badge-pulse__ux3h3 2s infinite ease-in-out;\n}\n\n.Badge-module_top-left__vhIBr {\n  top: 4px;\n  left: 4px;\n}\n\n.Badge-module_top-right__k9tm2 {\n  top: 4px;\n  right: 4px;\n}\n\n.Badge-module_bottom-left__B0MGj {\n  bottom: 4px;\n  left: 4px;\n}\n\n.Badge-module_bottom-right__wK-WR {\n  bottom: 4px;\n  right: 4px;\n}\n\n.Badge-module_details-top-left__9FED9 {\n  flex-direction: row;\n  gap: 5px;\n  top: 45px;\n  left: 20px;\n}\n\n.Badge-module_details-top-left__9FED9 svg.icon-badge {\n  width: 42px;\n  height: 42px;\n}\n\n.Badge-module_detailsBadgeWithButton__YG9ZN.Badge-module_details-top-left__9FED9 svg.icon-badge {\n  width: 32px;\n  height: 32px;\n}\n\n.Badge-module_details-top-right__GADVk {\n  top: 55px;\n  right: 20px;\n  align-items: center;\n}\n\n.Badge-module_search-top-right__V3fHe {\n  top: 10px;\n  right: 5px;\n}\n\n@keyframes Badge-module_nonsteam-badge-pulse__ux3h3 {\n  0% {\n    transform: scale(0.9);\n    opacity: 0.4;\n  }\n  50% {\n    transform: scale(1.1);\n    opacity: 0.8;\n  }\n  100% {\n    transform: scale(0.9);\n    opacity: 0.4;\n  }\n}\n";
+var css_248z$1 = ".Badge-module_badge__MUvUi {\r\n  position: absolute;\r\n  display: flex;\r\n  border-radius: 5px;\r\n  backdrop-filter: blur(10px);\r\n  -webkit-backdrop-filter: blur(10px);\r\n  color: white;\r\n  pointer-events: none;\r\n  background: #0000002e;\r\n  z-index: 9999;\r\n}\r\n\r\n.Badge-module_detailsBadge__ycul2 {\r\n  z-index: 0;\r\n  box-sizing: border-box;\r\n  padding: 5px;\r\n  padding-bottom: 0;\r\n}\r\n\r\n.Badge-module_detailsBadgeWithButton__YG9ZN {\r\n  flex-direction: column;\r\n  height: auto;\r\n}\r\n\r\n.Badge-module_detailsBadgeWithButton__YG9ZN svg.icon-badge {\r\n  width: 48px;\r\n  height: 48px;\r\n}\r\n\r\n.Badge-module_libraryBadge__nvyI6 {\r\n  padding: 2px;\r\n  border-radius: 2px;\r\n}\r\n\r\n.Badge-module_libraryBadge__nvyI6 svg.icon-badge {\r\n  width: 28px;\r\n  height: 28px;\r\n}\r\n\r\n.Badge-module_homeBadge__VBw7G {\r\n  padding: 2px;\r\n  border-radius: 2px;\r\n}\r\n\r\n.Badge-module_homeBadge__VBw7G svg.icon-badge {\r\n  width: 28px;\r\n  height: 28px;\r\n}\r\n\r\n.Panel\r\n  [role=\"listitem\"]:first-of-type\r\n  .Badge-module_homeBadge__VBw7G\r\n  svg.icon-badge {\r\n  width: 40px;\r\n  height: 40px;\r\n}\r\n\r\n.Badge-module_searchBadge__V2InQ svg.icon-badge {\r\n  width: 24px;\r\n  height: 24px;\r\n}\r\n\r\n.Badge-module_nonsteam-badge-pulsing__k7UJv {\r\n  animation: Badge-module_nonsteam-badge-pulse__ux3h3 2s infinite ease-in-out;\r\n}\r\n\r\n.Badge-module_top-left__vhIBr {\r\n  top: 4px;\r\n  left: 4px;\r\n}\r\n\r\n.Badge-module_top-right__k9tm2 {\r\n  top: 4px;\r\n  right: 4px;\r\n}\r\n\r\n.Badge-module_bottom-left__B0MGj {\r\n  bottom: 4px;\r\n  left: 4px;\r\n}\r\n\r\n.Badge-module_bottom-right__wK-WR {\r\n  bottom: 4px;\r\n  right: 4px;\r\n}\r\n\r\n.Badge-module_details-top-left__9FED9 {\r\n  flex-direction: row;\r\n  gap: 5px;\r\n  top: 45px;\r\n  left: 20px;\r\n}\r\n\r\n.Badge-module_details-top-left__9FED9 svg.icon-badge {\r\n  width: 42px;\r\n  height: 42px;\r\n}\r\n\r\n.Badge-module_detailsBadgeWithButton__YG9ZN.Badge-module_details-top-left__9FED9 svg.icon-badge {\r\n  width: 32px;\r\n  height: 32px;\r\n}\r\n\r\n.Badge-module_details-top-right__GADVk {\r\n  top: 55px;\r\n  right: 20px;\r\n  align-items: center;\r\n}\r\n\r\n.Badge-module_search-top-right__V3fHe {\r\n  top: 10px;\r\n  right: 5px;\r\n}\r\n\r\n@keyframes Badge-module_nonsteam-badge-pulse__ux3h3 {\r\n  0% {\r\n    transform: scale(0.9);\r\n    opacity: 0.4;\r\n  }\r\n  50% {\r\n    transform: scale(1.1);\r\n    opacity: 0.8;\r\n  }\r\n  100% {\r\n    transform: scale(0.9);\r\n    opacity: 0.4;\r\n  }\r\n}\r\n";
 var styles$1 = {"badge":"Badge-module_badge__MUvUi","detailsBadge":"Badge-module_detailsBadge__ycul2","detailsBadgeWithButton":"Badge-module_detailsBadgeWithButton__YG9ZN","libraryBadge":"Badge-module_libraryBadge__nvyI6","homeBadge":"Badge-module_homeBadge__VBw7G","searchBadge":"Badge-module_searchBadge__V2InQ","nonsteam-badge-pulsing":"Badge-module_nonsteam-badge-pulsing__k7UJv","nonsteam-badge-pulse":"Badge-module_nonsteam-badge-pulse__ux3h3","top-left":"Badge-module_top-left__vhIBr","top-right":"Badge-module_top-right__k9tm2","bottom-left":"Badge-module_bottom-left__B0MGj","bottom-right":"Badge-module_bottom-right__wK-WR","details-top-left":"Badge-module_details-top-left__9FED9","details-top-right":"Badge-module_details-top-right__GADVk","search-top-right":"Badge-module_search-top-right__V3fHe"};
 injectStyle(css_248z$1);
 
@@ -90,6 +87,9 @@ var GameStoreName;
     GameStoreName["UBISOFT"] = "ubisoft";
     GameStoreName["XBOX"] = "xbox";
     GameStoreName["EA"] = "ea";
+    GameStoreName["ITCH"] = "itch";
+    GameStoreName["SIDELOADED"] = "sideloaded";
+    GameStoreName["EMULATORS"] = "emulators";
     GameStoreName["DEFAULT"] = "default";
 })(GameStoreName || (GameStoreName = {}));
 var GameStoreContext;
@@ -112,6 +112,9 @@ function gameStoreIsValid(gameStore) {
         GameStoreName.UBISOFT,
         GameStoreName.XBOX,
         GameStoreName.EA,
+        GameStoreName.ITCH,
+        GameStoreName.SIDELOADED,
+        GameStoreName.EMULATORS,
         GameStoreName.DEFAULT,
     ].includes(gameStore);
 }
@@ -144,6 +147,9 @@ var SupportedStores;
     SupportedStores["UBISOFT"] = "ubisoft";
     SupportedStores["XBOX"] = "xbox";
     SupportedStores["EA"] = "ea";
+    SupportedStores["ITCH"] = "itch";
+    SupportedStores["SIDELOADED"] = "sideloaded";
+    SupportedStores["EMULATORS"] = "emulators";
 })(SupportedStores || (SupportedStores = {}));
 var BadgePosition;
 (function (BadgePosition) {
@@ -162,7 +168,7 @@ const DEFAULT_SETTINGS = {
     disableBadges: false,
 };
 
-const context$5 = "settings";
+const context$3 = "settings";
 const SETTINGS_KEY = "nonsteam-badges-settings";
 function getSettings() {
     try {
@@ -172,20 +178,18 @@ function getSettings() {
         return { ...DEFAULT_SETTINGS, ...JSON.parse(stored) };
     }
     catch (e) {
-        log(context$5, "Error loading settings:", "error");
         return DEFAULT_SETTINGS;
     }
 }
 function saveSettings(settings) {
     try {
         localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-        log(context$5, `Settings saved: ${JSON.stringify(settings)}`);
+        log(context$3, `Settings saved: ${JSON.stringify(settings)}`);
         window.dispatchEvent(new CustomEvent(SETTINGS_CHANGED_EVENT, {
             detail: settings,
         }));
     }
     catch (e) {
-        log(context$5, "Error saving settings:", "error");
     }
 }
 
@@ -219,6 +223,21 @@ var ea = [
 	"electronic arts",
 	"electronicarts"
 ];
+var itch = [
+	"itch",
+	"itch.io",
+	"itchio"
+];
+var sideloaded = [
+	"sideloaded",
+	"pirated"
+];
+var emulators = [
+	"emu",
+	"roms",
+	"emulators",
+	"retro"
+];
 var storeMappings = {
 	gog: gog,
 	epic: epic,
@@ -226,10 +245,13 @@ var storeMappings = {
 	rockstar: rockstar,
 	ubisoft: ubisoft,
 	xbox: xbox,
-	ea: ea
+	ea: ea,
+	itch: itch,
+	sideloaded: sideloaded,
+	emulators: emulators
 };
 
-const context$4 = "cache";
+const context$2 = "cache";
 const CACHE_TTL_MS = 60 * 1000; // 1 minute
 let gameStoreMappingsCache = {};
 let mappingsLoaded = false;
@@ -257,28 +279,18 @@ async function ensureMappingsLoaded(force = false) {
         });
     }
     isFetchingMappings = true;
-    if (isExpired) {
-        log(context$4, "Store mappings cache expired or missing, fetching...");
-    }
-    else {
-        log(context$4, "Fetching all store mappings...");
-    }
     try {
         const result = await call("get_all_store_mappings");
         if (result) {
             gameStoreMappingsCache = result;
             mappingsLoaded = true;
             lastFetchTime = Date.now();
-            log(context$4, `Loaded ${Object.keys(result).length} mappings`);
         }
         else {
-            log(context$4, "Failed to load mappings: API call returned unsuccessful", "error");
-            log(context$4, JSON.stringify(result), "error");
+            log(context$2, JSON.stringify(result), "error");
         }
     }
     catch (e) {
-        log(context$4, "Failed to load mappings", "error");
-        log(context$4, e, "error");
     }
     finally {
         isFetchingMappings = false;
@@ -333,7 +345,7 @@ function getFrontendStore(appid) {
         return null;
     }
     catch (e) {
-        log(context$4, "Could not check frontend collections: " + JSON.stringify(e), "warn");
+        log(context$2, "Could not check frontend collections: " + JSON.stringify(e), "warn");
         return null;
     }
 }
@@ -414,10 +426,25 @@ const BADGE_STYLES = {
         gradient: "linear-gradient(135deg, #111111 0%, #333333 100%)",
         icon: `<svg class="icon-badge" width="${width}" height="${height}" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/><path d="M17.5 15l-3 -6l-3 6h-5l1.5 -3"/><path d="M17 14h-2"/><path d="M6.5 12h3.5"/><path d="M8 9h3"/></svg>`,
     },
+    itch: {
+        name: "ITCH",
+        gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        icon: `<svg class="icon-badge" width="${width}" height="${height}" viewBox="0 0 245.371 220.736" xmlns="http://www.w3.org/2000/svg"><path d="M31.99 1.365C21.287 7.72.2 31.945 0 38.298v10.516C0 62.144 12.46 73.86 23.773 73.86c13.584 0 24.902-11.258 24.903-24.62 0 13.362 10.93 24.62 24.515 24.62 13.586 0 24.165-11.258 24.165-24.62 0 13.362 11.622 24.62 25.207 24.62h.246c13.586 0 25.208-11.258 25.208-24.62 0 13.362 10.58 24.62 24.164 24.62 13.585 0 24.515-11.258 24.515-24.62 0 13.362 11.32 24.62 24.903 24.62 11.313 0 23.773-11.714 23.773-25.046V38.298c-.2-6.354-21.287-30.58-31.988-36.933C180.118.197 157.056-.005 122.685 0c-34.37.003-81.228.54-90.697 1.365zm65.194 66.217a28.025 28.025 0 0 1-4.78 6.155c-5.128 5.014-12.157 8.122-19.906 8.122a28.482 28.482 0 0 1-19.948-8.126c-1.858-1.82-3.27-3.766-4.563-6.032l-.006.004c-1.292 2.27-3.092 4.215-4.954 6.037a28.5 28.5 0 0 1-19.948 8.12c-.934 0-1.906-.258-2.692-.528-1.092 11.372-1.553 22.24-1.716 30.164l-.002.045c-.02 4.024-.04 7.333-.06 11.93.21 23.86-2.363 77.334 10.52 90.473 19.964 4.655 56.7 6.775 93.555 6.788h.006c36.854-.013 73.59-2.133 93.554-6.788 12.883-13.14 10.31-66.614 10.52-90.474-.022-4.596-.04-7.905-.06-11.93l-.003-.045c-.162-7.926-.623-18.793-1.715-30.165-.786.27-1.757.528-2.692.528a28.5 28.5 0 0 1-19.948-8.12c-1.862-1.822-3.662-3.766-4.955-6.037l-.006-.004c-1.294 2.266-2.705 4.213-4.563 6.032a28.48 28.48 0 0 1-19.947 8.125c-7.748 0-14.778-3.11-19.906-8.123a28.025 28.025 0 0 1-4.78-6.155 27.99 27.99 0 0 1-4.736 6.155 28.49 28.49 0 0 1-19.95 8.124c-.27 0-.54-.012-.81-.02h-.007c-.27.008-.54.02-.813.02a28.49 28.49 0 0 1-19.95-8.123 27.992 27.992 0 0 1-4.736-6.155zm-20.486 26.49l-.002.01h.015c8.113.017 15.32 0 24.25 9.746 7.028-.737 14.372-1.105 21.722-1.094h.006c7.35-.01 14.694.357 21.723 1.094 8.93-9.747 16.137-9.73 24.25-9.746h.014l-.002-.01c3.833 0 19.166 0 29.85 30.007L210 165.244c8.504 30.624-2.723 31.373-16.727 31.4-20.768-.773-32.267-15.855-32.267-30.935-11.496 1.884-24.907 2.826-38.318 2.827h-.006c-13.412 0-26.823-.943-38.318-2.827 0 15.08-11.5 30.162-32.267 30.935-14.004-.027-25.23-.775-16.726-31.4L46.85 124.08C57.534 94.073 72.867 94.073 76.7 94.073zm45.985 23.582v.006c-.02.02-21.863 20.08-25.79 27.215l14.304-.573v12.474c0 .584 5.74.346 11.486.08h.006c5.744.266 11.485.504 11.485-.08v-12.474l14.304.573c-3.928-7.135-25.79-27.215-25.79-27.215v-.006l-.003.002z" fill="white"/></svg>`,
+    },
+    sideloaded: {
+        name: "SIDELOADED",
+        gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        icon: `<svg class="icon-badge" width="${width}" height="${height}" viewBox="0 0 736 736" fill="white" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"> <path fill="white" d=" M544.000000,1.000000 C546.370544,1.000000 548.741150,1.000000 551.793579,1.266841 C555.847595,2.569262 556.540161,4.796938 555.458435,7.952376 C554.920959,9.520539 554.603638,11.167391 554.234985,12.789614 C553.077393,17.884195 554.104126,19.315834 559.367554,18.289114 C564.407532,17.305984 569.194458,17.918720 574.179504,18.371017 C592.775635,20.058260 608.648865,28.175993 623.232849,39.006771 C635.660095,48.235813 647.632935,58.081776 660.785156,66.303185 C680.840149,78.839394 701.736450,85.604675 725.044128,75.390732 C726.102417,74.926971 727.516357,74.165634 728.581848,75.577499 C728.721191,76.820602 727.871887,77.474060 727.223450,78.195908 C715.212830,91.566193 701.040833,101.690895 683.891418,107.534904 C667.350098,113.171654 650.671509,114.894379 633.341309,111.544220 C620.524597,109.066582 610.328552,101.322624 598.904053,96.064034 C583.688049,89.060265 568.108765,83.544075 551.032532,83.828957 C547.525513,83.887459 544.016663,83.837433 540.119507,83.837433 C540.665894,82.864899 540.808228,82.339622 541.150391,82.052216 C542.294739,81.090843 543.496094,80.194893 544.701355,79.308807 C554.108337,72.392555 561.903992,64.121872 566.612732,53.257420 C569.825562,45.844326 569.554749,38.593151 565.015991,31.847631 C562.376282,27.924549 558.020996,25.658812 553.630920,25.453001 C550.247925,25.294401 550.474976,29.710781 549.901367,32.255089 C544.088135,58.040150 538.475525,83.870377 532.738953,109.672890 C532.029968,112.861794 532.848572,115.078705 535.645874,116.834572 C540.436218,119.841415 545.099060,123.050812 549.827271,126.157120 C574.736267,142.521347 599.662109,158.860092 624.528015,175.289490 C626.029846,176.281815 628.773010,177.077148 627.818787,179.618744 C626.855530,182.184311 624.151611,181.563828 622.088867,181.327271 C617.812378,180.836853 613.658569,179.596649 609.271790,179.669342 C582.688354,180.109741 562.776184,193.156174 546.834106,213.158356 C536.721008,225.847122 528.836731,239.924911 523.166138,255.220490 C515.301392,276.434723 509.385834,297.900940 513.145142,320.867615 C513.399597,322.421906 513.468201,323.962738 511.828064,324.790649 C510.060394,325.682983 509.026794,324.220917 508.010223,323.225647 C503.607605,318.915344 499.211334,314.653076 494.019775,311.212891 C490.539703,308.906830 488.284821,309.185333 487.610077,313.372955 C485.906067,323.948792 480.940948,333.978699 482.271393,345.062744 C482.447601,346.530701 481.375610,347.472443 480.692505,348.607086 C478.002075,353.075775 477.351990,357.950714 477.306061,363.106049 C480.294067,363.130798 481.785889,361.752258 483.190247,360.362488 C487.236908,356.357941 491.836365,353.043732 496.540100,349.918243 C519.276306,334.810791 544.515198,325.613281 570.635254,318.347656 C576.531860,316.707458 580.906555,317.855682 585.871948,320.984070 C606.576538,334.028595 627.517273,346.698364 648.371765,359.504944 C667.667236,371.354126 686.980164,383.175079 706.227173,395.102509 C707.790222,396.071136 710.421204,396.796295 709.951904,399.259552 C709.473206,401.772308 706.794922,401.852570 704.774231,402.478851 C704.303223,402.624847 703.789856,402.649414 703.292725,402.693298 C693.161133,403.587433 683.240356,405.474548 673.475769,408.394440 C642.855591,417.550903 620.840576,436.222534 609.296997,466.368286 C604.022827,480.141602 601.585144,494.661560 600.605591,509.261749 C599.446716,526.535034 601.037415,543.789734 603.595825,560.914185 C604.096375,564.264648 605.462708,566.534973 609.707764,566.679932 C616.462646,566.910461 623.215027,567.789368 629.922668,568.723206 C648.414001,571.297668 666.986572,571.822327 685.619141,571.457153 C689.307861,571.384888 691.150024,569.863281 691.548828,566.234741 C692.671753,556.017395 694.741211,545.936584 695.885010,535.707275 C696.362671,531.434753 695.214172,529.923889 691.371521,529.302795 C682.027588,527.792725 672.713623,526.097412 663.368835,524.592957 C660.143066,524.073608 657.549805,522.978638 658.914124,519.193115 C660.716614,514.191956 662.988708,509.357605 665.123657,504.479889 C666.025940,502.418488 667.430054,501.778748 669.904358,502.085785 C675.988220,502.840729 682.130249,503.318878 688.259827,503.473206 C700.308044,503.776520 700.311157,503.654205 702.400330,491.950073 C704.094666,482.458313 704.094666,482.458313 713.896729,482.534271 C722.012573,482.597168 723.392151,484.283203 721.827454,492.109161 C721.469849,493.898163 721.343994,495.732758 721.005127,497.526276 C719.959229,503.062805 720.596558,503.973053 726.074707,504.562378 C730.661133,505.055817 731.708191,506.453217 730.201477,510.744659 C728.217163,516.396118 726.018066,521.973572 723.841187,527.555542 C722.710327,530.455322 721.875366,533.510010 717.792175,533.893188 C715.636536,534.095459 715.440613,536.481812 715.129211,538.263550 C713.928467,545.132446 712.929810,552.038635 711.621460,558.886230 C709.300659,571.032410 709.564148,571.672363 721.939209,570.335938 C726.285461,569.866638 727.428284,571.548462 728.487427,574.939941 C731.211304,583.662170 734.148254,592.317749 737.000000,601.000000 C737.000000,601.000000 737.000000,601.500000 736.758423,602.014404 C735.152832,604.590088 733.035278,604.769897 730.830872,604.946167 C724.287170,605.469360 718.258484,607.719482 712.419739,610.593201 C710.478149,611.548767 709.066956,612.703735 709.493774,615.159424 C711.228333,625.139160 714.168274,634.631836 722.212769,641.437927 C727.953613,646.294983 733.352417,651.331970 737.000000,658.000000 C737.000000,684.256287 737.000000,710.512634 737.000000,737.000000 C713.646301,737.000000 690.291809,737.000000 666.575439,736.646545 C670.594421,706.772766 675.563660,677.327759 678.209778,647.512268 C675.043762,649.555298 673.901123,652.516724 672.864075,655.401062 C669.212524,665.557434 665.749329,675.781555 662.230774,685.985596 C655.179199,706.435791 643.852478,723.511536 624.289978,734.089417 C622.959351,734.808899 621.653381,735.528137 621.000000,737.000000 C537.312439,737.000000 453.624878,737.000000 369.167664,736.801392 C349.448761,733.215454 330.404724,730.280762 311.571777,726.338013 C280.810547,719.898010 250.098602,713.175110 221.711807,698.791687 C207.050400,691.362793 196.652374,681.172607 192.605179,664.390137 C186.842606,640.494629 180.292343,616.782104 174.359497,592.915466 C166.745605,562.286377 159.037735,531.673157 152.554352,500.791504 C150.455704,490.795258 146.386871,483.273468 138.124557,477.108887 C127.220497,468.973297 117.146057,459.726624 106.703911,450.970764 C92.832146,439.339172 78.942352,427.729126 65.074242,416.093201 C54.000664,406.802063 42.998528,397.425049 31.871092,388.199066 C21.645708,379.721008 11.295313,371.393707 1.000001,363.000000 C1.000000,361.611115 1.000000,360.222198 1.283797,358.245850 C3.947460,355.678528 4.913405,352.727081 6.566716,350.253571 C8.579386,347.242493 10.467097,346.288269 13.886106,348.530914 C23.198839,354.639465 32.700035,360.461761 42.150768,366.358673 C73.770065,386.087982 105.335106,405.905548 137.064148,425.456879 C146.956360,431.552429 156.294922,438.620056 167.209167,443.014221 C192.216507,453.082458 217.684830,461.899414 243.007721,471.111511 C244.697083,471.726105 246.460770,472.408630 248.173386,471.282898 C249.026993,469.461426 248.121384,467.908142 247.634033,466.367767 C245.027512,458.129395 242.824692,449.793915 240.976425,441.348602 C236.390167,420.392517 235.128754,399.249451 237.634766,377.963470 C240.997375,349.401550 252.126495,324.668091 274.005676,305.252533 C293.054565,288.348541 315.686615,280.503174 340.556122,277.592407 C350.709351,276.404114 359.027008,280.474579 367.441040,284.964600 C369.420685,286.020996 371.675140,287.895630 373.900604,286.147125 C376.293304,284.267212 374.431549,281.838867 373.754425,279.735229 C365.615784,254.450241 359.662506,228.921814 362.542816,201.977417 C364.041687,187.955841 367.048920,174.404724 372.948822,161.665314 C387.992554,129.182266 413.384399,108.237129 446.864227,96.635345 C457.747955,92.863792 469.015778,91.189545 480.497345,90.174881 C487.711975,89.537300 494.262207,89.255821 500.245941,94.214218 C503.685547,97.064430 507.683411,99.243721 511.445312,101.701538 C517.162598,105.436890 518.122131,105.066246 519.716125,98.652092 C527.805847,66.100174 535.904480,33.550480 544.000000,1.000000 M439.839752,419.594543 C444.626678,400.391357 449.420319,381.189880 454.189209,361.982208 C454.624634,360.228485 455.384308,358.242645 453.936401,356.761017 C452.391052,355.179657 450.499664,356.190247 448.818176,356.883850 C435.438171,362.403015 423.212524,370.011444 413.258270,380.371918 C403.105621,390.938843 395.004608,403.141937 389.806946,417.140625 C382.944550,435.622803 380.717834,454.530853 383.470520,474.006104 C384.259583,479.588715 385.421936,485.123352 387.208618,490.518036 C387.752167,492.159180 388.078400,494.315796 386.211304,495.547485 C384.661377,496.570007 383.318817,495.362915 382.221130,494.415375 C370.738037,484.502533 357.053162,478.938202 342.762360,474.774017 C321.028442,468.441040 298.910950,465.100769 276.230011,468.000061 C270.978638,468.671295 265.580505,468.913971 260.639954,471.194794 C259.441010,471.748322 258.092651,472.277100 258.003510,473.880707 C257.924408,475.303894 259.088440,475.876068 260.120575,476.381653 C261.160156,476.890900 262.289642,477.219666 263.386719,477.607819 C290.680878,487.264648 318.224274,496.161377 345.860565,504.783356 C366.323883,511.167542 386.838654,517.370605 407.515778,523.024963 C412.937195,524.507507 414.173340,523.783875 415.574585,518.129272 C423.644562,485.563507 431.647003,452.980988 439.839752,419.594543 M600.215393,639.689636 C603.235535,633.060303 603.422546,626.024475 602.072083,619.145508 C598.947205,603.227234 587.027405,592.278870 570.169739,589.773987 C559.781067,588.230286 542.367188,592.997131 534.434387,607.798096 C528.047913,619.713867 527.462341,631.539429 533.615662,643.552063 C540.348694,656.696594 552.028381,663.331177 565.999512,663.185974 C581.442810,663.025574 593.596191,655.407410 600.215393,639.689636 M305.973328,611.508850 C323.536407,631.784058 352.837036,626.813599 364.833893,607.210144 C372.155273,595.246582 372.813538,579.826111 365.191956,568.525879 C356.322784,555.376099 344.089233,549.313232 328.093414,551.605713 C299.467529,555.708252 287.716492,589.672424 305.973328,611.508850 M471.815277,638.333313 C483.807007,628.421387 488.240540,610.549622 482.132050,596.745850 C474.902405,580.408447 460.240295,571.791260 443.505890,574.044495 C422.787964,576.834106 408.196991,596.265076 411.610352,615.981506 C416.224121,642.631226 448.203461,657.486389 471.815277,638.333313 M567.335938,560.260315 C575.708923,561.828430 584.098389,563.240417 592.906372,563.590088 C591.558960,559.824707 591.575806,559.803894 589.999512,558.530518 C572.422546,544.330688 552.839294,534.066345 530.925964,528.333801 C512.708618,523.568115 494.821442,522.718140 477.761017,532.511230 C474.396057,534.442810 472.671692,532.856140 471.185181,529.822693 C464.808563,516.810425 459.442780,503.393311 454.676727,489.720734 C453.905762,487.509033 453.757233,484.859650 450.966492,483.196594 C449.598724,485.602325 448.858826,487.896271 448.329620,490.325745 C445.888550,501.532318 443.443817,512.738708 440.883057,523.918335 C439.399445,530.395203 440.064026,531.766541 446.577881,533.513733 C486.194763,544.140259 526.203857,552.997131 567.335938,560.260315 M457.610565,294.063202 C441.675079,288.585419 425.257629,286.571625 408.487915,287.544586 C403.331116,287.843781 398.347107,289.370178 393.513092,291.227112 C392.113007,291.764984 390.561127,292.431244 390.313141,294.083221 C390.028442,295.979523 391.790955,296.529388 393.070465,297.185913 C414.553711,308.209015 436.072174,319.163788 457.529480,330.237061 C460.500122,331.770081 461.822021,330.866882 462.561340,327.961487 C464.077087,322.005005 465.642334,316.061127 467.171509,310.108063 C470.214203,298.262695 470.209808,298.261566 457.610565,294.063202 z"/> </svg>`
+    },
+    emulators: {
+        name: "EMULATORS",
+        gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        icon: `<svg class="icon-badge" width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 416 416" xml:space="preserve"><path d="M262.559 394.66c-13.331 6.45-26.31 12.762-39.31 19.03-4.693 2.262-5.261 1.798-5.554-3.393-.757-13.451-.43-26.951-1.187-40.369-.937-16.592-.336-33.227-1.845-49.776-.437-4.792-2.302-9.243-6.956-11.403-8.82-4.093-11.439-11.053-11.164-20.297.191-6.402-.873-12.868-1.702-19.264-.661-5.102.662-8.839 4.959-12.07 13.942-10.482 27.7-21.204 41.936-31.3 3.968-2.815 6.845-6.719 8.265-11.585 7.997-27.403 16.227-54.74 23.997-82.207 2.571-9.091-.45-17.59-6.127-24.73-5.778-7.27-12.182-14.064-18.592-20.799-3.639-3.824-6.114-7.894-5.574-13.286a2998 2998 0 0 1 3.44-32.6c.768-6.908 1.456-13.837 2.601-20.687 1.37-8.194 9.427-11.887 16.197-7.129 8.693 6.11 16.897 12.915 25.356 19.36 15.847 12.076 31.676 24.176 47.613 36.13 7.573 5.68 11.636 12.804 11.425 22.498-.453 20.91-2.247 41.721-3.925 62.55-.932 11.571-1.35 23.183-2.151 34.766-1.223 17.692-2.868 35.36-3.77 53.066-.574 11.268-1.37 22.512-2.181 33.76-1.347 18.68-2.683 37.36-3.897 56.047-.538 8.285-.923 16.586-1.075 24.885-.083 4.544-1.83 7.577-6.018 9.357-21.111 8.97-41.877 18.696-62.519 28.69-.59.286-1.264.403-2.242.755"/><path d="M144.711 256.055c12.467 2.295 24.494 4.66 36.599 6.528 4.894.755 7.021 3.052 6.998 7.807-.045 8.977 1.143 17.868 2.095 26.765.566 5.29 2.6 9.904 7.608 12.751 7.49 4.258 10.471 10.62 10.414 19.395-.128 19.953.227 39.923 1.016 59.86.32 8.107 1.77 16.136-.634 24.07-3.042.785-5.2-1.211-7.677-1.978-17.117-5.3-34.246-10.566-51.323-15.995-16.275-5.175-32.479-10.576-48.749-15.767-2.296-.733-2.946-2.07-3.374-4.274-1.88-9.691-.842-19.533-1.748-29.299-1.44-15.52-1.677-31.158-2.191-46.754-.274-8.296-4.668-13.572-11.592-17.171-6.007-3.123-8.143-8.183-8.522-14.666-.482-8.261-1.308-16.516-2.398-24.719-.33-2.488-.152-4.172 1.898-5.587 8.62-5.95 17.197-11.96 25.851-17.858 2.875-1.96 5.873-2.114 9.58.946-8.884 8.112-19.153 14.032-29.752 22.357 22.419 6.341 44.337 8.191 65.901 13.59m-13.393 63.668c-1.132 15.43 3.383 30.619 1.965 46.058-.488 5.316 1.897 8.42 7.001 9.862a1080 1080 0 0 1 26.22 7.775c6.536 2.027 8.3.978 8.186-5.833-.21-12.614-.68-25.224-.95-37.838-.107-4.974-.056-9.923-.988-14.867-.593-3.148-2.095-5.404-4.995-6.213-9.253-2.579-18.524-5.148-27.897-7.233-7.505-1.67-8.44-.602-8.542 8.29M209.796 21.68c9.657-1.354 19.013-1.005 28.156-2.822 2.822-.56 4.653.442 4.311 3.651-.772 7.242-1.623 14.475-2.454 21.71-1.152 10.028-2.725 20.03-3.326 30.09-.383 6.428 3.334 11.795 7.612 16.313 5.375 5.675 11.013 11.093 16.02 17.12 6.422 7.734 9.45 16.185 6.416 26.25-6.7 22.227-13.265 44.493-19.965 66.72-1.845 6.118-2.144 12.78-6.828 17.917-4.339 4.76-9.772 7.915-15.244 10.958-3.23 1.796-6.888-.128-10.233-.527-10.516-1.255-20.93-3.344-31.415-4.893-13.919-2.057-27.87-3.897-41.803-5.857-4.091-.576-8.171-1.229-12.252-1.876-2.522-.4-3.549-1.712-2.354-4.198 4.048-8.423 3.002-16.125-3.304-23.04-2.08-2.28-1.197-4.617-.4-7.008 5.04-15.124 10.09-30.245 15.106-45.376 5.255-15.852 2.396-24.893-10.315-35.554-5.595-4.692-10.457-10.26-15.643-15.44-3.568-3.564-3.67-8.111-3.114-12.599 1.428-11.496 3.127-22.959 4.693-34.439.47-3.441.137-6.932 1.176-10.365 2.229-7.364 9.195-9.765 15.079-4.828 2.587 2.17 5.392 3.302 8.668 3.075 7.934-.55 15.855-1.294 23.789-1.843 15.714-1.088 31.435-2.096 47.624-3.14m-63.97 163.418c-1.193 3.629-2.42 7.246-3.57 10.888-1.616 5.105.784 9.773 6.164 10.799 6.813 1.299 13.74 2.016 20.629 2.9 12.64 1.62 25.357 2.762 37.913 4.87 15.215 2.553 20.535-.378 24.28-13.146 5.887-20.068 11.816-40.124 17.675-60.2 2.74-9.394-1.156-14.819-11.026-14.845-20.298-.055-40.588-.142-60.875-1.008-8.534-.364-13.1 3.35-15.733 11.594a13009 13009 0 0 1-15.456 48.148m4.418-148.807c-7.83-.626-15.542 1.337-23.365 1.061-3.652-.128-5.253 1.874-5.63 5.51-.851 8.225-1.963 16.425-3.042 24.626-.774 5.877-.598 6.366 5.33 6.171 15.416-.507 30.835-1.395 46.236-1.742 17.44-.392 34.863-1.788 52.333-1.26 6.78.204 8.34-1.672 8.59-8.606.06-1.644.414-3.275.587-4.916.802-7.57 1.642-15.136 2.352-22.714.273-2.915-.665-4.098-4.113-3.481-5.529.989-11.223.745-16.848 1.23-13.207 1.139-26.544.943-39.703 2.414-7.268.813-14.65-.353-22.727 1.707"/><path d="M104.02 195.145c5.086-4.299 11.623-4.522 15.635-.87 4.039 3.679 4.4 10.451.815 15.333-3.668 4.997-.142 13.494 5.984 14.007 4.382.367 8.522.966 9.657 6.006.696 3.091-3.669 6.462-9.134 7.683-4.093.915-8.086 1.386-12.266.13-2.804-.844-4.882-2.126-5.654-4.97-.84-3.091 1.693-4.427 3.5-6.032 1.477-1.31 4.416-1.463 3.344-4.624-1.093-3.22-1.252-6.89-5.225-8.455-9.116-3.592-11.198-9.162-6.656-18.208m89.57 37.597c4.002.801 7.67 1.263 10.478 3.953 2.95 2.827 2.773 5.825-.411 8.37-7.903 6.314-24.285 4.838-30.895 1.024-4.151-2.395-3.801-6.863.217-9.493 6.223-4.073 13.144-4.125 20.612-3.854M150.389 336.88c-6.26.17-7.255-.761-7.692-6.481-.1-1.307-.552-2.587-.65-3.894-.185-2.492-1.603-5.788 2.238-6.523 3.342-.64 6.044 1.332 6.591 4.642.654 3.962 1.21 8.074-.487 12.257m8.371-12.854c2.447.851 5.816.133 6.143 3.003.458 4.036 2.503 8.113.871 12.175-1.095 2.727-7.18 2.123-8.152-1.154-1.349-4.545-2.39-9.496 1.138-14.024"/></svg>`
+    },
     default: {
         name: "NON-STEAM",
         gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-        icon: `<svg class="icon-badge" width="${width}" height="${height}" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" > <!-- Steam-like core --> <circle cx="64" cy="64" r="26" fill="none" stroke="white" stroke-width="8" /> <circle cx="64" cy="64" r="10" fill="white" /> <!-- Plug connector --> <path d="M80 64 L88 64" stroke="white" stroke-width="6" stroke-linecap="round" /> <!-- Plug body --> <rect x="88" y="54" width="22" height="20" rx="4" fill="white" /> <!-- Plug prongs --> <line x1="110" y1="58" x2="118" y2="58" stroke="white" stroke-width="3" /> <line x1="110" y1="70" x2="118" y2="70" stroke="white" stroke-width="3" /></svg>`,
+        icon: `<svg class="icon-badge" width="${width}" height="${height}" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" > <circle cx="64" cy="64" r="26" fill="none" stroke="white" stroke-width="8" /> <circle cx="64" cy="64" r="10" fill="white" /> <path d="M80 64 L88 64" stroke="white" stroke-width="6" stroke-linecap="round" /> <rect x="88" y="54" width="22" height="20" rx="4" fill="white" /> <line x1="110" y1="58" x2="118" y2="58" stroke="white" stroke-width="3" /> <line x1="110" y1="70" x2="118" y2="70" stroke="white" stroke-width="3" /></svg>`,
     },
 };
 /**
@@ -427,7 +454,6 @@ function getBadgeStyle(gameStore, prop) {
     return BADGE_STYLES?.[gameStore]?.[prop] || BADGE_STYLES?.default?.[prop];
 }
 function getBadgeIcon(gameStore, context) {
-    log("getBadgeIcon", `gameStore: ${gameStore}, context: ${context}`);
     return getBadgeStyle(gameStore, GameStoreProp.ICON);
 }
 
@@ -645,7 +671,6 @@ function addBadgeToCapsule(capsule, bigPicWindow, context = GameStoreContext.LIB
     const cachedGameStoreName = getStore(appid)?.toLowerCase();
     const gameStoreName = sanitizedGameStoreName(cachedGameStoreName);
     const collectionVersion = getCollectionVersion();
-    log(context, `Adding badge to capsule. Store name: ${gameStoreName}`);
     // Determine the capsules context
     let effectiveContext = context;
     const cachedContext = existingBadge?.getAttribute("data-context");
@@ -655,9 +680,6 @@ function addBadgeToCapsule(capsule, bigPicWindow, context = GameStoreContext.LIB
     else if (effectiveContext === GameStoreContext.LIBRARY && img) {
         const rect = img.getBoundingClientRect();
         effectiveContext = getEffectiveCapsuleContext(effectiveContext, rect);
-        if (effectiveContext === GameStoreContext.SEARCH) {
-            log(context, `Detected landscaped capsule for appid ${appid}, using SEARCH context`);
-        }
     }
     const positionStyles = getCapsuleBadgeClassKeys(effectiveContext, settings)
         .map((classKey) => styles$1[classKey])
@@ -693,11 +715,10 @@ function addBadgeToCapsule(capsule, bigPicWindow, context = GameStoreContext.LIB
     }
     badgedElements.add(capsule);
     if (gameStoreName) {
-        log(context, `Got a game store name for appid ${appid}: ${gameStoreName}. Injecting badge icon into the DOM.`);
         // Inject the badge icon in the DOM
         if (badge.getAttribute("data-store") !== gameStoreName ||
             !existingBadge) {
-            badge.innerHTML = getBadgeIcon(gameStoreName, effectiveContext);
+            badge.innerHTML = getBadgeIcon(gameStoreName);
             badge.setAttribute("data-store", gameStoreName);
         }
         badge.classList.remove(styles$1[PULSATING_CLASSNAME]);
@@ -708,11 +729,10 @@ function addBadgeToCapsule(capsule, bigPicWindow, context = GameStoreContext.LIB
         });
     }
     else {
-        log(context, `No game store name for appid ${appid}: ${gameStoreName}. Falling back to default	while fetching.`);
         // If we don't have a cached store name, show placeholder and pulse while fetching
         if (badge.getAttribute("data-store") !== GameStoreName.DEFAULT ||
             !existingBadge) {
-            badge.innerHTML = getBadgeIcon(GameStoreName.DEFAULT, effectiveContext);
+            badge.innerHTML = getBadgeIcon(GameStoreName.DEFAULT);
             badge.setAttribute("data-store", GameStoreName.DEFAULT);
         }
         badge.classList.add(styles$1[PULSATING_CLASSNAME]);
@@ -729,7 +749,7 @@ function addBadgeToCapsule(capsule, bigPicWindow, context = GameStoreContext.LIB
                 badge.classList.remove(styles$1[PULSATING_CLASSNAME]);
                 const newName = sanitizedGameStoreName(newStore);
                 if (newName) {
-                    badge.innerHTML = getBadgeIcon(newName, effectiveContext);
+                    badge.innerHTML = getBadgeIcon(newName);
                     badge.setAttribute("data-store", newName);
                     capsuleRenderCache.set(capsule, {
                         appid: String(appid),
@@ -750,7 +770,6 @@ function addBadgeToCapsule(capsule, bigPicWindow, context = GameStoreContext.LIB
     }
 }
 
-const context$3 = "observer";
 let observer = null;
 let scanInterval = null;
 let retryTimeout = null;
@@ -795,7 +814,6 @@ function getBigPictureWindow() {
         }
     }
     catch (error) {
-        log(context$3, "Error getting Big Picture window:", "error");
     }
     return null;
 }
@@ -804,7 +822,6 @@ function startObserving() {
     stopObserving();
     const bigPicWindow = getBigPictureWindow();
     if (!bigPicWindow) {
-        log(context$3, "Big Picture window not found, retrying...");
         retryTimeout = window.setTimeout(() => {
             retryTimeout = null;
             startObserving();
@@ -830,9 +847,6 @@ function startObserving() {
             });
         }
     });
-    if (containers.length > 0) {
-        log(context$3, "Observer attached to containers");
-    }
     // Backup: scan every 2 seconds to catch anything missed
     scanInterval = setInterval(scanAndBadge, 2000);
     // Visibility change listener
@@ -912,17 +926,17 @@ function scanAndBadge() {
     }
 }
 
-const context$2 = "useSettings";
+const context$1 = "useSettings";
 function useSettings() {
     const [settings, setSettings] = SP_REACT.useState(getSettings());
     SP_REACT.useEffect(() => {
         const handleChange = (event) => {
             if (event instanceof CustomEvent && event.detail) {
-                log(context$2, "Settings changed (custom event): " + JSON.stringify(event.detail));
+                log(context$1, "Settings changed (custom event): " + JSON.stringify(event.detail));
                 setSettings(event.detail);
             }
             else {
-                log(context$2, "Settings changed (fallback): " + JSON.stringify(getSettings()));
+                log(context$1, "Settings changed (fallback): " + JSON.stringify(getSettings()));
                 setSettings(getSettings());
             }
         };
@@ -979,13 +993,7 @@ const Settings = () => {
                             value: checked,
                         });
                     } })),
-            (SP_REACT.createElement(DFL.PanelSectionRow, null,
-                SP_REACT.createElement(DFL.ToggleField, { label: "Disable Badges", description: "Dev-only toggle to disable badge rendering for performance checks", checked: settings.disableBadges, onChange: (checked) => {
-                        updateSetting({
-                            key: "disableBadges",
-                            value: checked,
-                        });
-                    } }))) )));
+            null)));
 };
 var Settings$1 = Settings;
 
@@ -1001,7 +1009,7 @@ function PluginIcon(props) {
 
 function r(e){var t,f,n="";if("string"==typeof e||"number"==typeof e)n+=e;else if("object"==typeof e)if(Array.isArray(e)){var o=e.length;for(t=0;t<o;t++)e[t]&&(f=r(e[t]))&&(n&&(n+=" "),n+=f);}else for(f in e)e[f]&&(n&&(n+=" "),n+=f);return n}function clsx(){for(var e,t,f=0,n="",o=arguments.length;f<o;f++)(e=arguments[f])&&(t=r(e))&&(n&&(n+=" "),n+=t);return n}
 
-var css_248z = ".SteamStoreButton-module_container__Ajz-- {\n  display: flex;\n  justify-content: center;\n  gap: 3px;\n}\n\nbutton.SteamStoreButton-module_steamStoreButton__W-gdi {\n  padding: 8px !important;\n  min-width: auto !important;\n  color: #000 !important;\n  background: #1b2838 !important;\n  animation: SteamStoreButton-module_nonsteam-badge-fade-in__giERj 0.3s cubic-bezier(0.2, 0, 0.2, 1) forwards;\n}\n\nbutton.SteamStoreButton-module_steamStoreButton__W-gdi:hover,\nbutton.SteamStoreButton-module_steamStoreButton__W-gdi:focus,\nbutton.SteamStoreButton-module_steamStoreButton__W-gdi:active {\n  background: #4b6479 !important;\n  outline: 1px solid black !important;\n}\n\n.SteamStoreButton-module_steamStoreButton__W-gdi svg {\n  color: #fff;\n}\n\n@keyframes SteamStoreButton-module_nonsteam-badge-fade-in__giERj {\n  from {\n    opacity: 0;\n    transform: scale(0.8);\n  }\n  to {\n    opacity: 1;\n    transform: scale(1);\n  }\n}\n";
+var css_248z = ".SteamStoreButton-module_container__Ajz-- {\r\n  display: flex;\r\n  justify-content: center;\r\n  gap: 3px;\r\n}\r\n\r\nbutton.SteamStoreButton-module_steamStoreButton__W-gdi {\r\n  padding: 8px !important;\r\n  min-width: auto !important;\r\n  color: #000 !important;\r\n  background: #1b2838 !important;\r\n  animation: SteamStoreButton-module_nonsteam-badge-fade-in__giERj 0.3s cubic-bezier(0.2, 0, 0.2, 1) forwards;\r\n}\r\n\r\nbutton.SteamStoreButton-module_steamStoreButton__W-gdi:hover,\r\nbutton.SteamStoreButton-module_steamStoreButton__W-gdi:focus,\r\nbutton.SteamStoreButton-module_steamStoreButton__W-gdi:active {\r\n  background: #4b6479 !important;\r\n  outline: 1px solid black !important;\r\n}\r\n\r\n.SteamStoreButton-module_steamStoreButton__W-gdi svg {\r\n  color: #fff;\r\n}\r\n\r\n@keyframes SteamStoreButton-module_nonsteam-badge-fade-in__giERj {\r\n  from {\r\n    opacity: 0;\r\n    transform: scale(0.8);\r\n  }\r\n  to {\r\n    opacity: 1;\r\n    transform: scale(1);\r\n  }\r\n}\r\n";
 var styles = {"container":"SteamStoreButton-module_container__Ajz--","steamStoreButton":"SteamStoreButton-module_steamStoreButton__W-gdi","nonsteam-badge-fade-in":"SteamStoreButton-module_nonsteam-badge-fade-in__giERj"};
 injectStyle(css_248z);
 
@@ -1082,7 +1090,7 @@ function SteamStoreButton({ steamAppId, }) {
                 SP_REACT.createElement(LiaExternalLinkAltSolid, null)))));
 }
 
-const context$1 = GameStoreContext.DETAILS;
+const context = GameStoreContext.DETAILS;
 function GameDetailsBadge() {
     const settings = useSettings();
     const [steamAppId, setSteamAppId] = SP_REACT.useState(null);
@@ -1092,9 +1100,9 @@ function GameDetailsBadge() {
     const currentPath = window.location.pathname;
     const match = currentPath.match(/\/library\/app\/(\d+)/);
     const appid = match ? match[1] : null;
-    log(context$1, `Badge appid: ${appid}`);
+    log(context);
     SP_REACT.useEffect(() => {
-        log(context$1, "Badge settings: " + JSON.stringify(settings));
+        log(context, "Badge settings: " + JSON.stringify(settings));
         // If setting is disabled, clear any existing ID and stop.
         if (settings.disableBadges || !settings.showSteamStoreButton) {
             setSteamAppId(null);
@@ -1103,7 +1111,7 @@ function GameDetailsBadge() {
     // Fetch gameStore info from backend via cache
     SP_REACT.useEffect(() => {
         if (!appid || !isNonSteamApp(appid)) {
-            log(context$1, `Details page useEffect skipping - not a non-Steam app: ${appid}`);
+            log(context);
             setLoading(false);
             return;
         }
@@ -1117,7 +1125,7 @@ function GameDetailsBadge() {
         setLoading(true);
         setGameStore(null);
         setSteamAppId(null);
-        log(context$1, "Details page useEffect - ensuring mappings loaded");
+        log(context);
         (async () => {
             await ensureMappingsLoaded();
             if (cancelled)
@@ -1126,25 +1134,25 @@ function GameDetailsBadge() {
             const name = getName(appid);
             if (store) {
                 setGameStore(store);
-                log(context$1, `Identified Store via Cache: ${store}`);
+                log(context);
             }
             else {
-                log(context$1, `AppID ${appid} not found in cache.`);
+                log(context);
             }
             if (cancelled)
                 return;
             setLoading(false);
             if (name && settings.showSteamStoreButton) {
-                log(context$1, `Searching for Steam AppID using name: ${name}`);
+                log(context);
                 const steamId = await call("search_steam_id", name);
                 if (cancelled)
                     return;
                 if (steamId) {
                     setSteamAppId(steamId);
-                    log(context$1, `Found Steam AppID: ${steamId}`);
+                    log(context);
                 }
                 else {
-                    log(context$1, `Could not find Steam AppID for ${name}`);
+                    log(context);
                 }
             }
         })();
@@ -1158,11 +1166,11 @@ function GameDetailsBadge() {
     }
     const gameStoreName = sanitizedGameStoreName(gameStore) ?? GameStoreName.DEFAULT;
     const badge = loading
-        ? getBadgeIcon(GameStoreName.DEFAULT, GameStoreContext.DETAILS)
-        : getBadgeIcon(gameStoreName, GameStoreContext.DETAILS);
+        ? getBadgeIcon(GameStoreName.DEFAULT)
+        : getBadgeIcon(gameStoreName);
     if (loading)
-        log(context$1, `Badge is loading`);
-    log(context$1, `Badge valid: ${!!badge}`);
+        log(context);
+    log(context);
     // If badge position is disabled but button is enabled, default button to top-left position
     const badgePositionStyle = styles$1[getDetailsBadgePositionClassKey(settings.detailsPosition, settings.showSteamStoreButton)];
     return (SP_REACT.createElement(SP_REACT.Fragment, null,
@@ -1171,7 +1179,6 @@ function GameDetailsBadge() {
             steamAppId && SP_REACT.createElement(SteamStoreButton, { steamAppId: steamAppId }))));
 }
 
-const context = GameStoreContext.DETAILS;
 let cleanupRenderPatch = null;
 let patchedRouteProps = null;
 function cleanupGameDetailsPatches() {
@@ -1195,7 +1202,6 @@ const patchGameDetails = (tree) => {
             const container = DFL.findInReactTree(ret, (x) => Array.isArray(x?.props?.children) &&
                 x?.props?.className?.includes(DFL.appDetailsClasses.InnerContainer));
             if (typeof container !== "object") {
-                log(context, "Patch FAILED to find container in 'ret'.");
                 return ret;
             }
             container.props.children.splice(1, 0, SP_REACT.createElement(GameDetailsBadge, null));
@@ -1232,29 +1238,15 @@ var index = definePlugin(() => {
     const settings = getSettings();
     const startupTimeouts = new Set();
     const routeMonitorIntervalMs = 500;
-    let routeLoggerInterval;
     let routeMonitorInterval;
     let observerActive = false;
     // Warm the store cache early so visible capsules can render final badges immediately.
     void ensureMappingsLoaded();
-    {
-        let lastPathname = window.location.pathname;
-        log("debug", `Current pathname: ${lastPathname}`);
-        routeLoggerInterval = window.setInterval(() => {
-            const currentPathname = window.location.pathname;
-            if (currentPathname === lastPathname) {
-                return;
-            }
-            lastPathname = currentPathname;
-            log("debug", `Pathname changed: ${currentPathname}`);
-        }, 500);
-    }
     const canObserveCurrentSettings = () => shouldObserveDomBadges(getSettings());
     const stopObserverForCurrentRoute = () => {
         if (!observerActive) {
             return;
         }
-        log("debug", `Stopping DOM observer on route: ${window.location.pathname}`);
         stopObserving();
         observerActive = false;
     };
@@ -1265,7 +1257,6 @@ var index = definePlugin(() => {
         const timeoutId = window.setTimeout(() => {
             startupTimeouts.delete(timeoutId);
             if (canObserveCurrentSettings() && isObserverRoute(window.location.pathname)) {
-                log("debug", `Starting DOM observer on route: ${window.location.pathname}`);
                 startObserving();
                 observerActive = true;
             }
@@ -1288,7 +1279,6 @@ var index = definePlugin(() => {
     };
     // Patch library and home carousel (DOM-based)
     const handleLibraryPatch = (tree) => {
-        log(GameStoreContext.LIBRARY, "Library patch applied. Listening ...");
         scheduleObservationStart();
         return tree;
     };
@@ -1300,7 +1290,6 @@ var index = definePlugin(() => {
     };
     // Patch search results (DOM-based)
     const handleSearchPatch = (tree) => {
-        log(GameStoreContext.SEARCH, "Search patch applied. Listening ...");
         scheduleObservationStart();
         return tree;
     };
@@ -1315,7 +1304,6 @@ var index = definePlugin(() => {
         if (settings.detailsPosition === "none") {
             return;
         }
-        log(GameStoreContext.DETAILS, "Game details patching ...");
         return routerHook.addPatch("/library/app/:appid", patchGameDetails);
     };
     const handleSettingsChange = () => {
@@ -1343,9 +1331,6 @@ var index = definePlugin(() => {
             startupTimeouts.clear();
             if (routeMonitorInterval) {
                 clearInterval(routeMonitorInterval);
-            }
-            if (routeLoggerInterval) {
-                clearInterval(routeLoggerInterval);
             }
             cleanupGameDetailsPatches();
             // Remove patches
