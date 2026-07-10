@@ -12,6 +12,7 @@ export enum SupportedStores {
   EA = "ea",
   ITCH = "itch",
   SIDELOADED = "sideloaded",
+  EMULATORS = "emulators",
 }
 
 export enum BadgePosition {

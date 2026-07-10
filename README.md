@@ -19,6 +19,9 @@ Since non-Steam games also lack a 'game info' tab, I also took the opportunity t
   - **Ubisoft**
   - **Xbox**
   - **Electronic Arts (EA)**
+  - **Itch.io**
+  - **Sideloaded and custom installed Games
+  - **Emulators
 - **Fallback Badge**: Other non-Steam games outside the currently supported storefronts will display a custom non-Steam badge.
 - **Steam Store Button**: (optionally) Adds a "Steam Page" button to the game details screen, allowing you to quickly visit the Steam Store page for your non-Steam games.
 - **Seamless Integration**: Badges are injected into multiple areas:

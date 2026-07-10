@@ -204,7 +204,8 @@ class Plugin:
                     "xbox": ["xbox", "microsoft"],
                     "ea": ["ea", "origin", "electronic arts", "electronicarts"],
                     "itch": ["itch", "itch.io","itchio"],
-                    "sideloaded": ["sideloaded", "pirated"]
+                    "sideloaded": ["sideloaded", "pirated"],
+                    "emulators" : ["emu", "roms", "emulators", "retro"]
                 }
 
             with open(vdf_path, "rb") as f:
