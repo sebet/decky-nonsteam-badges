@@ -202,7 +202,9 @@ class Plugin:
                     "rockstar": ["rockstar", "rockstar games", "rockstargames", "social club"],
                     "ubisoft": ["ubisoft", "uplay"],
                     "xbox": ["xbox", "microsoft"],
-                    "ea": ["ea", "origin", "electronic arts", "electronicarts"]
+                    "ea": ["ea", "origin", "electronic arts", "electronicarts"],
+                    "itch": ["itch", "itch.io","itchio"],
+                    "sideloaded": ["sideloaded", "pirated"]
                 }
 
             with open(vdf_path, "rb") as f:
