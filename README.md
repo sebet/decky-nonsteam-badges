@@ -19,6 +19,7 @@ Since non-Steam games also lack a 'game info' tab, I also took the opportunity t
   - **Ubisoft**
   - **Xbox**
   - **Electronic Arts (EA)**
+  - **itch.io**
 - **Fallback Badge**: Other non-Steam games outside the currently supported storefronts will display a custom non-Steam badge.
 - **Steam Store Button**: (optionally) Adds a "Steam Page" button to the game details screen, allowing you to quickly visit the Steam Store page for your non-Steam games.
 - **Seamless Integration**: Badges are injected into multiple areas:
@@ -32,7 +33,7 @@ Since non-Steam games also lack a 'game info' tab, I also took the opportunity t
 
 ## How It Works
 
-Non-Steam Badges works by scanning your Steam games collection. It looks for common patterns in launcher options and collection names (like `gog`, `epic`, `amazon`, `rockstar`, `ubisoft`, `xbox`, or `ea`) and maps these to the correct storefront.
+Non-Steam Badges works by scanning your Steam games collection. It looks for common patterns in launcher options and collection names (like `gog`, `epic`, `amazon`, `rockstar`, `ubisoft`, `xbox`, `ea`, or `itch`) and maps these to the correct storefront.
 If it finds matches, it overlays the relevant badge. If there are no matches, it overlays a custom non-Steam badge.
 
 **Matching rules priority:**
@@ -49,7 +50,7 @@ If no matches are found in your collections, it groups together the underlying p
 4. **Launch Options**
 
 If you use [Unifideck](https://github.com/mubaraknumann/unifideck), you shouldn't need any additional steps, since Unifideck already adds the correct collection names for non-Steam games as well as launch options.
-If you add non-Steam games to your Steam library manually or through the [Heroic Games Launcher](https://heroicgameslauncher.com/), you just need to add the correct collection names for the plugin to identify it (i.e. `gog`, `epic`, `amazon`, `rockstar`, `ubisoft`, `xbox`, or `ea`).
+If you add non-Steam games to your Steam library manually or through the [Heroic Games Launcher](https://heroicgameslauncher.com/), you just need to add the correct collection names for the plugin to identify it (i.e. `gog`, `epic`, `amazon`, `rockstar`, `ubisoft`, `xbox`, `ea`, or `itch`).
 
 ## Screenshots
 
