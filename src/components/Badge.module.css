@@ -1,4 +1,7 @@
 .badge {
+  --badge-size: 28px;
+  --badge-padding: calc(var(--badge-size) * 0.08);
+  --badge-offset: calc(var(--badge-size) * 0.14);
   position: absolute;
   display: flex;
   border-radius: 5px;
@@ -11,9 +14,10 @@
 }
 
 .detailsBadge {
+  --badge-size: clamp(32px, 2.8vw, 48px);
   z-index: 0;
   box-sizing: border-box;
-  padding: 5px;
+  padding: calc(var(--badge-size) * 0.1);
   padding-bottom: 0;
 }
 
@@ -23,41 +27,47 @@
 }
 
 .detailsBadgeWithButton :global(svg.icon-badge) {
-  width: 48px;
-  height: 48px;
+  width: var(--badge-size);
+  height: var(--badge-size);
 }
 
 .libraryBadge {
-  padding: 2px;
+  --badge-size: clamp(24px, 1.6vw, 32px);
+  padding: var(--badge-padding);
   border-radius: 2px;
 }
 
 .libraryBadge :global(svg.icon-badge) {
-  width: 28px;
-  height: 28px;
+  width: var(--badge-size);
+  height: var(--badge-size);
 }
 
 .homeBadge {
-  padding: 2px;
+  --badge-size: clamp(24px, 1.6vw, 32px);
+  padding: var(--badge-padding);
   border-radius: 2px;
 }
 
 .homeBadge :global(svg.icon-badge) {
-  width: 28px;
-  height: 28px;
+  width: var(--badge-size);
+  height: var(--badge-size);
 }
 
 :global(.Panel)
   [role="listitem"]:first-of-type
   .homeBadge
   :global(svg.icon-badge) {
-  width: 40px;
-  height: 40px;
+  width: clamp(32px, 2vw, 40px);
+  height: clamp(32px, 2vw, 40px);
+}
+
+.searchBadge {
+  --badge-size: clamp(20px, 1.4vw, 28px);
 }
 
 .searchBadge :global(svg.icon-badge) {
-  width: 24px;
-  height: 24px;
+  width: var(--badge-size);
+  height: var(--badge-size);
 }
 
 .nonsteam-badge-pulsing {
@@ -65,23 +75,23 @@
 }
 
 .top-left {
-  top: 4px;
-  left: 4px;
+  top: var(--badge-offset);
+  left: var(--badge-offset);
 }
 
 .top-right {
-  top: 4px;
-  right: 4px;
+  top: var(--badge-offset);
+  right: var(--badge-offset);
 }
 
 .bottom-left {
-  bottom: 4px;
-  left: 4px;
+  bottom: var(--badge-offset);
+  left: var(--badge-offset);
 }
 
 .bottom-right {
-  bottom: 4px;
-  right: 4px;
+  bottom: var(--badge-offset);
+  right: var(--badge-offset);
 }
 
 .details-top-left {
@@ -92,13 +102,13 @@
 }
 
 .details-top-left :global(svg.icon-badge) {
-  width: 42px;
-  height: 42px;
+  width: calc(var(--badge-size) * 0.875);
+  height: calc(var(--badge-size) * 0.875);
 }
 
 .detailsBadgeWithButton.details-top-left :global(svg.icon-badge) {
-  width: 32px;
-  height: 32px;
+  width: calc(var(--badge-size) * 0.67);
+  height: calc(var(--badge-size) * 0.67);
 }
 
 .details-top-right {
