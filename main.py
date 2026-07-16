@@ -193,7 +193,8 @@ class Plugin:
                     "rockstar": ["rockstar", "rockstar games", "rockstargames", "social club"],
                     "ubisoft": ["ubisoft", "uplay"],
                     "xbox": ["xbox", "microsoft"],
-                    "ea": ["ea", "origin", "electronic arts", "electronicarts"]
+                    "ea": ["ea", "origin", "electronic arts", "electronicarts"],
+                    "itch": ["itch", "itch.io", "itchio"]
                 }
 
             with open(shortcuts_path, "rb") as f:

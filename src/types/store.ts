@@ -6,6 +6,7 @@ export enum GameStoreName {
   UBISOFT = "ubisoft",
   XBOX = "xbox",
   EA = "ea",
+  ITCH = "itch",
   DEFAULT = "default",
 }
 
