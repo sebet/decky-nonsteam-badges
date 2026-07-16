@@ -38,7 +38,7 @@ jobs:
         run: |
           PKG=decky-nonsteam-badges
           mkdir -p "$PKG/dist"
-          cp README.md LICENSE plugin.json package.json main.py "$PKG/"
+          cp README.md LICENSE plugin.json package.json main.py store_mappings.json "$PKG/"
           cp -r py_modules "$PKG/"
           cp dist/index.js "$PKG/dist/"
           echo "Package contents:"
