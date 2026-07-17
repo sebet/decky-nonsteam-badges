@@ -6,9 +6,9 @@ import { injectStyleIntoWindow } from "src/utils/styleInjector";
 const context = "observer";
 
 let observer: MutationObserver | null = null;
-let scanInterval: number | null = null;
 let retryTimeout: number | null = null;
 let visibilityTimeout: number | null = null;
+let backupScanTimeouts = new Set<number>();
 
 let debounceTimeout: number | null = null;
 let visibilityDocument: Document | null = null;
@@ -22,6 +22,16 @@ const debouncedScan = () => {
     debounceTimeout = null;
   }) as unknown as number;
 };
+
+function scheduleBackupScans(delays: number[]): void {
+  delays.forEach((delay) => {
+    const timeoutId = window.setTimeout(() => {
+      backupScanTimeouts.delete(timeoutId);
+      scanAndBadge();
+    }, delay);
+    backupScanTimeouts.add(timeoutId);
+  });
+}
 
 let cachedWindow: Window | null = null;
 
@@ -104,8 +114,9 @@ export function startObserving(): void {
     log(context, "Observer attached to containers");
   }
 
-  // Backup: scan every 2 seconds to catch anything missed
-  scanInterval = setInterval(scanAndBadge, 2000) as unknown as number;
+  // Steam often finishes virtualized rendering shortly after the first observer tick.
+  // Run a small burst of follow-up scans instead of a permanent polling loop.
+  scheduleBackupScans([250, 1000, 2500]);
 
   // Visibility change listener
   visibilityDocument = bigPicWindow.document;
@@ -117,6 +128,7 @@ export function startObserving(): void {
       visibilityTimeout = window.setTimeout(() => {
         visibilityTimeout = null;
         scanAndBadge();
+        scheduleBackupScans([400, 1200]);
       }, 100);
     }
   };
@@ -131,10 +143,6 @@ export function stopObserving(): void {
     observer.disconnect();
     observer = null;
   }
-  if (scanInterval) {
-    clearInterval(scanInterval);
-    scanInterval = null;
-  }
   if (retryTimeout) {
     clearTimeout(retryTimeout);
     retryTimeout = null;
@@ -147,6 +155,8 @@ export function stopObserving(): void {
     cancelAnimationFrame(debounceTimeout);
     debounceTimeout = null;
   }
+  backupScanTimeouts.forEach((timeoutId) => clearTimeout(timeoutId));
+  backupScanTimeouts.clear();
   if (visibilityDocument && visibilityChangeHandler) {
     visibilityDocument.removeEventListener(
       "visibilitychange",
@@ -173,15 +183,11 @@ function scanAndBadge(): void {
     },
   ];
 
-  // Scan both grid (library) and list items (home carousel)
-  const selectors = contexts.map((c) => c.selector);
-
   // Ensure styles are available in this window
   injectStyleIntoWindow(bigPicWindow);
 
-  for (const selector of selectors) {
+  for (const { selector, context } of contexts) {
     const capsules = bigPicWindow.document.querySelectorAll(selector);
-    const context = contexts.find((c) => c.selector === selector)?.context;
 
     capsules.forEach((capsule) => {
       // True game capsules contain a clickable wrapper with role="link".
