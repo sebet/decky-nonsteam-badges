@@ -20,6 +20,50 @@ let lastUserCollectionsRef: unknown = null;
 let lastUserCollectionsSignature = "";
 let collectionVersion = 0;
 
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function getAppIdCandidates(appid: string): Array<string | number> {
+  const numericAppId = parseInt(appid, 10);
+  if (isNaN(numericAppId)) return [appid];
+
+  const unsignedAppId = numericAppId >>> 0;
+  const signedAppId =
+    unsignedAppId > 0x7fffffff ? unsignedAppId - 0x100000000 : unsignedAppId;
+
+  return Array.from(
+    new Set([
+      appid,
+      String(numericAppId),
+      String(unsignedAppId),
+      String(signedAppId),
+      numericAppId,
+      unsignedAppId,
+      signedAppId,
+    ]),
+  );
+}
+
+function collectionContainsApp(
+  apps: { has?: (value: string | number) => boolean } | Array<string | number>,
+  appid: string,
+): boolean {
+  const candidates = getAppIdCandidates(appid);
+
+  if (apps && typeof (apps as { has?: (value: string | number) => boolean }).has === "function") {
+    return candidates.some((candidate) =>
+      (apps as { has: (value: string | number) => boolean }).has(candidate),
+    );
+  }
+
+  if (Array.isArray(apps)) {
+    return candidates.some((candidate) => apps.includes(candidate));
+  }
+
+  return false;
+}
+
 /**
  * Wait for store mappings to be loaded from the backend before attempting to access the cache.
  */
@@ -108,22 +152,15 @@ function getFrontendStore(appid: string): string | null {
       collectionVersion++;
     }
 
-    const numericAppId = parseInt(appid);
-    if (isNaN(numericAppId)) return null;
-
     for (const collection of userCollections) {
-      if (
-        collection.apps &&
-        collection.apps.has &&
-        collection.apps.has(numericAppId)
-      ) {
+      if (collection.apps && collectionContainsApp(collection.apps, appid)) {
         const colName = String(collection.displayName ?? "");
         for (const store of supportedStores) {
           const aliases = (storeMappings as Record<string, string[]>)[
             store as string
           ] || [store];
           for (const alias of aliases) {
-            const regex = new RegExp(`\\b${alias}\\b`, "i");
+            const regex = new RegExp(`\\b${escapeRegExp(alias)}\\b`, "i");
             if (regex.test(colName)) {
               return store;
             }

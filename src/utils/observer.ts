@@ -6,9 +6,10 @@ import { injectStyleIntoWindow } from "src/utils/styleInjector";
 const context = "observer";
 
 let observer: MutationObserver | null = null;
-let scanInterval: number | null = null;
 let retryTimeout: number | null = null;
 let visibilityTimeout: number | null = null;
+let backupScanTimeouts = new Set<number>();
+let lastViewSignature = "";
 
 let debounceTimeout: number | null = null;
 let visibilityDocument: Document | null = null;
@@ -23,7 +24,65 @@ const debouncedScan = () => {
   }) as unknown as number;
 };
 
+function scheduleBackupScans(delays: number[]): void {
+  backupScanTimeouts.forEach((timeoutId) => clearTimeout(timeoutId));
+  backupScanTimeouts.clear();
+
+  delays.forEach((delay) => {
+    const timeoutId = window.setTimeout(() => {
+      backupScanTimeouts.delete(timeoutId);
+      scanAndBadge();
+    }, delay);
+    backupScanTimeouts.add(timeoutId);
+  });
+}
+
 let cachedWindow: Window | null = null;
+
+function getVisibleTextSignature(bigPicWindow: Window): string {
+  const visiblePanels = Array.from(
+    bigPicWindow.document.querySelectorAll('div[role="tabpanel"]'),
+  ).filter((panel) => {
+    if (!(panel instanceof HTMLElement)) return false;
+    return panel.offsetParent !== null;
+  });
+
+  const selectedTabs = Array.from(
+    bigPicWindow.document.querySelectorAll(
+      '[aria-selected="true"], [aria-pressed="true"]',
+    ),
+  )
+    .map((element) => element.textContent?.trim())
+    .filter(Boolean)
+    .slice(0, 5);
+
+  const panelHeadings = visiblePanels
+    .flatMap((panel) =>
+      Array.from(panel.querySelectorAll("h1, h2, h3, [role='heading']"))
+        .map((element) => element.textContent?.trim())
+        .filter(Boolean)
+        .slice(0, 5),
+    )
+    .slice(0, 8);
+
+  const gridCounts = visiblePanels.map(
+    (panel) => panel.querySelectorAll('div[role="gridcell"], div[role="listitem"]').length,
+  );
+
+  return JSON.stringify({
+    tabs: selectedTabs,
+    headings: panelHeadings,
+    counts: gridCounts,
+  });
+}
+
+function scheduleViewTransitionScans(bigPicWindow: Window): void {
+  const nextSignature = getVisibleTextSignature(bigPicWindow);
+  if (nextSignature === lastViewSignature) return;
+
+  lastViewSignature = nextSignature;
+  scheduleBackupScans([0, 300, 1000, 2000]);
+}
 
 /**
  * Get the Big Picture window from Decky's navigation trees
@@ -78,12 +137,15 @@ export function startObserving(): void {
 
   // Initial scan
   scanAndBadge();
+  lastViewSignature = getVisibleTextSignature(bigPicWindow);
 
   // Set up MutationObserver for instant badge injection
   observer = new MutationObserver((mutations) => {
-    // Only scan if elements were added
-    const hasAddedNodes = mutations.some((m) => m.addedNodes.length > 0);
-    if (hasAddedNodes) {
+    const hasStructuralChanges = mutations.some(
+      (m) => m.addedNodes.length > 0 || m.removedNodes.length > 0,
+    );
+    if (hasStructuralChanges) {
+      scheduleViewTransitionScans(bigPicWindow);
       debouncedScan();
     }
   });
@@ -104,8 +166,9 @@ export function startObserving(): void {
     log(context, "Observer attached to containers");
   }
 
-  // Backup: scan every 2 seconds to catch anything missed
-  scanInterval = setInterval(scanAndBadge, 2000) as unknown as number;
+  // Steam often finishes virtualized rendering shortly after the first observer tick.
+  // Run a small burst of follow-up scans instead of a permanent polling loop.
+  scheduleBackupScans([250, 1000, 2500]);
 
   // Visibility change listener
   visibilityDocument = bigPicWindow.document;
@@ -116,6 +179,7 @@ export function startObserving(): void {
       }
       visibilityTimeout = window.setTimeout(() => {
         visibilityTimeout = null;
+        scheduleViewTransitionScans(bigPicWindow);
         scanAndBadge();
       }, 100);
     }
@@ -131,10 +195,6 @@ export function stopObserving(): void {
     observer.disconnect();
     observer = null;
   }
-  if (scanInterval) {
-    clearInterval(scanInterval);
-    scanInterval = null;
-  }
   if (retryTimeout) {
     clearTimeout(retryTimeout);
     retryTimeout = null;
@@ -147,6 +207,9 @@ export function stopObserving(): void {
     cancelAnimationFrame(debounceTimeout);
     debounceTimeout = null;
   }
+  backupScanTimeouts.forEach((timeoutId) => clearTimeout(timeoutId));
+  backupScanTimeouts.clear();
+  lastViewSignature = "";
   if (visibilityDocument && visibilityChangeHandler) {
     visibilityDocument.removeEventListener(
       "visibilitychange",
@@ -173,15 +236,11 @@ function scanAndBadge(): void {
     },
   ];
 
-  // Scan both grid (library) and list items (home carousel)
-  const selectors = contexts.map((c) => c.selector);
-
   // Ensure styles are available in this window
   injectStyleIntoWindow(bigPicWindow);
 
-  for (const selector of selectors) {
+  for (const { selector, context } of contexts) {
     const capsules = bigPicWindow.document.querySelectorAll(selector);
-    const context = contexts.find((c) => c.selector === selector)?.context;
 
     capsules.forEach((capsule) => {
       // True game capsules contain a clickable wrapper with role="link".

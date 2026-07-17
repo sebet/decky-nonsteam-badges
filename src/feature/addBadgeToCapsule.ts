@@ -2,6 +2,7 @@ import { log } from "../utils/logger";
 import styles from "../components/Badge.module.css";
 import { isNonSteamApp, sanitizedGameStoreName } from "src/utils/store";
 import { getSettings } from "../utils/settings";
+import storeMappings from "../../store_mappings.json";
 import {
   ensureMappingsLoaded,
   getCollectionVersion,
@@ -25,6 +26,60 @@ type CapsuleRenderState = {
   collectionVersion: number;
 };
 let capsuleRenderCache = new WeakMap<Element, CapsuleRenderState>();
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function getCollectionHeadingStore(
+  capsule: Element,
+  bigPicWindow: Window,
+): GameStoreName | undefined {
+  try {
+    const tabPanel = capsule.closest('div[role="tabpanel"]');
+    if (!tabPanel) return undefined;
+
+    const candidateElements = Array.from(
+      tabPanel.querySelectorAll("h1, h2, h3, div, span"),
+    ).filter((element) => {
+      if (!(element instanceof HTMLElement)) return false;
+      if (
+        element.closest('div[role="gridcell"], div[role="link"], button, a')
+      ) {
+        return false;
+      }
+
+      const text = element.innerText?.trim();
+      if (!text || text.length > 40) return false;
+      return true;
+    });
+
+    const seenStores = new Set<GameStoreName>();
+
+    for (const element of candidateElements) {
+      const text = element.textContent?.trim();
+      if (!text) continue;
+
+      for (const [store, aliases] of Object.entries(
+        storeMappings as Record<string, string[]>,
+      )) {
+        for (const alias of aliases) {
+          const regex = new RegExp(`^${escapeRegExp(alias)}$`, "i");
+          if (regex.test(text)) {
+            const sanitized = sanitizedGameStoreName(store);
+            if (sanitized) {
+              seenStores.add(sanitized);
+            }
+          }
+        }
+      }
+    }
+
+    return seenStores.size === 1 ? [...seenStores][0] : undefined;
+  } catch {
+    return undefined;
+  }
+}
 
 /**
  * Remove existing badges from DOM
@@ -173,10 +228,14 @@ export function addBadgeToCapsule(
 
   // Clean up any improperly attached or orphaned badges before proceeding
   let appid = existingBadge?.getAttribute("data-appid") || getAppId(capsule);
+  let forcedCollectionStore: GameStoreName | undefined;
 
   // If we can't find a Steam ID through any method (no artwork URL, no visible anchor tag, no fiber prop),
   // Native Steam games NEVER have a missing ID. So it is inherently a generic/blank non-Steam app.
   if (!appid) {
+    if (context === GameStoreContext.LIBRARY) {
+      forcedCollectionStore = getCollectionHeadingStore(capsule, bigPicWindow);
+    }
     appid = "unknown_generic_app";
   } else if (!isNonSteamApp(appid)) {
     if (existingBadge) {
@@ -237,7 +296,8 @@ export function addBadgeToCapsule(
   }
 
   // Check if we have a store name mapping for this 'appid'
-  const cachedGameStoreName = getStore(appid)?.toLowerCase();
+  const cachedGameStoreName =
+    forcedCollectionStore || sanitizedGameStoreName(getStore(appid)?.toLowerCase());
   const gameStoreName = sanitizedGameStoreName(cachedGameStoreName);
   const collectionVersion = getCollectionVersion();
 

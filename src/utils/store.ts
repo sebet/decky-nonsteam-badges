@@ -12,6 +12,7 @@ function gameStoreIsValid(gameStore: string): gameStore is GameStoreName {
     GameStoreName.UBISOFT,
     GameStoreName.XBOX,
     GameStoreName.EA,
+    GameStoreName.ITCH,
     GameStoreName.DEFAULT,
   ].includes(gameStore as GameStoreName);
 }
