@@ -246,7 +246,7 @@ let lastFetchTime = 0;
 let lastUserCollectionsRef = null;
 let lastUserCollectionsSignature = "";
 let collectionVersion = 0;
-function escapeRegExp(value) {
+function escapeRegExp$1(value) {
     return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 function getAppIdCandidates(appid) {
@@ -354,7 +354,7 @@ function getFrontendStore(appid) {
                 for (const store of supportedStores) {
                     const aliases = storeMappings[store] || [store];
                     for (const alias of aliases) {
-                        const regex = new RegExp(`\\b${escapeRegExp(alias)}\\b`, "i");
+                        const regex = new RegExp(`\\b${escapeRegExp$1(alias)}\\b`, "i");
                         if (regex.test(colName)) {
                             return store;
                         }
@@ -497,6 +497,48 @@ const POSITION_PREPARED_ATTR = "data-nonsteam-badge-positioned";
 // Track which elements already have badges
 let badgedElements = new WeakSet();
 let capsuleRenderCache = new WeakMap();
+function escapeRegExp(value) {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+function getCollectionHeadingStore(capsule, bigPicWindow) {
+    try {
+        const tabPanel = capsule.closest('div[role="tabpanel"]');
+        if (!tabPanel)
+            return undefined;
+        const candidateElements = Array.from(tabPanel.querySelectorAll("h1, h2, h3, div, span")).filter((element) => {
+            if (!(element instanceof HTMLElement))
+                return false;
+            if (element.closest('div[role="gridcell"], div[role="link"], button, a')) {
+                return false;
+            }
+            const text = element.innerText?.trim();
+            if (!text || text.length > 40)
+                return false;
+            return true;
+        });
+        const seenStores = new Set();
+        for (const element of candidateElements) {
+            const text = element.textContent?.trim();
+            if (!text)
+                continue;
+            for (const [store, aliases] of Object.entries(storeMappings)) {
+                for (const alias of aliases) {
+                    const regex = new RegExp(`^${escapeRegExp(alias)}$`, "i");
+                    if (regex.test(text)) {
+                        const sanitized = sanitizedGameStoreName(store);
+                        if (sanitized) {
+                            seenStores.add(sanitized);
+                        }
+                    }
+                }
+            }
+        }
+        return seenStores.size === 1 ? [...seenStores][0] : undefined;
+    }
+    catch {
+        return undefined;
+    }
+}
 /**
  * Remove existing badges from DOM
  */
@@ -619,9 +661,13 @@ function addBadgeToCapsule(capsule, bigPicWindow, context = GameStoreContext.LIB
     }
     // Clean up any improperly attached or orphaned badges before proceeding
     let appid = existingBadge?.getAttribute("data-appid") || getAppId(capsule);
+    let forcedCollectionStore;
     // If we can't find a Steam ID through any method (no artwork URL, no visible anchor tag, no fiber prop),
     // Native Steam games NEVER have a missing ID. So it is inherently a generic/blank non-Steam app.
     if (!appid) {
+        if (context === GameStoreContext.LIBRARY) {
+            forcedCollectionStore = getCollectionHeadingStore(capsule);
+        }
         appid = "unknown_generic_app";
     }
     else if (!isNonSteamApp(appid)) {
@@ -679,7 +725,7 @@ function addBadgeToCapsule(capsule, bigPicWindow, context = GameStoreContext.LIB
         targetElement.setAttribute(POSITION_PREPARED_ATTR, "true");
     }
     // Check if we have a store name mapping for this 'appid'
-    const cachedGameStoreName = getStore(appid)?.toLowerCase();
+    const cachedGameStoreName = forcedCollectionStore || sanitizedGameStoreName(getStore(appid)?.toLowerCase());
     const gameStoreName = sanitizedGameStoreName(cachedGameStoreName);
     const collectionVersion = getCollectionVersion();
     log(context, `Adding badge to capsule. Store name: ${gameStoreName}`);
