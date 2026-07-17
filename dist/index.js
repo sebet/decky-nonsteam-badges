@@ -789,9 +789,9 @@ function addBadgeToCapsule(capsule, bigPicWindow, context = GameStoreContext.LIB
 
 const context$3 = "observer";
 let observer = null;
-let scanInterval = null;
 let retryTimeout = null;
 let visibilityTimeout = null;
+let backupScanTimeouts = new Set();
 let debounceTimeout = null;
 let visibilityDocument = null;
 let visibilityChangeHandler = null;
@@ -803,6 +803,15 @@ const debouncedScan = () => {
         debounceTimeout = null;
     });
 };
+function scheduleBackupScans(delays) {
+    delays.forEach((delay) => {
+        const timeoutId = window.setTimeout(() => {
+            backupScanTimeouts.delete(timeoutId);
+            scanAndBadge();
+        }, delay);
+        backupScanTimeouts.add(timeoutId);
+    });
+}
 let cachedWindow = null;
 /**
  * Get the Big Picture window from Decky's navigation trees
@@ -870,8 +879,9 @@ function startObserving() {
     if (containers.length > 0) {
         log(context$3, "Observer attached to containers");
     }
-    // Backup: scan every 2 seconds to catch anything missed
-    scanInterval = setInterval(scanAndBadge, 2000);
+    // Steam often finishes virtualized rendering shortly after the first observer tick.
+    // Run a small burst of follow-up scans instead of a permanent polling loop.
+    scheduleBackupScans([250, 1000, 2500]);
     // Visibility change listener
     visibilityDocument = bigPicWindow.document;
     visibilityChangeHandler = () => {
@@ -882,6 +892,7 @@ function startObserving() {
             visibilityTimeout = window.setTimeout(() => {
                 visibilityTimeout = null;
                 scanAndBadge();
+                scheduleBackupScans([400, 1200]);
             }, 100);
         }
     };
@@ -891,10 +902,6 @@ function stopObserving() {
     if (observer) {
         observer.disconnect();
         observer = null;
-    }
-    if (scanInterval) {
-        clearInterval(scanInterval);
-        scanInterval = null;
     }
     if (retryTimeout) {
         clearTimeout(retryTimeout);
@@ -908,6 +915,8 @@ function stopObserving() {
         cancelAnimationFrame(debounceTimeout);
         debounceTimeout = null;
     }
+    backupScanTimeouts.forEach((timeoutId) => clearTimeout(timeoutId));
+    backupScanTimeouts.clear();
     if (visibilityDocument && visibilityChangeHandler) {
         visibilityDocument.removeEventListener("visibilitychange", visibilityChangeHandler);
     }
@@ -928,13 +937,10 @@ function scanAndBadge() {
             context: GameStoreContext.HOME,
         },
     ];
-    // Scan both grid (library) and list items (home carousel)
-    const selectors = contexts.map((c) => c.selector);
     // Ensure styles are available in this window
     injectStyleIntoWindow(bigPicWindow);
-    for (const selector of selectors) {
+    for (const { selector, context } of contexts) {
         const capsules = bigPicWindow.document.querySelectorAll(selector);
-        const context = contexts.find((c) => c.selector === selector)?.context;
         capsules.forEach((capsule) => {
             // True game capsules contain a clickable wrapper with role="link".
             if (capsule.querySelector('div[role="link"]')) {
