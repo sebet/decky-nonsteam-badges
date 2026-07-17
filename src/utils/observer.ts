@@ -9,6 +9,7 @@ let observer: MutationObserver | null = null;
 let retryTimeout: number | null = null;
 let visibilityTimeout: number | null = null;
 let backupScanTimeouts = new Set<number>();
+let lastViewSignature = "";
 
 let debounceTimeout: number | null = null;
 let visibilityDocument: Document | null = null;
@@ -24,6 +25,9 @@ const debouncedScan = () => {
 };
 
 function scheduleBackupScans(delays: number[]): void {
+  backupScanTimeouts.forEach((timeoutId) => clearTimeout(timeoutId));
+  backupScanTimeouts.clear();
+
   delays.forEach((delay) => {
     const timeoutId = window.setTimeout(() => {
       backupScanTimeouts.delete(timeoutId);
@@ -34,6 +38,51 @@ function scheduleBackupScans(delays: number[]): void {
 }
 
 let cachedWindow: Window | null = null;
+
+function getVisibleTextSignature(bigPicWindow: Window): string {
+  const visiblePanels = Array.from(
+    bigPicWindow.document.querySelectorAll('div[role="tabpanel"]'),
+  ).filter((panel) => {
+    if (!(panel instanceof HTMLElement)) return false;
+    return panel.offsetParent !== null;
+  });
+
+  const selectedTabs = Array.from(
+    bigPicWindow.document.querySelectorAll(
+      '[aria-selected="true"], [aria-pressed="true"]',
+    ),
+  )
+    .map((element) => element.textContent?.trim())
+    .filter(Boolean)
+    .slice(0, 5);
+
+  const panelHeadings = visiblePanels
+    .flatMap((panel) =>
+      Array.from(panel.querySelectorAll("h1, h2, h3, [role='heading']"))
+        .map((element) => element.textContent?.trim())
+        .filter(Boolean)
+        .slice(0, 5),
+    )
+    .slice(0, 8);
+
+  const gridCounts = visiblePanels.map(
+    (panel) => panel.querySelectorAll('div[role="gridcell"], div[role="listitem"]').length,
+  );
+
+  return JSON.stringify({
+    tabs: selectedTabs,
+    headings: panelHeadings,
+    counts: gridCounts,
+  });
+}
+
+function scheduleViewTransitionScans(bigPicWindow: Window): void {
+  const nextSignature = getVisibleTextSignature(bigPicWindow);
+  if (nextSignature === lastViewSignature) return;
+
+  lastViewSignature = nextSignature;
+  scheduleBackupScans([0, 300, 1000, 2000]);
+}
 
 /**
  * Get the Big Picture window from Decky's navigation trees
@@ -88,12 +137,15 @@ export function startObserving(): void {
 
   // Initial scan
   scanAndBadge();
+  lastViewSignature = getVisibleTextSignature(bigPicWindow);
 
   // Set up MutationObserver for instant badge injection
   observer = new MutationObserver((mutations) => {
-    // Only scan if elements were added
-    const hasAddedNodes = mutations.some((m) => m.addedNodes.length > 0);
-    if (hasAddedNodes) {
+    const hasStructuralChanges = mutations.some(
+      (m) => m.addedNodes.length > 0 || m.removedNodes.length > 0,
+    );
+    if (hasStructuralChanges) {
+      scheduleViewTransitionScans(bigPicWindow);
       debouncedScan();
     }
   });
@@ -127,8 +179,8 @@ export function startObserving(): void {
       }
       visibilityTimeout = window.setTimeout(() => {
         visibilityTimeout = null;
+        scheduleViewTransitionScans(bigPicWindow);
         scanAndBadge();
-        scheduleBackupScans([400, 1200]);
       }, 100);
     }
   };
@@ -157,6 +209,7 @@ export function stopObserving(): void {
   }
   backupScanTimeouts.forEach((timeoutId) => clearTimeout(timeoutId));
   backupScanTimeouts.clear();
+  lastViewSignature = "";
   if (visibilityDocument && visibilityChangeHandler) {
     visibilityDocument.removeEventListener(
       "visibilitychange",
