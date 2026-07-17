@@ -91,8 +91,6 @@ var GameStoreName;
     GameStoreName["XBOX"] = "xbox";
     GameStoreName["EA"] = "ea";
     GameStoreName["ITCH"] = "itch";
-    GameStoreName["SIDELOADED"] = "sideloaded";
-    GameStoreName["EMULATORS"] = "emulators";
     GameStoreName["DEFAULT"] = "default";
 })(GameStoreName || (GameStoreName = {}));
 var GameStoreContext;
@@ -116,8 +114,6 @@ function gameStoreIsValid(gameStore) {
         GameStoreName.XBOX,
         GameStoreName.EA,
         GameStoreName.ITCH,
-        GameStoreName.SIDELOADED,
-        GameStoreName.EMULATORS,
         GameStoreName.DEFAULT,
     ].includes(gameStore);
 }
@@ -151,8 +147,6 @@ var SupportedStores;
     SupportedStores["XBOX"] = "xbox";
     SupportedStores["EA"] = "ea";
     SupportedStores["ITCH"] = "itch";
-    SupportedStores["SIDELOADED"] = "sideloaded";
-    SupportedStores["EMULATORS"] = "emulators";
 })(SupportedStores || (SupportedStores = {}));
 var BadgePosition;
 (function (BadgePosition) {

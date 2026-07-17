@@ -7,8 +7,6 @@ export enum GameStoreName {
   XBOX = "xbox",
   EA = "ea",
   ITCH = "itch",
-  SIDELOADED = "sideloaded",
-  EMULATORS = "emulators",
   DEFAULT = "default",
 }
 
