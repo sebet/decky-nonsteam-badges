@@ -18,6 +18,7 @@ def import_main():
         )
         sys.modules["decky"] = types.SimpleNamespace(
             DECKY_PLUGIN_SETTINGS_DIR="",
+            DECKY_USER_HOME="",
             logger=logger,
         )
 
@@ -42,6 +43,64 @@ class PluginSettingsTests(unittest.TestCase):
 
 
 class StoreMappingTests(unittest.TestCase):
+    def test_finds_config_files_from_decky_user_home(self):
+        main = import_main()
+
+        for relative_userdata in (
+            Path(".steam/steam/userdata"),
+            Path(".local/share/Steam/userdata"),
+        ):
+            with self.subTest(relative_userdata=relative_userdata):
+                with tempfile.TemporaryDirectory() as temp_dir:
+                    config_dir = (
+                        Path(temp_dir) / relative_userdata / "123456" / "config"
+                    )
+                    config_dir.mkdir(parents=True)
+                    shortcuts = config_dir / "shortcuts.vdf"
+                    localconfig = config_dir / "localconfig.vdf"
+                    shortcuts.touch()
+                    localconfig.touch()
+
+                    with mock.patch.object(main.decky, "DECKY_USER_HOME", temp_dir):
+                        self.assertEqual(
+                            main.Plugin._find_shortcuts_vdf(), str(shortcuts)
+                        )
+                        self.assertEqual(
+                            main.Plugin._find_localconfig_vdf(), str(localconfig)
+                        )
+
+    def test_ignores_non_user_userdata_directories(self):
+        main = import_main()
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            userdata = Path(temp_dir) / ".steam" / "steam" / "userdata"
+            for directory in ("0", "ac", "anonymous"):
+                config_dir = userdata / directory / "config"
+                config_dir.mkdir(parents=True)
+                (config_dir / "shortcuts.vdf").touch()
+
+            with mock.patch.object(main.decky, "DECKY_USER_HOME", temp_dir):
+                self.assertIsNone(main.Plugin._find_shortcuts_vdf())
+
+    def test_does_not_mix_config_files_between_steam_accounts(self):
+        main = import_main()
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            userdata = Path(temp_dir) / ".steam" / "steam" / "userdata"
+            shortcut_config = userdata / "111111" / "config"
+            other_config = userdata / "222222" / "config"
+            shortcut_config.mkdir(parents=True)
+            other_config.mkdir(parents=True)
+            (shortcut_config / "shortcuts.vdf").touch()
+            (other_config / "localconfig.vdf").touch()
+
+            with mock.patch.object(main.decky, "DECKY_USER_HOME", temp_dir):
+                self.assertEqual(
+                    main.Plugin._find_shortcuts_vdf(),
+                    str(shortcut_config / "shortcuts.vdf"),
+                )
+                self.assertIsNone(main.Plugin._find_localconfig_vdf())
+
     def test_get_games_mapping_prefers_localconfig_tags_over_launcher_paths(self):
         main = import_main()
 
@@ -80,14 +139,14 @@ class StoreMappingTests(unittest.TestCase):
                         "1": {
                             "AppName": "Path Game",
                             "LaunchOptions": "",
-                            "Exe": "/home/deck/Games/Ubisoft/game.exe",
+                            "Exe": "/games/Ubisoft/game.exe",
                             "StartDir": "",
                             "appid": 123456789,
                         },
                         "2": {
                             "AppName": "Rockstar Game",
                             "LaunchOptions": "",
-                            "Exe": "/home/deck/Games/Rockstar Games/Launcher.exe",
+                            "Exe": "/games/Rockstar Games/Launcher.exe",
                             "StartDir": "",
                             "appid": 444444444,
                         },
@@ -122,9 +181,12 @@ class StoreMappingTests(unittest.TestCase):
 
         with (
             mock.patch.object(main, "vdf", FakeVdf),
-            mock.patch.object(main.Plugin, "_find_localconfig_vdf", return_value="/fake/localconfig.vdf"),
-            mock.patch.object(main.os, "listdir", return_value=["0", "123456"]),
-            mock.patch.object(main.os.path, "exists", return_value=True),
+            mock.patch.object(
+                main.Plugin,
+                "_find_shortcuts_vdf",
+                return_value="/fake/shortcuts.vdf",
+            ),
+            mock.patch.object(main.Path, "is_file", return_value=True),
             mock.patch("builtins.open", side_effect=fake_open),
         ):
             mapping = main.Plugin._get_games_mapping()
@@ -178,15 +240,15 @@ class StoreMappingTests(unittest.TestCase):
                         "1": {
                             "AppName": "Target Game",
                             "LaunchOptions": "",
-                            "Exe": "/home/deck/Games/Epic/Game.exe",
+                            "Exe": "/games/Epic/Game.exe",
                             "StartDir": "",
                             "appid": 222222222,
                         },
                         "2": {
                             "AppName": "StartDir Game",
                             "LaunchOptions": "",
-                            "Exe": "/home/deck/Games/Game.exe",
-                            "StartDir": "/home/deck/Games/Amazon Luna/Game",
+                            "Exe": "/games/Game.exe",
+                            "StartDir": "/games/Amazon Luna/Game",
                             "appid": 333333333,
                         },
                         "3": {
@@ -220,9 +282,12 @@ class StoreMappingTests(unittest.TestCase):
 
         with (
             mock.patch.object(main, "vdf", FakeVdf),
-            mock.patch.object(main.Plugin, "_find_localconfig_vdf", return_value="/fake/localconfig.vdf"),
-            mock.patch.object(main.os, "listdir", return_value=["123456"]),
-            mock.patch.object(main.os.path, "exists", return_value=True),
+            mock.patch.object(
+                main.Plugin,
+                "_find_shortcuts_vdf",
+                return_value="/fake/shortcuts.vdf",
+            ),
+            mock.patch.object(main.Path, "is_file", return_value=True),
             mock.patch("builtins.open", side_effect=fake_open),
         ):
             mapping = main.Plugin._get_games_mapping()
