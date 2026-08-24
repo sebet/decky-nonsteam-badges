@@ -94,55 +94,55 @@ class Plugin:
             pass
 
     @staticmethod
+    def _steam_userdata_roots() -> tuple[Path, ...]:
+        """Return supported Steam userdata roots for Decky's active user."""
+        user_home = Path(decky.DECKY_USER_HOME)
+        return (
+            user_home / ".steam" / "steam" / "userdata",
+            user_home / ".local" / "share" / "Steam" / "userdata",
+        )
+
+    @staticmethod
+    def _find_steam_user_config_dir() -> Path | None:
+        """Find the config directory for a Steam user with non-Steam shortcuts."""
+        for userdata_root in Plugin._steam_userdata_roots():
+            try:
+                if not userdata_root.is_dir():
+                    continue
+
+                user_directories = sorted(
+                    path
+                    for path in userdata_root.iterdir()
+                    if path.is_dir() and path.name.isdigit() and path.name != "0"
+                )
+                for user_directory in user_directories:
+                    config_directory = user_directory / "config"
+                    if (config_directory / "shortcuts.vdf").is_file():
+                        return config_directory
+            except OSError as error:
+                _debug_warning(
+                    f"Unable to inspect Steam userdata directory {userdata_root}: {error}"
+                )
+
+        _debug_warning("Steam user config directory not found")
+        return None
+
+    @staticmethod
     def _find_shortcuts_vdf() -> str | None:
-        """Find the shortcuts.vdf file for the current user"""
-        try:
-            base_path = Path("/home/deck/.steam/steam/userdata/")
-
-            if not base_path.exists():
-                _debug_warning("Steam userdata directory not found")
-                return None
-
-            # Find the first user directory (filter out '0', 'ac', 'anonymous')
-            user_folders = [f for f in os.listdir(base_path) if f.isdigit() and f != '0']
-
-            if not user_folders:
-                _debug_warning("No user folders found")
-                return None
-
-            shortcuts_file = base_path / user_folders[0] / "config" / "shortcuts.vdf"
-            if shortcuts_file.exists():
-                return str(shortcuts_file)
-
-            _debug_warning("shortcuts.vdf not found")
+        """Find the shortcuts.vdf file for Decky's active user."""
+        config_directory = Plugin._find_steam_user_config_dir()
+        if config_directory is None:
             return None
-        except Exception as e:
-            decky.logger.error(f"Error finding shortcuts.vdf: {e}")
-            return None
+        return str(config_directory / "shortcuts.vdf")
 
     @staticmethod
     def _find_localconfig_vdf() -> str | None:
-        """Find the localconfig.vdf file for the current user"""
-        try:
-            base_path = Path("/home/deck/.steam/steam/userdata/")
-
-            if not base_path.exists():
-                return None
-
-            # Find the first user directory (filter out '0', 'ac', 'anonymous')
-            user_folders = [f for f in os.listdir(base_path) if f.isdigit() and f != '0']
-
-            if not user_folders:
-                return None
-
-            localconfig_file = base_path / user_folders[0] / "config" / "localconfig.vdf"
-            if localconfig_file.exists():
-                return str(localconfig_file)
-
+        """Find the localconfig.vdf file for Decky's active user."""
+        config_directory = Plugin._find_steam_user_config_dir()
+        if config_directory is None:
             return None
-        except Exception as e:
-            decky.logger.error(f"Error finding localconfig.vdf: {e}")
-            return None
+        localconfig_file = config_directory / "localconfig.vdf"
+        return str(localconfig_file) if localconfig_file.is_file() else None
 
     @staticmethod
     def _get_games_mapping() -> dict:
@@ -151,23 +151,19 @@ class Plugin:
         Returns: { 'appid_string': 'store' }
         """
         mapping = {}
-        base_path = "/home/deck/.steam/steam/userdata/"
-
         try:
             if vdf is None:
                 decky.logger.error("vdf library not available")
                 return {}
 
-            # Filter out '0', 'ac', and 'anonymous' to find the real user ID
-            user_folders = [f for f in os.listdir(base_path) if f.isdigit() and f != '0']
-
-            if not user_folders:
+            shortcuts_path = Plugin._find_shortcuts_vdf()
+            if shortcuts_path is None:
                 return {}
 
-            # Load localconfig tags first
+            # Keep both files tied to the same Steam account directory.
             local_tags = {}
-            localconfig_path = Plugin._find_localconfig_vdf()
-            if localconfig_path:
+            localconfig_path = Path(shortcuts_path).with_name("localconfig.vdf")
+            if localconfig_path.is_file():
                 try:
                     with open(localconfig_path, "r", encoding="utf-8") as f:
                         # localconfig is text vdf
@@ -183,11 +179,6 @@ class Plugin:
                                     local_tags[str(appid)] = tags
                 except Exception as e:
                     decky.logger.error(f"Error parsing localconfig.vdf: {e}")
-
-            vdf_path = os.path.join(base_path, user_folders[0], "config/shortcuts.vdf")
-
-            if not os.path.exists(vdf_path):
-                return {}
 
             try:
                 mappings_path = os.path.join(os.path.dirname(__file__), "store_mappings.json")
@@ -205,7 +196,7 @@ class Plugin:
                     "ea": ["ea", "origin", "electronic arts", "electronicarts"]
                 }
 
-            with open(vdf_path, "rb") as f:
+            with open(shortcuts_path, "rb") as f:
                 # Load the binary VDF data
                 data = vdf.binary_load(f)
                 shortcuts = data.get('shortcuts', {})
