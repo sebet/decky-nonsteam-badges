@@ -6,6 +6,7 @@ import storeMappings from "../../store_mappings.json";
 interface StoreMapping {
   store: string;
   name?: string;
+  emulator?: string;
 }
 
 const context = "cache";
@@ -94,7 +95,7 @@ export async function ensureMappingsLoaded(force = false): Promise<void> {
   try {
     const result = await call<
       [],
-      Record<string, { store: string; name?: string }>
+      Record<string, StoreMapping>
     >("get_all_store_mappings");
 
     if (result) {
@@ -195,6 +196,13 @@ export function getStore(appid: string): string | null {
   }
 
   return null;
+}
+
+/** Specific emulator icons apply only when the effective category is emulators. */
+export function getEmulator(appid: string): string | null {
+  if (getStore(appid) !== "emulators") return null;
+  const entry = gameStoreMappingsCache[appid];
+  return typeof entry === "object" ? entry.emulator ?? null : null;
 }
 
 export function getCollectionVersion(): number {

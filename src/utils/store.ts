@@ -34,7 +34,7 @@ export function sanitizedGameStoreName(gameStore: string): GameStoreName {
  */
 export function isNonSteamApp(appid: string | number): boolean {
   const id = Number(appid);
-  // Real Steam app IDs are typically < 6,000,000. Non-Steam game IDs generated via CRC32 
+  // Real Steam app IDs are typically < 6,000,000. Non-Steam game IDs generated via CRC32
   // can be anywhere from 0 to 4.2 billion+, but occasionally end up < 2 billion.
   // Using 10,000,000 as a safe upper threshold to ensure no Non-Steam apps get ignored.
   return !isNaN(id) && (id > 10000000 || id < -1000000);

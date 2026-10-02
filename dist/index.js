@@ -31,8 +31,265 @@ const definePlugin = (fn) => {
     };
 };
 
+const SETTINGS_CHANGED_EVENT = "nonsteam-badges-settings-changed";
+var SupportedStores;
+(function (SupportedStores) {
+    SupportedStores["GOG"] = "gog";
+    SupportedStores["EPIC"] = "epic";
+    SupportedStores["AMAZON"] = "amazon";
+    SupportedStores["ROCKSTAR"] = "rockstar";
+    SupportedStores["UBISOFT"] = "ubisoft";
+    SupportedStores["XBOX"] = "xbox";
+    SupportedStores["EA"] = "ea";
+    SupportedStores["ITCH"] = "itch";
+    SupportedStores["EMULATORS"] = "emulators";
+    SupportedStores["GAMEVAULT"] = "gamevault";
+    SupportedStores["SIDELOADED"] = "sideloaded";
+})(SupportedStores || (SupportedStores = {}));
+var BadgePosition;
+(function (BadgePosition) {
+    BadgePosition["NONE"] = "none";
+    BadgePosition["TOP_LEFT"] = "top-left";
+    BadgePosition["TOP_RIGHT"] = "top-right";
+    BadgePosition["BOTTOM_LEFT"] = "bottom-left";
+    BadgePosition["BOTTOM_RIGHT"] = "bottom-right";
+})(BadgePosition || (BadgePosition = {}));
+const DEFAULT_SETTINGS = {
+    homePosition: BadgePosition.BOTTOM_RIGHT,
+    libraryPosition: BadgePosition.BOTTOM_RIGHT,
+    detailsPosition: BadgePosition.TOP_RIGHT,
+    addBadgesToAllNonSteamGames: true,
+    showSteamStoreButton: true,
+    disableBadges: false,
+};
+
 function log(context, message, level = "log") {
     return;
+}
+
+var gog = [
+	"gog"
+];
+var epic = [
+	"epic"
+];
+var amazon = [
+	"amazon",
+	"luna"
+];
+var rockstar = [
+	"rockstar",
+	"rockstar games",
+	"rockstargames",
+	"social club"
+];
+var ubisoft = [
+	"ubisoft",
+	"uplay"
+];
+var xbox = [
+	"xbox",
+	"microsoft"
+];
+var ea = [
+	"ea",
+	"origin",
+	"electronic arts",
+	"electronicarts"
+];
+var itch = [
+	"itch",
+	"itch.io",
+	"itchio"
+];
+var emulators = [
+	"emu",
+	"roms",
+	"emulators",
+	"retro"
+];
+var gamevault = [
+	"gamevault",
+	"game vault"
+];
+var sideloaded = [
+	"sideloaded",
+	"side-loaded",
+	"side loaded"
+];
+var storeMappings = {
+	gog: gog,
+	epic: epic,
+	amazon: amazon,
+	rockstar: rockstar,
+	ubisoft: ubisoft,
+	xbox: xbox,
+	ea: ea,
+	itch: itch,
+	emulators: emulators,
+	gamevault: gamevault,
+	sideloaded: sideloaded
+};
+
+const context$3 = "cache";
+const CACHE_TTL_MS = 60 * 1000; // 1 minute
+let gameStoreMappingsCache = {};
+let mappingsLoaded = false;
+let isFetchingMappings = false;
+let lastFetchTime = 0;
+let lastUserCollectionsRef = null;
+let lastUserCollectionsSignature = "";
+let collectionVersion = 0;
+function escapeRegExp$1(value) {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+function getAppIdCandidates(appid) {
+    const numericAppId = parseInt(appid, 10);
+    if (isNaN(numericAppId))
+        return [appid];
+    const unsignedAppId = numericAppId >>> 0;
+    const signedAppId = unsignedAppId > 0x7fffffff ? unsignedAppId - 0x100000000 : unsignedAppId;
+    return Array.from(new Set([
+        appid,
+        String(numericAppId),
+        String(unsignedAppId),
+        String(signedAppId),
+        numericAppId,
+        unsignedAppId,
+        signedAppId,
+    ]));
+}
+function collectionContainsApp(apps, appid) {
+    const candidates = getAppIdCandidates(appid);
+    if (apps && typeof apps.has === "function") {
+        return candidates.some((candidate) => apps.has(candidate));
+    }
+    if (Array.isArray(apps)) {
+        return candidates.some((candidate) => apps.includes(candidate));
+    }
+    return false;
+}
+/**
+ * Wait for store mappings to be loaded from the backend before attempting to access the cache.
+ */
+async function ensureMappingsLoaded(force = false) {
+    const now = Date.now();
+    const isExpired = now - lastFetchTime > CACHE_TTL_MS;
+    if (!force && mappingsLoaded && !isExpired)
+        return;
+    if (isFetchingMappings) {
+        return new Promise((resolve) => {
+            const checkInterval = setInterval(() => {
+                if (!isFetchingMappings) {
+                    clearInterval(checkInterval);
+                    resolve();
+                }
+            }, 100);
+        });
+    }
+    isFetchingMappings = true;
+    try {
+        const result = await call("get_all_store_mappings");
+        if (result) {
+            gameStoreMappingsCache = result;
+            mappingsLoaded = true;
+            lastFetchTime = Date.now();
+        }
+        else {
+            log(context$3, JSON.stringify(result), "error");
+        }
+    }
+    catch (e) {
+    }
+    finally {
+        isFetchingMappings = false;
+    }
+}
+function getFrontendStore(appid) {
+    try {
+        const supportedStores = Object.values(SupportedStores);
+        const collectionStore = window.collectionStore;
+        if (!collectionStore) {
+            return null;
+        }
+        const userCollections = collectionStore.userCollections;
+        if (!userCollections)
+            return null;
+        const collectionStateSignature = userCollections
+            .map((collection) => {
+            const apps = collection?.apps;
+            const appCount = typeof apps?.size === "number"
+                ? apps.size
+                : Array.isArray(apps)
+                    ? apps.length
+                    : 0;
+            return `${collection?.displayName ?? ""}:${appCount}`;
+        })
+            .join("|");
+        if (userCollections !== lastUserCollectionsRef ||
+            collectionStateSignature !== lastUserCollectionsSignature) {
+            lastUserCollectionsRef = userCollections;
+            lastUserCollectionsSignature = collectionStateSignature;
+            collectionVersion++;
+        }
+        for (const collection of userCollections) {
+            if (collection.apps && collectionContainsApp(collection.apps, appid)) {
+                const colName = String(collection.displayName ?? "");
+                for (const store of supportedStores) {
+                    const aliases = storeMappings[store] || [store];
+                    for (const alias of aliases) {
+                        const regex = new RegExp(`\\b${escapeRegExp$1(alias)}\\b`, "i");
+                        if (regex.test(colName)) {
+                            return store;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+    catch (e) {
+        log(context$3, "Could not check frontend collections: " + JSON.stringify(e), "warn");
+        return null;
+    }
+}
+function getStore(appid) {
+    // Check Collections first to give them priority
+    const frontendStore = getFrontendStore(appid);
+    if (frontendStore) {
+        return frontendStore;
+    }
+    // Check backend cache (Launch Options / localconfig.vdf)
+    if (mappingsLoaded && gameStoreMappingsCache[appid]) {
+        const entry = gameStoreMappingsCache[appid];
+        if (typeof entry === "string")
+            return entry;
+        if (entry.store)
+            return entry.store;
+    }
+    return null;
+}
+/** Specific emulator icons apply only when the effective category is emulators. */
+function getEmulator(appid) {
+    if (getStore(appid) !== "emulators")
+        return null;
+    const entry = gameStoreMappingsCache[appid];
+    return typeof entry === "object" ? entry.emulator ?? null : null;
+}
+function getCollectionVersion() {
+    return collectionVersion;
+}
+/**
+ * Gets the game name for a given AppID from the cache.
+ */
+function getName(appid) {
+    if (mappingsLoaded && gameStoreMappingsCache[appid]) {
+        const entry = gameStoreMappingsCache[appid];
+        if (typeof entry === "object" && entry.name) {
+            return entry.name;
+        }
+    }
+    return null;
 }
 
 const PLUGIN_ID = "nonsteam-badges-decky";
@@ -133,45 +390,13 @@ function sanitizedGameStoreName(gameStore) {
  */
 function isNonSteamApp(appid) {
     const id = Number(appid);
-    // Real Steam app IDs are typically < 6,000,000. Non-Steam game IDs generated via CRC32 
+    // Real Steam app IDs are typically < 6,000,000. Non-Steam game IDs generated via CRC32
     // can be anywhere from 0 to 4.2 billion+, but occasionally end up < 2 billion.
     // Using 10,000,000 as a safe upper threshold to ensure no Non-Steam apps get ignored.
     return !isNaN(id) && (id > 10000000 || id < -1000000);
 }
 
-const SETTINGS_CHANGED_EVENT = "nonsteam-badges-settings-changed";
-var SupportedStores;
-(function (SupportedStores) {
-    SupportedStores["GOG"] = "gog";
-    SupportedStores["EPIC"] = "epic";
-    SupportedStores["AMAZON"] = "amazon";
-    SupportedStores["ROCKSTAR"] = "rockstar";
-    SupportedStores["UBISOFT"] = "ubisoft";
-    SupportedStores["XBOX"] = "xbox";
-    SupportedStores["EA"] = "ea";
-    SupportedStores["ITCH"] = "itch";
-    SupportedStores["EMULATORS"] = "emulators";
-    SupportedStores["GAMEVAULT"] = "gamevault";
-    SupportedStores["SIDELOADED"] = "sideloaded";
-})(SupportedStores || (SupportedStores = {}));
-var BadgePosition;
-(function (BadgePosition) {
-    BadgePosition["NONE"] = "none";
-    BadgePosition["TOP_LEFT"] = "top-left";
-    BadgePosition["TOP_RIGHT"] = "top-right";
-    BadgePosition["BOTTOM_LEFT"] = "bottom-left";
-    BadgePosition["BOTTOM_RIGHT"] = "bottom-right";
-})(BadgePosition || (BadgePosition = {}));
-const DEFAULT_SETTINGS = {
-    homePosition: BadgePosition.BOTTOM_RIGHT,
-    libraryPosition: BadgePosition.BOTTOM_RIGHT,
-    detailsPosition: BadgePosition.TOP_RIGHT,
-    addBadgesToAllNonSteamGames: true,
-    showSteamStoreButton: true,
-    disableBadges: false,
-};
-
-const context$3 = "settings";
+const context$2 = "settings";
 const SETTINGS_KEY = "nonsteam-badges-settings";
 function getSettings() {
     try {
@@ -187,7 +412,7 @@ function getSettings() {
 function saveSettings(settings) {
     try {
         localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-        log(context$3, `Settings saved: ${JSON.stringify(settings)}`);
+        log(context$2, `Settings saved: ${JSON.stringify(settings)}`);
         window.dispatchEvent(new CustomEvent(SETTINGS_CHANGED_EVENT, {
             detail: settings,
         }));
@@ -196,223 +421,15 @@ function saveSettings(settings) {
     }
 }
 
-var gog = [
-	"gog"
-];
-var epic = [
-	"epic"
-];
-var amazon = [
-	"amazon",
-	"luna"
-];
-var rockstar = [
-	"rockstar",
-	"rockstar games",
-	"rockstargames",
-	"social club"
-];
-var ubisoft = [
-	"ubisoft",
-	"uplay"
-];
-var xbox = [
-	"xbox",
-	"microsoft"
-];
-var ea = [
-	"ea",
-	"origin",
-	"electronic arts",
-	"electronicarts"
-];
-var itch = [
-	"itch",
-	"itch.io",
-	"itchio"
-];
-var emulators = [
-	"emu",
-	"roms",
-	"emulators",
-	"retro"
-];
-var gamevault = [
-	"gamevault",
-	"game vault"
-];
-var sideloaded = [
-	"sideloaded",
-	"side-loaded",
-	"side loaded"
-];
-var storeMappings = {
-	gog: gog,
-	epic: epic,
-	amazon: amazon,
-	rockstar: rockstar,
-	ubisoft: ubisoft,
-	xbox: xbox,
-	ea: ea,
-	itch: itch,
-	emulators: emulators,
-	gamevault: gamevault,
-	sideloaded: sideloaded
+// Compact monochrome interpretations of the emulator marks. No raster data or filters.
+const EMULATOR_BADGE_ICONS = {
+    "retroarch": "<svg class=\"icon-badge\" width=\"64\" height=\"64\" viewBox=\"0 0 32 32\" fill=\"white\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M8 5h3v3h10V5h3v3h3v4h3v3H2v-3h3V8h3Zm0 6v2h4v-2Zm12 0v2h4v-2ZM5 17h22v3h-6l4 5h-4l-5-5-5 5H7l4-5H5Z\"/></svg>",
+    "dolphin": "<svg class=\"icon-badge\" width=\"64\" height=\"64\" viewBox=\"0 0 32 32\" fill=\"white\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M3 18C4 9 14 6 21 9c3-2 6-2 8 0-3-1-5 0-6 2C14 7 7 10 3 18Zm7-3c7-3 13 1 16 9-4-6-9-9-16-9Zm13-3c4 3 6 7 7 13-2-5-4-9-7-11Z\"/></svg>",
+    "pcsx2": "<svg class=\"icon-badge\" width=\"64\" height=\"64\" viewBox=\"0 0 32 32\" fill=\"white\" xmlns=\"http://www.w3.org/2000/svg\"><g fill=\"none\" stroke=\"white\" stroke-width=\"2.6\" stroke-linecap=\"square\" stroke-linejoin=\"round\"><path d=\"M3 23V9h6v7H3M13 23h6v-7h-6V9h6M23 9h6v7h-6v7h6\"/></g></svg>",
+    "rpcs3": "<svg class=\"icon-badge\" width=\"64\" height=\"64\" viewBox=\"0 0 32 32\" fill=\"white\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M6 8h16a4 4 0 0 1 0 8H6m16 0a4 4 0 0 1 0 8H6\" fill=\"none\" stroke=\"white\" stroke-width=\"3\" stroke-linecap=\"square\" stroke-linejoin=\"round\"/></svg>",
+    "xenia": "<svg class=\"icon-badge\" width=\"64\" height=\"64\" viewBox=\"0 0 32 32\" fill=\"white\" xmlns=\"http://www.w3.org/2000/svg\"><g fill=\"none\" stroke=\"white\" stroke-width=\"1.2\" stroke-linejoin=\"round\"><path d=\"m16 3 13 7.5V15l-13 7.5L3 15v-4.5Zm-13 7.5L16 18l13-7.5M16 18v4.5M5 17v1.5l2 1.2M9 19.3v1.5l2 1.2M13 21.6v1.5l2 1.2M19 20.8v1.5l-2 1.2M23 18.5V20l-2 1.2M27 16.2v1.5l-2 1.2\"/></g><path d=\"M9.5 7.5c4 1 7 3.5 12 7M22 7c-4 1.5-7 4-12 7.5\" fill=\"none\" stroke=\"white\" stroke-width=\"1.8\" stroke-linecap=\"round\"/></svg>",
+    "xemu": "<svg class=\"icon-badge\" width=\"64\" height=\"64\" viewBox=\"0 0 32 32\" fill=\"white\" xmlns=\"http://www.w3.org/2000/svg\"><circle cx=\"16\" cy=\"16\" r=\"14\" fill=\"none\" stroke=\"white\" stroke-width=\"1.5\"/><g fill=\"none\" stroke=\"white\" stroke-width=\"1.4\" stroke-linejoin=\"round\"><path d=\"m5 13 4 6m0-6-4 6m6-3h4v-3h-4v6h4m2 0v-6h3v6m0-6h3v6m2-6v6h3v-6\"/></g></svg>"
 };
-
-const context$2 = "cache";
-const CACHE_TTL_MS = 60 * 1000; // 1 minute
-let gameStoreMappingsCache = {};
-let mappingsLoaded = false;
-let isFetchingMappings = false;
-let lastFetchTime = 0;
-let lastUserCollectionsRef = null;
-let lastUserCollectionsSignature = "";
-let collectionVersion = 0;
-function escapeRegExp$1(value) {
-    return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-function getAppIdCandidates(appid) {
-    const numericAppId = parseInt(appid, 10);
-    if (isNaN(numericAppId))
-        return [appid];
-    const unsignedAppId = numericAppId >>> 0;
-    const signedAppId = unsignedAppId > 0x7fffffff ? unsignedAppId - 0x100000000 : unsignedAppId;
-    return Array.from(new Set([
-        appid,
-        String(numericAppId),
-        String(unsignedAppId),
-        String(signedAppId),
-        numericAppId,
-        unsignedAppId,
-        signedAppId,
-    ]));
-}
-function collectionContainsApp(apps, appid) {
-    const candidates = getAppIdCandidates(appid);
-    if (apps && typeof apps.has === "function") {
-        return candidates.some((candidate) => apps.has(candidate));
-    }
-    if (Array.isArray(apps)) {
-        return candidates.some((candidate) => apps.includes(candidate));
-    }
-    return false;
-}
-/**
- * Wait for store mappings to be loaded from the backend before attempting to access the cache.
- */
-async function ensureMappingsLoaded(force = false) {
-    const now = Date.now();
-    const isExpired = now - lastFetchTime > CACHE_TTL_MS;
-    if (!force && mappingsLoaded && !isExpired)
-        return;
-    if (isFetchingMappings) {
-        return new Promise((resolve) => {
-            const checkInterval = setInterval(() => {
-                if (!isFetchingMappings) {
-                    clearInterval(checkInterval);
-                    resolve();
-                }
-            }, 100);
-        });
-    }
-    isFetchingMappings = true;
-    try {
-        const result = await call("get_all_store_mappings");
-        if (result) {
-            gameStoreMappingsCache = result;
-            mappingsLoaded = true;
-            lastFetchTime = Date.now();
-        }
-        else {
-            log(context$2, JSON.stringify(result), "error");
-        }
-    }
-    catch (e) {
-    }
-    finally {
-        isFetchingMappings = false;
-    }
-}
-function getFrontendStore(appid) {
-    try {
-        const supportedStores = Object.values(SupportedStores);
-        const collectionStore = window.collectionStore;
-        if (!collectionStore) {
-            return null;
-        }
-        const userCollections = collectionStore.userCollections;
-        if (!userCollections)
-            return null;
-        const collectionStateSignature = userCollections
-            .map((collection) => {
-            const apps = collection?.apps;
-            const appCount = typeof apps?.size === "number"
-                ? apps.size
-                : Array.isArray(apps)
-                    ? apps.length
-                    : 0;
-            return `${collection?.displayName ?? ""}:${appCount}`;
-        })
-            .join("|");
-        if (userCollections !== lastUserCollectionsRef ||
-            collectionStateSignature !== lastUserCollectionsSignature) {
-            lastUserCollectionsRef = userCollections;
-            lastUserCollectionsSignature = collectionStateSignature;
-            collectionVersion++;
-        }
-        for (const collection of userCollections) {
-            if (collection.apps && collectionContainsApp(collection.apps, appid)) {
-                const colName = String(collection.displayName ?? "");
-                for (const store of supportedStores) {
-                    const aliases = storeMappings[store] || [store];
-                    for (const alias of aliases) {
-                        const regex = new RegExp(`\\b${escapeRegExp$1(alias)}\\b`, "i");
-                        if (regex.test(colName)) {
-                            return store;
-                        }
-                    }
-                }
-            }
-        }
-        return null;
-    }
-    catch (e) {
-        log(context$2, "Could not check frontend collections: " + JSON.stringify(e), "warn");
-        return null;
-    }
-}
-function getStore(appid) {
-    // Check Collections first to give them priority
-    const frontendStore = getFrontendStore(appid);
-    if (frontendStore) {
-        return frontendStore;
-    }
-    // Check backend cache (Launch Options / localconfig.vdf)
-    if (mappingsLoaded && gameStoreMappingsCache[appid]) {
-        const entry = gameStoreMappingsCache[appid];
-        if (typeof entry === "string")
-            return entry;
-        if (entry.store)
-            return entry.store;
-    }
-    return null;
-}
-function getCollectionVersion() {
-    return collectionVersion;
-}
-/**
- * Gets the game name for a given AppID from the cache.
- */
-function getName(appid) {
-    if (mappingsLoaded && gameStoreMappingsCache[appid]) {
-        const entry = gameStoreMappingsCache[appid];
-        if (typeof entry === "object" && entry.name) {
-            return entry.name;
-        }
-    }
-    return null;
-}
 
 const PULSATING_CLASSNAME = "nonsteam-badge-pulsing";
 var GameStoreProp;
@@ -492,7 +509,10 @@ const BADGE_STYLES = {
 function getBadgeStyle(gameStore, prop) {
     return BADGE_STYLES?.[gameStore]?.[prop] || BADGE_STYLES?.default?.[prop];
 }
-function getBadgeIcon(gameStore, context) {
+function getBadgeIcon(gameStore, context, emulator) {
+    if (gameStore === GameStoreName.EMULATORS && emulator && EMULATOR_BADGE_ICONS[emulator]) {
+        return EMULATOR_BADGE_ICONS[emulator];
+    }
     return getBadgeStyle(gameStore, GameStoreProp.ICON);
 }
 
@@ -755,6 +775,7 @@ function addBadgeToCapsule(capsule, bigPicWindow, context = GameStoreContext.LIB
     // Check if we have a store name mapping for this 'appid'
     const cachedGameStoreName = forcedCollectionStore || sanitizedGameStoreName(getStore(appid)?.toLowerCase());
     const gameStoreName = sanitizedGameStoreName(cachedGameStoreName);
+    const emulator = gameStoreName === GameStoreName.EMULATORS ? getEmulator(appid) : null;
     const collectionVersion = getCollectionVersion();
     // Determine the capsules context
     let effectiveContext = context;
@@ -774,6 +795,7 @@ function addBadgeToCapsule(capsule, bigPicWindow, context = GameStoreContext.LIB
         String(appid),
         effectiveContext,
         storeSignature,
+        emulator ?? "",
         ...positionStyles,
     ].join("|");
     const cachedRenderState = capsuleRenderCache.get(capsule);
@@ -802,9 +824,11 @@ function addBadgeToCapsule(capsule, bigPicWindow, context = GameStoreContext.LIB
     if (gameStoreName) {
         // Inject the badge icon in the DOM
         if (badge.getAttribute("data-store") !== gameStoreName ||
+            badge.getAttribute("data-emulator") !== (emulator ?? "") ||
             !existingBadge) {
-            badge.innerHTML = getBadgeIcon(gameStoreName);
+            badge.innerHTML = getBadgeIcon(gameStoreName, effectiveContext, emulator);
             badge.setAttribute("data-store", gameStoreName);
+            badge.setAttribute("data-emulator", emulator ?? "");
         }
         badge.classList.remove(styles$1[PULSATING_CLASSNAME]);
         capsuleRenderCache.set(capsule, {
@@ -819,6 +843,7 @@ function addBadgeToCapsule(capsule, bigPicWindow, context = GameStoreContext.LIB
             !existingBadge) {
             badge.innerHTML = getBadgeIcon(GameStoreName.DEFAULT);
             badge.setAttribute("data-store", GameStoreName.DEFAULT);
+            badge.removeAttribute("data-emulator");
         }
         badge.classList.add(styles$1[PULSATING_CLASSNAME]);
         // Fetch mapping if not available and not already loaded
@@ -1221,6 +1246,7 @@ function GameDetailsBadge() {
     const settings = useSettings();
     const [steamAppId, setSteamAppId] = SP_REACT.useState(null);
     const [gameStore, setGameStore] = SP_REACT.useState(null);
+    const [emulator, setEmulator] = SP_REACT.useState(null);
     const [loading, setLoading] = SP_REACT.useState(true);
     // Extract appid from current URL
     const currentPath = window.location.pathname;
@@ -1250,6 +1276,7 @@ function GameDetailsBadge() {
         let cancelled = false;
         setLoading(true);
         setGameStore(null);
+        setEmulator(null);
         setSteamAppId(null);
         log(context);
         (async () => {
@@ -1257,6 +1284,7 @@ function GameDetailsBadge() {
             if (cancelled)
                 return;
             const store = getStore(appid);
+            setEmulator(getEmulator(appid));
             const name = getName(appid);
             if (store) {
                 setGameStore(store);
@@ -1293,7 +1321,7 @@ function GameDetailsBadge() {
     const gameStoreName = sanitizedGameStoreName(gameStore) ?? GameStoreName.DEFAULT;
     const badge = loading
         ? getBadgeIcon(GameStoreName.DEFAULT)
-        : getBadgeIcon(gameStoreName);
+        : getBadgeIcon(gameStoreName, GameStoreContext.DETAILS, emulator);
     if (loading)
         log(context);
     log(context);

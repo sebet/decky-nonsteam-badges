@@ -4,6 +4,7 @@ import urllib.request
 from pathlib import Path
 import sys
 import re
+import shlex
 
 # Add py_modules to path for local vdf library
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'py_modules'))
@@ -16,6 +17,53 @@ except ImportError:
 
 # Decky plugin imports
 import decky
+
+# Launcher identifiers, not generic platform words (e.g. Xbox or Dolphin).
+EMULATOR_LAUNCHERS = (
+    "xenia", "xenia_canary", "xenia-canary", "xemu", "retroarch",
+    "dolphin-emu", "pcsx2", "pcsx2-qt", "rpcs3", "duckstation",
+    "duckstation-qt", "ppsspp", "ppssppqt", "mgba", "melonds",
+    "cemu", "citra", "azahar", "ryujinx", "yuzu", "flycast",
+    "shadps4", "scummvm", "dosbox", "dosbox-x", "mame",
+)
+
+
+def _get_emulator_launcher(exe: str, launch_options: str) -> str | None:
+    """Recognize launcher basenames and Flatpak IDs, without matching ROM folders."""
+    try:
+        arguments = shlex.split(launch_options)
+    except ValueError:
+        arguments = launch_options.split()
+
+    for token in [exe.strip('"\''), *arguments]:
+        basename = token.replace("\\", "/").rsplit("/", 1)[-1].lower()
+        basename = re.sub(r"\.(exe|appimage|sh|bat)$", "", basename)
+        # Reverse-domain Flatpak application IDs end with the launcher name.
+        candidates = [basename]
+        if basename.startswith(("org.", "net.", "com.", "io.")):
+            candidates.append(basename.rsplit(".", 1)[-1])
+        for candidate in candidates:
+            if candidate in EMULATOR_LAUNCHERS:
+                return candidate
+            for launcher in EMULATOR_LAUNCHERS:
+                if re.fullmatch(
+                    re.escape(launcher) + r"-v?\d+(?:[.-]\d+)*(?:-[a-z0-9]+)?", candidate
+                ):
+                    return launcher
+    return None
+
+
+def _is_emulator_launcher(exe: str, launch_options: str) -> bool:
+    return _get_emulator_launcher(exe, launch_options) is not None
+
+
+EMULATOR_ICON_NAMES = {
+    "retroarch": "retroarch", "dolphin-emu": "dolphin",
+    "pcsx2": "pcsx2", "pcsx2-qt": "pcsx2", "rpcs3": "rpcs3",
+    "xenia": "xenia", "xenia_canary": "xenia", "xenia-canary": "xenia",
+    "xemu": "xemu",
+}
+
 
 DEBUG_MODE = False
 
@@ -237,6 +285,12 @@ class Plugin:
                         if store:
                             break
 
+                    # Explicit emulator launchers outrank generic storefront paths.
+                    # Keep collections above this, so deliberate overrides still win.
+                    emulator_launcher = _get_emulator_launcher(exe, opts)
+                    if not store and emulator_launcher:
+                        store = "emulators"
+
                     # 2. Check automated launcher paths / options second
                     if not store:
                         for s_key, aliases in store_aliases.items():
@@ -251,6 +305,9 @@ class Plugin:
                         mapping[str(vdf_appid_unsigned)] = {"store": store, "name": name}
                     else:
                         mapping[str(vdf_appid_unsigned)] = {"store": None, "name": name}
+                    emulator_icon = EMULATOR_ICON_NAMES.get(emulator_launcher)
+                    if store == "emulators" and emulator_icon:
+                        mapping[str(vdf_appid_unsigned)]["emulator"] = emulator_icon
 
             return mapping
         except Exception as e:

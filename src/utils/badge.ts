@@ -1,5 +1,6 @@
 import { GameStoreName, GameStoreContext } from "src/types/store";
 import { log } from "src/utils/logger";
+import { EMULATOR_BADGE_ICONS } from "./emulatorBadges.js";
 
 export const PULSATING_CLASSNAME = "nonsteam-badge-pulsing";
 
@@ -92,7 +93,11 @@ function getBadgeStyle(gameStore: GameStoreName, prop: GameStoreProp): string {
 export function getBadgeIcon(
   gameStore: GameStoreName,
   context: GameStoreContext,
+  emulator?: string | null,
 ): string {
   log("getBadgeIcon", `gameStore: ${gameStore}, context: ${context}`);
+  if (gameStore === GameStoreName.EMULATORS && emulator && EMULATOR_BADGE_ICONS[emulator]) {
+    return EMULATOR_BADGE_ICONS[emulator];
+  }
   return getBadgeStyle(gameStore, GameStoreProp.ICON);
 }

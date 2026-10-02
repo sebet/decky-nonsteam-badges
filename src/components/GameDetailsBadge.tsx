@@ -4,7 +4,7 @@ import clsx from "clsx";
 import { log } from "src/utils/logger";
 import useSettings from "src/hooks/useSettings";
 import SteamStoreButton from "src/components/SteamStoreButton";
-import { ensureMappingsLoaded, getStore, getName } from "../utils/storeCache";
+import { ensureMappingsLoaded, getStore, getName, getEmulator } from "../utils/storeCache";
 import { isNonSteamApp, sanitizedGameStoreName } from "src/utils/store";
 import { getBadgeIcon, PULSATING_CLASSNAME } from "src/utils/badge";
 import { GameStoreName, GameStoreContext } from "src/types/store";
@@ -18,6 +18,7 @@ export default function GameDetailsBadge(): ReactElement | null {
 
   const [steamAppId, setSteamAppId] = useState<string | null>(null);
   const [gameStore, setGameStore] = useState<string | null>(null);
+  const [emulator, setEmulator] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   // Extract appid from current URL
@@ -58,6 +59,7 @@ export default function GameDetailsBadge(): ReactElement | null {
 
     setLoading(true);
     setGameStore(null);
+    setEmulator(null);
     setSteamAppId(null);
 
     log(context, "Details page useEffect - ensuring mappings loaded");
@@ -67,6 +69,7 @@ export default function GameDetailsBadge(): ReactElement | null {
       if (cancelled) return;
 
       const store = getStore(appid);
+      setEmulator(getEmulator(appid));
       const name = getName(appid);
 
       if (store) {
@@ -110,7 +113,7 @@ export default function GameDetailsBadge(): ReactElement | null {
 
   const badge = loading
     ? getBadgeIcon(GameStoreName.DEFAULT, GameStoreContext.DETAILS)
-    : getBadgeIcon(gameStoreName, GameStoreContext.DETAILS);
+    : getBadgeIcon(gameStoreName, GameStoreContext.DETAILS, emulator);
 
   if (loading) log(context, `Badge is loading`);
 

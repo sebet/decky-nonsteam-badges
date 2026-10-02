@@ -1,3 +1,4 @@
+import { getEmulator } from "../utils/storeCache";
 import { log } from "../utils/logger";
 import styles from "../components/Badge.module.css";
 import { isNonSteamApp, sanitizedGameStoreName } from "src/utils/store";
@@ -299,6 +300,7 @@ export function addBadgeToCapsule(
   const cachedGameStoreName =
     forcedCollectionStore || sanitizedGameStoreName(getStore(appid)?.toLowerCase());
   const gameStoreName = sanitizedGameStoreName(cachedGameStoreName);
+  const emulator = gameStoreName === GameStoreName.EMULATORS ? getEmulator(appid) : null;
   const collectionVersion = getCollectionVersion();
 
   log(context, `Adding badge to capsule. Store name: ${gameStoreName}`);
@@ -327,6 +329,7 @@ export function addBadgeToCapsule(
     String(appid),
     effectiveContext,
     storeSignature,
+    emulator ?? "",
     ...positionStyles,
   ].join("|");
 
@@ -369,10 +372,12 @@ export function addBadgeToCapsule(
     // Inject the badge icon in the DOM
     if (
       badge.getAttribute("data-store") !== gameStoreName ||
+      badge.getAttribute("data-emulator") !== (emulator ?? "") ||
       !existingBadge
     ) {
-      badge.innerHTML = getBadgeIcon(gameStoreName, effectiveContext);
+      badge.innerHTML = getBadgeIcon(gameStoreName, effectiveContext, emulator);
       badge.setAttribute("data-store", gameStoreName);
+      badge.setAttribute("data-emulator", emulator ?? "");
     }
     badge.classList.remove(styles[PULSATING_CLASSNAME]);
     capsuleRenderCache.set(capsule, {
@@ -393,6 +398,7 @@ export function addBadgeToCapsule(
     ) {
       badge.innerHTML = getBadgeIcon(GameStoreName.DEFAULT, effectiveContext);
       badge.setAttribute("data-store", GameStoreName.DEFAULT);
+      badge.removeAttribute("data-emulator");
     }
     badge.classList.add(styles[PULSATING_CLASSNAME]);
 

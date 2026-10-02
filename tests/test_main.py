@@ -42,6 +42,39 @@ class PluginSettingsTests(unittest.TestCase):
             self.assertEqual(plugin._load_setting("libraryPosition"), "top-left")
 
 
+class EmulatorLauncherTests(unittest.TestCase):
+    def test_known_launchers_and_common_packaging(self):
+        main = import_main()
+        for launcher in main.EMULATOR_LAUNCHERS:
+            with self.subTest(launcher=launcher):
+                self.assertTrue(main._is_emulator_launcher(f'/apps/{launcher}', ''))
+        for exe, options in (
+            ('"C:\\Emulators\\Xenia\\xenia_canary.exe"', ''),
+            ('/apps/PCSX2-Qt-v2.6.3.AppImage', ''),
+            ('/usr/bin/flatpak', 'run org.libretro.RetroArch'),
+            ('/usr/bin/flatpak', 'run org.DolphinEmu.dolphin-emu'),
+            ('/usr/bin/proton', '"/apps/xenia_canary.exe" "/games/xbox/game.iso"'),
+            ('/usr/bin/bash', '"/tools/launchers/duckstation.sh" "/games/game.chd"'),
+        ):
+            with self.subTest(exe=exe, options=options):
+                self.assertTrue(main._is_emulator_launcher(exe, options))
+
+    def test_rejects_folder_names_rom_titles_and_file_manager(self):
+        main = import_main()
+        for exe, options in (
+            ('/usr/bin/dolphin', ''),
+            ('/games/xenia/game.exe', ''),
+            ('/games/xbox/myxenia.exe', ''),
+            ('/games/game.exe', '"/games/retroarch/game.iso"'),
+            ('/games/game.exe', '"/games/PCSX2.iso"'),
+            ('/games/game.exe', '"/games/pcsx2-v2.iso"'),
+            ('/games/my.xemu.exe', ''),
+            ('/games/game.exe', ''),
+        ):
+            with self.subTest(exe=exe, options=options):
+                self.assertFalse(main._is_emulator_launcher(exe, options))
+
+
 class StoreMappingTests(unittest.TestCase):
     def test_finds_config_files_from_decky_user_home(self):
         main = import_main()
@@ -224,9 +257,23 @@ class StoreMappingTests(unittest.TestCase):
             "7": {"appid": 888888888, "Exe": "/games/side-loaded/game"},
             "8": {"appid": 999999999, "Exe": "/games/pirated/game"},
             "9": {"appid": 121212121, "LaunchOptions": "gamevault:456"},
+            "10": {"appid": 131313131, "Exe": '"/emulators/xenia/xenia.exe"', "LaunchOptions": '"/roms/xbox/game.iso"'},
+            "11": {"appid": 141414141, "Exe": "/usr/bin/proton", "LaunchOptions": '"/emulators/xenia_canary.exe" "/roms/xbox/game.iso"'},
+            "12": {"appid": 151515151, "Exe": "/emulators/xenia-canary.exe", "StartDir": "/games/xbox"},
+            "13": {"appid": 161616161, "Exe": "/games/xbox/game.exe"},
+            "14": {"appid": 171717171, "Exe": "/games/xbox/myxenia.exe"},
+            "15": {"appid": 181818181, "Exe": "/emulators/xenia_canary.exe", "LaunchOptions": '"/roms/xbox/game.iso"'},
+            "16": {"appid": 191919191, "Exe": "/apps/xemu", "StartDir": "/games/xbox"},
+            "17": {"appid": 202020202, "Exe": "/usr/bin/flatpak", "LaunchOptions": "run org.libretro.RetroArch /games/xbox/game.iso"},
+            "18": {"appid": 212121212, "Exe": "/apps/PCSX2-Qt-v2.6.3.AppImage"},
+            "19": {"appid": 222222223, "Exe": "/usr/bin/flatpak", "LaunchOptions": "run org.DolphinEmu.dolphin-emu /games/game.iso"},
+            "20": {"appid": 232323232, "Exe": "/apps/rpcs3"},
+            "21": {"appid": 242424242, "Exe": "/apps/duckstation"},
         })
         apps = {
             "121212121": {"tags": {"0": "Sideloaded"}},
+            "181818181": {"tags": {"0": "Xbox"}},
+            "212121212": {"tags": {"0": "Emulators"}},
             "111111111": {"tags": {"0": "Emulators"}},
             "666666666": {"tags": {"0": "GOG"}},
         }
@@ -260,6 +307,20 @@ class StoreMappingTests(unittest.TestCase):
                 self.assertEqual(mapping["888888888"]["store"], "sideloaded")
                 self.assertIsNone(mapping["999999999"]["store"])
                 self.assertEqual(mapping["121212121"]["store"], "sideloaded")
+                for appid in (131313131, 141414141, 151515151, 191919191, 202020202):
+                    self.assertEqual(mapping[str(appid)]["store"], "emulators")
+                for appid in (131313131, 141414141, 151515151):
+                    self.assertEqual(mapping[str(appid)]["emulator"], "xenia")
+                self.assertEqual(mapping["191919191"]["emulator"], "xemu")
+                self.assertEqual(mapping["202020202"]["emulator"], "retroarch")
+                self.assertEqual(mapping["212121212"]["emulator"], "pcsx2")
+                self.assertEqual(mapping["222222223"]["emulator"], "dolphin")
+                self.assertEqual(mapping["232323232"]["emulator"], "rpcs3")
+                self.assertEqual(mapping["242424242"]["store"], "emulators")
+                self.assertNotIn("emulator", mapping["242424242"])
+                self.assertNotIn("emulator", mapping["181818181"])
+                for appid in (161616161, 171717171, 181818181):
+                    self.assertEqual(mapping[str(appid)]["store"], "xbox")
 
     def test_get_games_mapping_detects_store_from_launch_options_target_and_start_dir(self):
         main = import_main()
