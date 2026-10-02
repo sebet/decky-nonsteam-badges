@@ -14,7 +14,7 @@ Since non-Steam games also lack a 'game info' tab, I also took the opportunity t
 - **Store Badges**: Displays themed badges for various storefronts:
   - **GOG**
   - **Epic Games**
-  - **Amazon**
+  - **Amazon Games**
   - **Rockstar Games**
   - **Ubisoft**
   - **Xbox**
