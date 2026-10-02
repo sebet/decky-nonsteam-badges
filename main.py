@@ -194,7 +194,8 @@ class Plugin:
                     "ubisoft": ["ubisoft", "uplay"],
                     "xbox": ["xbox", "microsoft"],
                     "ea": ["ea", "origin", "electronic arts", "electronicarts"],
-                    "itch": ["itch", "itch.io", "itchio"]
+                    "itch": ["itch", "itch.io", "itchio"],
+                    "emulators": ["emu", "roms", "emulators", "retro"]
                 }
 
             with open(shortcuts_path, "rb") as f:

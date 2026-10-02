@@ -13,6 +13,7 @@ function gameStoreIsValid(gameStore: string): gameStore is GameStoreName {
     GameStoreName.XBOX,
     GameStoreName.EA,
     GameStoreName.ITCH,
+    GameStoreName.EMULATORS,
     GameStoreName.DEFAULT,
   ].includes(gameStore as GameStoreName);
 }

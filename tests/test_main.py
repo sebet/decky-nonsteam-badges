@@ -208,6 +208,48 @@ class StoreMappingTests(unittest.TestCase):
             {"store": None, "name": "Unknown Game"},
         )
 
+    def test_emulator_aliases_and_collection_priority(self):
+        main = import_main()
+        real_open = open
+        shortcuts = {
+            "0": {"appid": 111111111, "AppName": "Collection", "Exe": "/games/epic/game.exe"},
+            "1": {"appid": 222222222, "AppName": "Options", "LaunchOptions": "--category emu"},
+            "2": {"appid": 333333333, "AppName": "Target", "Exe": "/games/roms/game"},
+            "3": {"appid": 444444444, "AppName": "Directory", "StartDir": "/games/retro"},
+            "4": {"appid": 555555555, "AppName": "No substring match", "Exe": "/games/premium/game"},
+            "5": {"appid": 666666666, "AppName": "Store override", "StartDir": "/games/roms"},
+        }
+        apps = {
+            "111111111": {"tags": {"0": "Emulators"}},
+            "666666666": {"tags": {"0": "GOG"}},
+        }
+        fake_vdf = types.SimpleNamespace(
+            load=lambda _file: {"UserLocalConfigStore": {"Software": {"Valve": {"Steam": {"apps": apps}}}}},
+            binary_load=lambda _file: {"shortcuts": shortcuts},
+        )
+
+        for use_fallback in (False, True):
+            with self.subTest(use_fallback=use_fallback):
+                def fake_open(path, mode="r", *args, **kwargs):
+                    if str(path).endswith("store_mappings.json"):
+                        if use_fallback:
+                            raise FileNotFoundError(path)
+                        return real_open(path, mode, *args, **kwargs)
+                    return io.BytesIO(b"") if "b" in mode else io.StringIO("")
+
+                with (
+                    mock.patch.object(main, "vdf", fake_vdf),
+                    mock.patch.object(main.Plugin, "_find_shortcuts_vdf", return_value="/fake/shortcuts.vdf"),
+                    mock.patch.object(main.Path, "is_file", return_value=True),
+                    mock.patch("builtins.open", side_effect=fake_open),
+                ):
+                    mapping = main.Plugin._get_games_mapping()
+
+                for appid in (111111111, 222222222, 333333333, 444444444):
+                    self.assertEqual(mapping[str(appid)]["store"], "emulators")
+                self.assertIsNone(mapping["555555555"]["store"])
+                self.assertEqual(mapping["666666666"]["store"], "gog")
+
     def test_get_games_mapping_detects_store_from_launch_options_target_and_start_dir(self):
         main = import_main()
 
