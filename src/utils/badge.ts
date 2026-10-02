@@ -67,8 +67,8 @@ const BADGE_STYLES: Record<string, BadgeStyleProps> = {
   gamevault: {
     name: "GAMEVAULT",
     gradient: "linear-gradient(135deg, #4F46AF 0%, #7165D6 100%)",
-    // Compact monochrome interpretation of GameVault's die-and-padlock mark.
-    icon: `<svg class="icon-badge" width="${width}" height="${height}" viewBox="0 0 32 32" fill="white" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M16 1 30 9 16 17 2 9ZM16 4l-2 1 2 1 2-1ZM9 8 7 9l2 1 2-1ZM23 8l-2 1 2 1 2-1ZM16 12l-2 1 2 1 2-1ZM17 19l13-8v12l-13 8ZM25 15v3l2-1.2v-3ZM20 20v3l2-1.2v-3ZM25 23v3l2-1.2v-3Z"/><path d="m2 11 13 8v12L2 23Z"/><path d="M6 18v-3c0-3 5 0 5 3v3" fill="none" stroke="#4F46AF" stroke-width="1.5"/><path fill="#4F46AF" d="m5 17 7 4v6l-7-4Z"/></svg>`,
+    // Rounded die faces with four/five pips and a padlock, using only three paths.
+    icon: `<svg class="icon-badge" width="${width}" height="${height}" viewBox="0 0 32 32" fill="white" fill-rule="evenodd" xmlns="http://www.w3.org/2000/svg"><path transform="matrix(.866 .5 -.866 .5 16 1)" d="M2 0h10q2 0 2 2v10q0 2-2 2H2q-2 0-2-2V2q0-2 2-2ZM2.75 4a1.25 1.25 0 1 0 2.5 0 1.25 1.25 0 1 0-2.5 0ZM8.75 4a1.25 1.25 0 1 0 2.5 0 1.25 1.25 0 1 0-2.5 0ZM2.75 10a1.25 1.25 0 1 0 2.5 0 1.25 1.25 0 1 0-2.5 0ZM8.75 10a1.25 1.25 0 1 0 2.5 0 1.25 1.25 0 1 0-2.5 0Z"/><path transform="matrix(.866 .5 0 1 3.5 9.5)" d="M2 0h10q2 0 2 2v10q0 2-2 2H2q-2 0-2-2V2q0-2 2-2ZM3 6h1V4a3 3 0 0 1 6 0v2h1v6H3ZM5.5 6h3V4a1.5 1.5 0 0 0-3 0ZM6 9a1 1 0 1 1 1.5.87L8 11H6l.5-1.13A1 1 0 0 1 6 9Z"/><path transform="matrix(.866 -.5 0 1 17 16.5)" d="M2 0h10q2 0 2 2v10q0 2-2 2H2q-2 0-2-2V2q0-2 2-2ZM2.75 4a1.25 1.25 0 1 0 2.5 0 1.25 1.25 0 1 0-2.5 0ZM8.75 4a1.25 1.25 0 1 0 2.5 0 1.25 1.25 0 1 0-2.5 0ZM5.75 7a1.25 1.25 0 1 0 2.5 0 1.25 1.25 0 1 0-2.5 0ZM2.75 10a1.25 1.25 0 1 0 2.5 0 1.25 1.25 0 1 0-2.5 0ZM8.75 10a1.25 1.25 0 1 0 2.5 0 1.25 1.25 0 1 0-2.5 0Z"/></svg>`,
   },
   sideloaded: {
     name: "SIDELOADED",
