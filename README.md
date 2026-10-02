@@ -61,7 +61,7 @@ GameVault games match `gamevault` or `game vault`, including Unifideck launch op
 
 Known emulator launchers are recognized before generic storefront paths, so Xbox ROM paths do not override Xenia or xemu. Supported identifiers include Xenia/Canary, xemu, RetroArch, Dolphin (`dolphin-emu`), PCSX2, RPCS3, DuckStation, PPSSPP, mGBA, melonDS, Cemu, Citra, Azahar, Ryujinx, Yuzu, Flycast, shadPS4, ScummVM, DOSBox, and MAME. Detection checks launcher filenames and launch-option tokens, including Flatpak IDs and common AppImage names. The Dolphin file manager is excluded. Recognized collections still take priority; use an `Emulators` collection for unknown launchers.
 
-RetroArch, Dolphin, PCSX2, RPCS3, Xenia/Canary, and xemu use individual compact white icons when their launcher is recognized. Other emulators keep the generic emulator icon. An `Emulators` collection preserves a detected launcher icon; a storefront collection overrides the emulator category and icon.
+RetroArch, Dolphin, PCSX2, RPCS3, Xenia/Canary, and xemu use individual compact white icons when their launcher is recognized. Other emulators keep the generic emulator icon. Collections named RetroArch, Dolphin, PCSX2, RPCS3, Xenia, or xemu explicitly select that emulator icon, even alongside an automatically assigned storefront collection. An `Emulators` collection preserves a detected launcher icon; other storefront collections override automatic launcher detection.
 
 ## Screenshots
 

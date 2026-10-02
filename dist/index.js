@@ -67,6 +67,18 @@ function log(context, message, level = "log") {
     return;
 }
 
+const EMULATOR_COLLECTION_PATTERNS = [
+    ["retroarch", /\bretroarch\b/i],
+    ["dolphin", /\bdolphin(?:-emu)?\b/i],
+    ["pcsx2", /\bpcsx2(?:-qt)?\b/i],
+    ["rpcs3", /\brpcs3\b/i],
+    ["xenia", /\bxenia(?:[_-]canary)?\b/i],
+    ["xemu", /\bxemu\b/i],
+];
+function getCollectionEmulator(name) {
+    return EMULATOR_COLLECTION_PATTERNS.find(([, pattern]) => pattern.test(name))?.[0] ?? null;
+}
+
 var gog = [
 	"gog"
 ];
@@ -205,7 +217,7 @@ async function ensureMappingsLoaded(force = false) {
         isFetchingMappings = false;
     }
 }
-function getFrontendStore(appid) {
+function getFrontendMapping(appid) {
     try {
         const supportedStores = Object.values(SupportedStores);
         const collectionStore = window.collectionStore;
@@ -232,6 +244,15 @@ function getFrontendStore(appid) {
             lastUserCollectionsSignature = collectionStateSignature;
             collectionVersion++;
         }
+        // Specific emulator collections are explicit overrides, even alongside
+        // storefront collections automatically assigned by tools such as Unifideck.
+        for (const collection of userCollections) {
+            if (collection.apps && collectionContainsApp(collection.apps, appid)) {
+                const emulator = getCollectionEmulator(String(collection.displayName ?? ""));
+                if (emulator)
+                    return { store: "emulators", emulator };
+            }
+        }
         for (const collection of userCollections) {
             if (collection.apps && collectionContainsApp(collection.apps, appid)) {
                 const colName = String(collection.displayName ?? "");
@@ -240,7 +261,7 @@ function getFrontendStore(appid) {
                     for (const alias of aliases) {
                         const regex = new RegExp(`\\b${escapeRegExp$1(alias)}\\b`, "i");
                         if (regex.test(colName)) {
-                            return store;
+                            return { store };
                         }
                     }
                 }
@@ -255,9 +276,9 @@ function getFrontendStore(appid) {
 }
 function getStore(appid) {
     // Check Collections first to give them priority
-    const frontendStore = getFrontendStore(appid);
+    const frontendStore = getFrontendMapping(appid);
     if (frontendStore) {
-        return frontendStore;
+        return frontendStore.store;
     }
     // Check backend cache (Launch Options / localconfig.vdf)
     if (mappingsLoaded && gameStoreMappingsCache[appid]) {
@@ -271,6 +292,9 @@ function getStore(appid) {
 }
 /** Specific emulator icons apply only when the effective category is emulators. */
 function getEmulator(appid) {
+    const frontendMapping = getFrontendMapping(appid);
+    if (frontendMapping?.emulator)
+        return frontendMapping.emulator;
     if (getStore(appid) !== "emulators")
         return null;
     const entry = gameStoreMappingsCache[appid];

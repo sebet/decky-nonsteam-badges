@@ -276,8 +276,16 @@ class Plugin:
 
                     store = None
 
+                    # Specific emulator collections override automatically assigned store tags.
+                    collection_emulator = None
+                    for alias, icon in {**EMULATOR_ICON_NAMES, "dolphin": "dolphin"}.items():
+                        if re.search(r'\b' + re.escape(alias) + r'\b', tags_string):
+                            collection_emulator = icon
+                            store = "emulators"
+                            break
+
                     # 1. Check user collections (tags) first
-                    for s_key, aliases in store_aliases.items():
+                    for s_key, aliases in (store_aliases.items() if not store else []):
                         for alias in aliases:
                             if re.search(r'\b' + re.escape(alias) + r'\b', tags_string):
                                 store = s_key
@@ -305,7 +313,7 @@ class Plugin:
                         mapping[str(vdf_appid_unsigned)] = {"store": store, "name": name}
                     else:
                         mapping[str(vdf_appid_unsigned)] = {"store": None, "name": name}
-                    emulator_icon = EMULATOR_ICON_NAMES.get(emulator_launcher)
+                    emulator_icon = collection_emulator or EMULATOR_ICON_NAMES.get(emulator_launcher)
                     if store == "emulators" and emulator_icon:
                         mapping[str(vdf_appid_unsigned)]["emulator"] = emulator_icon
 

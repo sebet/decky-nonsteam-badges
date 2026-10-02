@@ -1,6 +1,7 @@
 import { SupportedStores } from "../types/settings.js";
 import { log } from "./logger.js";
 import { call } from "@decky/api";
+import { getCollectionEmulator } from "./emulatorCollections.js";
 import storeMappings from "../../store_mappings.json";
 
 interface StoreMapping {
@@ -119,7 +120,7 @@ export async function ensureMappingsLoaded(force = false): Promise<void> {
   }
 }
 
-function getFrontendStore(appid: string): string | null {
+function getFrontendMapping(appid: string): StoreMapping | null {
   try {
     const supportedStores = Object.values(SupportedStores);
     const collectionStore = (window as any).collectionStore;
@@ -153,6 +154,15 @@ function getFrontendStore(appid: string): string | null {
       collectionVersion++;
     }
 
+    // Specific emulator collections are explicit overrides, even alongside
+    // storefront collections automatically assigned by tools such as Unifideck.
+    for (const collection of userCollections) {
+      if (collection.apps && collectionContainsApp(collection.apps, appid)) {
+        const emulator = getCollectionEmulator(String(collection.displayName ?? ""));
+        if (emulator) return { store: "emulators", emulator };
+      }
+    }
+
     for (const collection of userCollections) {
       if (collection.apps && collectionContainsApp(collection.apps, appid)) {
         const colName = String(collection.displayName ?? "");
@@ -163,7 +173,7 @@ function getFrontendStore(appid: string): string | null {
           for (const alias of aliases) {
             const regex = new RegExp(`\\b${escapeRegExp(alias)}\\b`, "i");
             if (regex.test(colName)) {
-              return store;
+              return { store };
             }
           }
         }
@@ -183,9 +193,9 @@ function getFrontendStore(appid: string): string | null {
 
 export function getStore(appid: string): string | null {
   // Check Collections first to give them priority
-  const frontendStore = getFrontendStore(appid);
+  const frontendStore = getFrontendMapping(appid);
   if (frontendStore) {
-    return frontendStore;
+    return frontendStore.store;
   }
 
   // Check backend cache (Launch Options / localconfig.vdf)
@@ -200,6 +210,8 @@ export function getStore(appid: string): string | null {
 
 /** Specific emulator icons apply only when the effective category is emulators. */
 export function getEmulator(appid: string): string | null {
+  const frontendMapping = getFrontendMapping(appid);
+  if (frontendMapping?.emulator) return frontendMapping.emulator;
   if (getStore(appid) !== "emulators") return null;
   const entry = gameStoreMappingsCache[appid];
   return typeof entry === "object" ? entry.emulator ?? null : null;

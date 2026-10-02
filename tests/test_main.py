@@ -269,11 +269,13 @@ class StoreMappingTests(unittest.TestCase):
             "19": {"appid": 222222223, "Exe": "/usr/bin/flatpak", "LaunchOptions": "run org.DolphinEmu.dolphin-emu /games/game.iso"},
             "20": {"appid": 232323232, "Exe": "/apps/rpcs3"},
             "21": {"appid": 242424242, "Exe": "/apps/duckstation"},
+            "22": {"appid": 252525252, "Exe": "/apps/unifideck-launcher", "LaunchOptions": "microsoft:1234"},
         })
         apps = {
             "121212121": {"tags": {"0": "Sideloaded"}},
             "181818181": {"tags": {"0": "Xbox"}},
             "212121212": {"tags": {"0": "Emulators"}},
+            "252525252": {"tags": {"0": "Xbox", "1": "Xenia"}},
             "111111111": {"tags": {"0": "Emulators"}},
             "666666666": {"tags": {"0": "GOG"}},
         }
@@ -319,6 +321,8 @@ class StoreMappingTests(unittest.TestCase):
                 self.assertEqual(mapping["242424242"]["store"], "emulators")
                 self.assertNotIn("emulator", mapping["242424242"])
                 self.assertNotIn("emulator", mapping["181818181"])
+                self.assertEqual(mapping["252525252"]["store"], "emulators")
+                self.assertEqual(mapping["252525252"]["emulator"], "xenia")
                 for appid in (161616161, 171717171, 181818181):
                     self.assertEqual(mapping[str(appid)]["store"], "xbox")
 
