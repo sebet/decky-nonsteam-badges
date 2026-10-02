@@ -1,6 +1,8 @@
 #!/bin/bash
 # Full deploy script
 
+set -e
+
 if [ -f .env ]; then
   export $(grep -v '^#' .env | xargs)
 fi
@@ -37,7 +39,7 @@ scp -r py_modules deck@$DECK_IP:$DECK_USER_HOME/homebrew/plugins/$PLUGIN_NAME/
 scp -r assets deck@$DECK_IP:$DECK_USER_HOME/homebrew/plugins/$PLUGIN_NAME/
 scp plugin.json deck@$DECK_IP:$DECK_USER_HOME/homebrew/plugins/$PLUGIN_NAME/
 scp package.json deck@$DECK_IP:$DECK_USER_HOME/homebrew/plugins/$PLUGIN_NAME/
-scp .env deck@$DECK_IP:$DECK_USER_HOME/homebrew/plugins/$PLUGIN_NAME/
+# Keep deployment credentials in the local .env file.
 scp main.py deck@$DECK_IP:$DECK_USER_HOME/homebrew/plugins/$PLUGIN_NAME/
 scp store_mappings.json deck@$DECK_IP:$DECK_USER_HOME/homebrew/plugins/$PLUGIN_NAME/
 
