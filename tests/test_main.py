@@ -208,7 +208,7 @@ class StoreMappingTests(unittest.TestCase):
             {"store": None, "name": "Unknown Game"},
         )
 
-    def test_emulator_aliases_and_collection_priority(self):
+    def test_added_badge_aliases_and_collection_priority(self):
         main = import_main()
         real_open = open
         shortcuts = {
@@ -219,7 +219,14 @@ class StoreMappingTests(unittest.TestCase):
             "4": {"appid": 555555555, "AppName": "No substring match", "Exe": "/games/premium/game"},
             "5": {"appid": 666666666, "AppName": "Store override", "StartDir": "/games/roms"},
         }
+        shortcuts.update({
+            "6": {"appid": 777777777, "LaunchOptions": "gamevault:123"},
+            "7": {"appid": 888888888, "Exe": "/games/side-loaded/game"},
+            "8": {"appid": 999999999, "Exe": "/games/pirated/game"},
+            "9": {"appid": 121212121, "LaunchOptions": "gamevault:456"},
+        })
         apps = {
+            "121212121": {"tags": {"0": "Sideloaded"}},
             "111111111": {"tags": {"0": "Emulators"}},
             "666666666": {"tags": {"0": "GOG"}},
         }
@@ -249,6 +256,10 @@ class StoreMappingTests(unittest.TestCase):
                     self.assertEqual(mapping[str(appid)]["store"], "emulators")
                 self.assertIsNone(mapping["555555555"]["store"])
                 self.assertEqual(mapping["666666666"]["store"], "gog")
+                self.assertEqual(mapping["777777777"]["store"], "gamevault")
+                self.assertEqual(mapping["888888888"]["store"], "sideloaded")
+                self.assertIsNone(mapping["999999999"]["store"])
+                self.assertEqual(mapping["121212121"]["store"], "sideloaded")
 
     def test_get_games_mapping_detects_store_from_launch_options_target_and_start_dir(self):
         main = import_main()

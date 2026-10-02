@@ -14,6 +14,8 @@ function gameStoreIsValid(gameStore: string): gameStore is GameStoreName {
     GameStoreName.EA,
     GameStoreName.ITCH,
     GameStoreName.EMULATORS,
+    GameStoreName.GAMEVAULT,
+    GameStoreName.SIDELOADED,
     GameStoreName.DEFAULT,
   ].includes(gameStore as GameStoreName);
 }

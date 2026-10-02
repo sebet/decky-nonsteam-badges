@@ -21,6 +21,8 @@ Since non-Steam games also lack a 'game info' tab, I also took the opportunity t
   - **Electronic Arts (EA)**
   - **itch.io**
   - **Emulators**
+  - **GameVault**
+  - **Sideloaded and custom installed games**
 - **Fallback Badge**: Other non-Steam games outside the currently supported storefronts will display a custom non-Steam badge.
 - **Steam Store Button**: (optionally) Adds a "Steam Page" button to the game details screen, allowing you to quickly visit the Steam Store page for your non-Steam games.
 - **Seamless Integration**: Badges are injected into multiple areas:
@@ -54,6 +56,8 @@ If you use [Unifideck](https://github.com/mubaraknumann/unifideck), you shouldn'
 If you add non-Steam games to your Steam library manually or through the [Heroic Games Launcher](https://heroicgameslauncher.com/), you just need to add the correct collection names for the plugin to identify it (i.e. `gog`, `epic`, `amazon`, `rockstar`, `ubisoft`, `xbox`, `ea`, or `itch`).
 
 Emulated games use the emulator badge when a collection name, launch options, executable path, or installation directory matches `emu`, `roms`, `emulators`, or `retro`. For example, add games to a Steam collection named `Emulators`. Collection names take priority over launch metadata, using the same matching rules as storefront badges.
+
+GameVault games match `gamevault` or `game vault`, including Unifideck launch options such as `gamevault:123`. Manually installed games can use a collection named `Sideloaded`; `side-loaded` and `side loaded` also match. These badges follow the same collection-first matching rules.
 
 ## Screenshots
 
