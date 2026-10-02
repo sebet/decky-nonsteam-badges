@@ -36,32 +36,16 @@ Since non-Steam games also lack a 'game info' tab, I also took the opportunity t
 
 ## How It Works
 
-Non-Steam Badges works by scanning your Steam games collection. It looks for common patterns in launcher options and collection names (like `gog`, `epic`, `amazon`, `rockstar`, `ubisoft`, `xbox`, `ea`, or `itch`) and maps these to the correct storefront.
-If it finds matches, it overlays the relevant badge. If there are no matches, it overlays a custom non-Steam badge.
+The plugin identifies non-Steam games in this order:
 
-**Matching rules priority:**
+1. **Collections**: Recognized collection names override automatic detection. A specific emulator collection, such as `Xenia`, takes priority over a storefront collection such as `Xbox`.
+2. **Launchers**: Known emulator launchers are detected before generic storefront matches.
+3. **Shortcut metadata**: Launch options, executable paths, and installation directories are checked for storefront matches.
+4. **Fallback**: Unmatched games receive the generic non-Steam badge.
 
-The plugin looks for storefront matches in two distinct phases:
+[Unifideck](https://github.com/mubaraknumann/unifideck) usually supplies the collections and launch metadata automatically. For manually added games, use a collection such as `GOG`, `Epic`, `Amazon`, `Ubisoft`, `Xbox`, `itch.io`, `GameVault`, or `Sideloaded`.
 
-**Phase 1:** Custom Overrides
-1. **Collection Name**: The plugin strictly searches your assigned Steam Collections first. Custom tags take absolute priority.
-
-**Phase 2:** Automated Fallbacks
-If no matches are found in your collections, it groups together the underlying program configurations to search for automated tags or installation folder names:
-2. **Target** (Executable file path)
-3. **Start In** (Installation directory)
-4. **Launch Options**
-
-If you use [Unifideck](https://github.com/mubaraknumann/unifideck), you shouldn't need any additional steps, since Unifideck already adds the correct collection names for non-Steam games as well as launch options.
-If you add non-Steam games to your Steam library manually or through the [Heroic Games Launcher](https://heroicgameslauncher.com/), you just need to add the correct collection names for the plugin to identify it (i.e. `gog`, `epic`, `amazon`, `rockstar`, `ubisoft`, `xbox`, `ea`, or `itch`).
-
-Emulated games use the emulator badge when a collection name, launch options, executable path, or installation directory matches `emu`, `roms`, `emulators`, or `retro`. For example, add games to a Steam collection named `Emulators`. Collection names take priority over launch metadata, using the same matching rules as storefront badges.
-
-GameVault games match `gamevault` or `game vault`, including Unifideck launch options such as `gamevault:123`. Manually installed games can use a collection named `Sideloaded`; `side-loaded` and `side loaded` also match. These badges follow the same collection-first matching rules.
-
-Known emulator launchers are recognized before generic storefront paths, so Xbox ROM paths do not override Xenia or xemu. Supported identifiers include Xenia/Canary, xemu, RetroArch, Dolphin (`dolphin-emu`), PCSX2, RPCS3, DuckStation, PPSSPP, mGBA, melonDS, Cemu, Citra, Azahar, Ryujinx, Yuzu, Flycast, shadPS4, ScummVM, DOSBox, and MAME. Detection checks launcher filenames and launch-option tokens, including Flatpak IDs and common AppImage names. The Dolphin file manager is excluded. Recognized collections still take priority; use an `Emulators` collection for unknown launchers.
-
-RetroArch, Dolphin, PCSX2, RPCS3, Xenia/Canary, and xemu use individual compact white icons when their launcher is recognized. Other emulators keep the generic emulator icon. Collections named RetroArch, Dolphin, PCSX2, RPCS3, Xenia, or xemu explicitly select that emulator icon, even alongside an automatically assigned storefront collection. An `Emulators` collection preserves a detected launcher icon; other storefront collections override automatic launcher detection.
+For emulated games, use `Emulators` for the generic badge or a supported emulator name, such as `RetroArch`, `Dolphin`, `PCSX2`, `RPCS3`, `Xenia`, or `xemu`, to select its badge.
 
 ## Screenshots
 
