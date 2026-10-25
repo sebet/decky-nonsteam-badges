@@ -66,5 +66,6 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           artifacts: "decky-nonsteam-badges.zip,decky-nonsteam-badges.tar.gz"
+          generateReleaseNotes: true
           allowUpdates: true
           replacesArtifacts: true
