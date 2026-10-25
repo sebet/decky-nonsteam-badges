@@ -20,6 +20,9 @@ jobs:
           node-version: "20"
           package-manager-cache: false
 
+      - name: Check plugin versions
+        run: node scripts/check-version.mjs
+
       - name: Enable corepack
         run: corepack enable
 

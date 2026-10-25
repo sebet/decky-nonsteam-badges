@@ -41,6 +41,9 @@ jobs:
       - name: Activate pnpm
         run: corepack prepare pnpm@9.0.0 --activate
 
+      - name: Check plugin versions
+        run: node scripts/check-version.mjs
+
       - name: Install dependencies
         id: install
         run: pnpm install --frozen-lockfile
