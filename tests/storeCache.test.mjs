@@ -29,7 +29,12 @@ try {
   await bundle.close();
 }
 
-for (const [collection, expected] of [['GOG 2026', 'gog'], ['Epic 2025', 'epic']]) {
+for (const [collection, expected] of [
+  ['GOG 2026', 'gog'],
+  ['Epic 2025', 'epic'],
+  ['Battle.net', 'battlenet'],
+  ['Blizzard Entertainment', 'battlenet'],
+]) {
   test(`numbered storefront collection ${collection} selects its storefront`, () => {
     const originalWindow = globalThis.window;
     globalThis.window = {

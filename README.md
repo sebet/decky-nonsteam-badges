@@ -14,6 +14,7 @@ Since non-Steam games also lack a 'game info' tab, I also took the opportunity t
 - **Store Badges**: Displays themed badges for various storefronts:
   - **GOG**
   - **Epic Games**
+  - **Battle.net**
   - **Amazon Games**
   - **Rockstar Games**
   - **Ubisoft**
@@ -63,6 +64,7 @@ These aliases identify storefronts or broad game categories in collection names,
 | ------------------- | ------------------------------------------------------------ |
 | GOG                 | `gog`                                                        |
 | Epic Games          | `epic`                                                       |
+| Battle.net          | `battle.net`, `battlenet`, `blizzard entertainment`          |
 | Amazon Games        | `amazon`, `luna`                                             |
 | Rockstar Games      | `rockstar`, `rockstar games`, `rockstargames`, `social club` |
 | Ubisoft             | `ubisoft`, `uplay`                                           |
