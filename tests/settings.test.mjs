@@ -103,4 +103,5 @@ test('saveSettings persists settings and dispatches the settings-changed event',
 
 test('SupportedStores includes rockstar for frontend collection overrides', () => {
   assert.equal(SupportedStores.ROCKSTAR, 'rockstar');
+  assert.equal(SupportedStores.BATTLENET, 'battlenet');
 });

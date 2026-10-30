@@ -279,6 +279,7 @@ class Plugin:
                 store_aliases = {
                     "gog": ["gog"],
                     "epic": ["epic"],
+                    "battlenet": ["battle.net", "battlenet", "blizzard entertainment"],
                     "amazon": ["amazon", "luna"],
                     "rockstar": ["rockstar", "rockstar games", "rockstargames", "social club"],
                     "ubisoft": ["ubisoft", "uplay"],

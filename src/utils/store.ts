@@ -7,6 +7,7 @@ function gameStoreIsValid(gameStore: string): gameStore is GameStoreName {
   return [
     GameStoreName.GOG,
     GameStoreName.EPIC,
+    GameStoreName.BATTLENET,
     GameStoreName.AMAZON,
     GameStoreName.ROCKSTAR,
     GameStoreName.UBISOFT,

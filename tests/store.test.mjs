@@ -6,6 +6,7 @@ import { GameStoreName } from '../.test-dist/types/store.js';
 test('sanitizedGameStoreName accepts known stores case-insensitively', () => {
   assert.equal(sanitizedGameStoreName('GOG'), GameStoreName.GOG);
   assert.equal(sanitizedGameStoreName('Epic'), GameStoreName.EPIC);
+  assert.equal(sanitizedGameStoreName('battlenet'), GameStoreName.BATTLENET);
   assert.equal(sanitizedGameStoreName('amazon'), GameStoreName.AMAZON);
   assert.equal(sanitizedGameStoreName('RockStar'), GameStoreName.ROCKSTAR);
   assert.equal(sanitizedGameStoreName('UBISOFT'), GameStoreName.UBISOFT);

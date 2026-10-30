@@ -1,6 +1,7 @@
 export enum GameStoreName {
   GOG = "gog",
   EPIC = "epic",
+  BATTLENET = "battlenet",
   AMAZON = "amazon",
   ROCKSTAR = "rockstar",
   UBISOFT = "ubisoft",

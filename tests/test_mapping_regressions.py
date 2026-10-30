@@ -25,6 +25,7 @@ class MappingRegressionTests(unittest.TestCase):
                         {
                             "gog": ["gog"],
                             "epic": ["epic"],
+                            "battlenet": ["battle.net", "battlenet", "blizzard entertainment"],
                             "xbox": ["xbox", "microsoft"],
                         }
                     )
@@ -58,6 +59,23 @@ class MappingRegressionTests(unittest.TestCase):
             ):
                 with self.subTest(alias=alias, field=field):
                     self.assertEqual(self.get_mapping({field: value})["store"], expected)
+
+    def test_battlenet_launcher_aliases_are_detected(self):
+        for field, value in (
+            ("LaunchOptions", "battlenet://launch/123"),
+            ("Exe", "/games/Battle.net/Battle.net.exe"),
+            ("StartDir", "/games/Blizzard Entertainment/Game"),
+        ):
+            with self.subTest(field=field, value=value):
+                self.assertEqual(self.get_mapping({field: value})["store"], "battlenet")
+
+    def test_battlenet_aliases_do_not_match_partial_words(self):
+        for field, value in (
+            ("LaunchOptions", "--battle-pass"),
+            ("Exe", "/games/mybattlenet/game.exe"),
+        ):
+            with self.subTest(field=field, value=value):
+                self.assertIsNone(self.get_mapping({field: value})["store"])
 
     def test_emulator_executable_variants_remain_recognized(self):
         main = import_main()

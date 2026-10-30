@@ -5,6 +5,7 @@ export const SETTINGS_CHANGED_EVENT = "nonsteam-badges-settings-changed";
 export enum SupportedStores {
   GOG = "gog",
   EPIC = "epic",
+  BATTLENET = "battlenet",
   AMAZON = "amazon",
   ROCKSTAR = "rockstar",
   UBISOFT = "ubisoft",
