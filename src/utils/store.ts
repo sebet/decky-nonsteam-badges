@@ -10,6 +10,7 @@ function gameStoreIsValid(gameStore: string): gameStore is GameStoreName {
     GameStoreName.AMAZON,
     GameStoreName.ROCKSTAR,
     GameStoreName.UBISOFT,
+    GameStoreName.XBOX_GAME_PASS,
     GameStoreName.XBOX,
     GameStoreName.EA,
     GameStoreName.ITCH,

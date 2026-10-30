@@ -9,6 +9,7 @@ test('sanitizedGameStoreName accepts known stores case-insensitively', () => {
   assert.equal(sanitizedGameStoreName('amazon'), GameStoreName.AMAZON);
   assert.equal(sanitizedGameStoreName('RockStar'), GameStoreName.ROCKSTAR);
   assert.equal(sanitizedGameStoreName('UBISOFT'), GameStoreName.UBISOFT);
+  assert.equal(sanitizedGameStoreName('XBOX-GAME-PASS'), GameStoreName.XBOX_GAME_PASS);
   assert.equal(sanitizedGameStoreName('Xbox'), GameStoreName.XBOX);
   assert.equal(sanitizedGameStoreName('EA'), GameStoreName.EA);
   assert.equal(sanitizedGameStoreName('Itch'), GameStoreName.ITCH);

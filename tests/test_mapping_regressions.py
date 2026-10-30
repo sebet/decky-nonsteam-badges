@@ -25,6 +25,7 @@ class MappingRegressionTests(unittest.TestCase):
                         {
                             "gog": ["gog"],
                             "epic": ["epic"],
+                            "xbox-game-pass": ["xodus-nexus", "xbox game pass", "xbox gamepass"],
                             "xbox": ["xbox", "microsoft"],
                         }
                     )
@@ -98,6 +99,12 @@ class MappingRegressionTests(unittest.TestCase):
             with self.subTest(collection=collection):
                 self.assertIsNone(self.get_mapping({}, [collection])["store"])
         self.assertEqual(self.get_mapping({}, ["Xbox"])["store"], "xbox")
+
+    def test_xodus_nexus_selects_the_xbox_game_pass_badge(self):
+        self.assertEqual(
+            self.get_mapping({"LaunchOptions": "xodus-nexus"})["store"],
+            "xbox-game-pass",
+        )
 
     def test_launcher_variants_are_not_separate_emulator_identities(self):
         main = import_main()
