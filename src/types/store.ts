@@ -4,6 +4,7 @@ export enum GameStoreName {
   AMAZON = "amazon",
   ROCKSTAR = "rockstar",
   UBISOFT = "ubisoft",
+  XBOX_GAME_PASS = "xbox-game-pass",
   XBOX = "xbox",
   EA = "ea",
   ITCH = "itch",

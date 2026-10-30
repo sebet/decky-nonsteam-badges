@@ -18,6 +18,7 @@ Since non-Steam games also lack a 'game info' tab, I also took the opportunity t
   - **Rockstar Games**
   - **Ubisoft**
   - **Xbox**
+  - **Xbox Game Pass** (for Xodus games)
   - **Electronic Arts (EA)**
   - **itch.io**
   - **Emulators**
@@ -36,7 +37,7 @@ Since non-Steam games also lack a 'game info' tab, I also took the opportunity t
 
 ## How It Works
 
-Non-Steam Badges works by scanning your Steam games collection. It looks for common patterns in launcher options and collection names (like `gog`, `epic`, `amazon`, `rockstar`, `ubisoft`, `xbox`, `ea`, or `itch`) and maps these to the correct storefront.
+Non-Steam Badges works by scanning your Steam games collection. It looks for common patterns in launcher options and collection names (like `gog`, `epic`, `amazon`, `rockstar`, `ubisoft`, `xbox`, `xodus-nexus`, `ea`, or `itch`) and maps these to the correct storefront.
 If it finds matches, it overlays the relevant badge. If there are no matches, it overlays a custom non-Steam badge.
 
 **Matching rules priority:**
@@ -55,6 +56,8 @@ If you add non-Steam games to your Steam library manually or through the [Heroic
 
 Aliases are matched case-insensitively. Collection names take priority over launch metadata, using the same matching rules as storefront badges.
 
+Xodus games are recognized by `xodus-nexus` in their launch options and use the Xbox Game Pass badge.
+
 ### Store and Category Aliases
 
 These aliases identify storefronts or broad game categories in collection names, launch options, executable paths, and installation directories:
@@ -66,6 +69,7 @@ These aliases identify storefronts or broad game categories in collection names,
 | Amazon Games        | `amazon`, `luna`                                             |
 | Rockstar Games      | `rockstar`, `rockstar games`, `rockstargames`, `social club` |
 | Ubisoft             | `ubisoft`, `uplay`                                           |
+| Xbox Game Pass      | `xodus-nexus`, `xbox game pass`, `xbox gamepass`              |
 | Xbox                | `xbox`, `microsoft`                                          |
 | EA                  | `ea`, `origin`, `electronic arts`, `electronicarts`          |
 | itch.io             | `itch`, `itch.io`, `itchio`                                  |

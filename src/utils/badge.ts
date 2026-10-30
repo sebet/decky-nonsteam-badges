@@ -1,6 +1,7 @@
 import { GameStoreName, GameStoreContext } from "src/types/store";
 import { log } from "src/utils/logger";
 import { EMULATOR_BADGE_ICONS } from "./emulatorBadges.js";
+import { XBOX_GAME_PASS_ICON } from "./xboxGamePassIcon.js";
 
 export const PULSATING_CLASSNAME = "nonsteam-badge-pulsing";
 
@@ -82,6 +83,13 @@ const BADGE_STYLES: Record<string, BadgeStyleProps> = {
     gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
     icon: `<svg class="icon-badge" width="${width}" height="${height}" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" > <!-- Steam-like core --> <circle cx="64" cy="64" r="26" fill="none" stroke="white" stroke-width="8" /> <circle cx="64" cy="64" r="10" fill="white" /> <!-- Plug connector --> <path d="M80 64 L88 64" stroke="white" stroke-width="6" stroke-linecap="round" /> <!-- Plug body --> <rect x="88" y="54" width="22" height="20" rx="4" fill="white" /> <!-- Plug prongs --> <line x1="110" y1="58" x2="118" y2="58" stroke="white" stroke-width="3" /> <line x1="110" y1="70" x2="118" y2="70" stroke="white" stroke-width="3" /></svg>`,
   },
+};
+
+// Xodus runs Game Pass titles; the compact wordmark fits the badge proportions.
+BADGE_STYLES["xbox-game-pass"] = {
+  name: "GAME PASS",
+  gradient: BADGE_STYLES.xbox.gradient,
+  icon: XBOX_GAME_PASS_ICON,
 };
 
 /**

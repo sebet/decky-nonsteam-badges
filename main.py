@@ -282,6 +282,7 @@ class Plugin:
                     "amazon": ["amazon", "luna"],
                     "rockstar": ["rockstar", "rockstar games", "rockstargames", "social club"],
                     "ubisoft": ["ubisoft", "uplay"],
+                    "xbox-game-pass": ["xodus-nexus", "xbox game pass", "xbox gamepass"],
                     "xbox": ["xbox", "microsoft"],
                     "ea": ["ea", "origin", "electronic arts", "electronicarts"],
                     "itch": ["itch", "itch.io", "itchio"],
